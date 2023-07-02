@@ -1,17 +1,15 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+import { devtools } from 'vue';
+import Note from './components/Note.vue'
+const testNote = {
+  timestamp: new Date(),
+  tags: ["tag 1", "tag 2"],
+  message: "This is the note body message."
+}
 </script>
 
 <template>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <HelloWorld msg="Vite + Vue" />
+  <Note :note="testNote" />
 </template>
 
 <style scoped>
