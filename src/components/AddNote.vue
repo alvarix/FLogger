@@ -14,9 +14,16 @@ export default {
 	data() {
 		return {
 			timestampValue: "",
-			tags: "",
+			tags: [],
+			newTag: '',
 			entry: '',
 		}
+	},
+ methods: {
+		 addTag() {
+			  this.tags.push(this.newTag);
+			  this.newTag = '';
+		 },
 	},
 	mounted() {
 		this.timestampValue = this.timestamp.toString();
@@ -40,8 +47,12 @@ export default {
 		</div>
 		<div>
 			<label for="tags">Tags</label>
-			<input type="text" v-model='tags' required>
-			<em>V-model sanity check: {{tags}}</em>
+			<input type="text" v-model="newTag" @keyup.enter="addTag" required>
+			<em>V-model sanity check: {{newTag}}</em>
+			<em>Array:</em>
+			    <ul>
+       <li v-for="tag in tags" :key="tag">{{ tag }}</li>
+    </ul>
 		</div>
 		<div>
 			<label for="entry">Entry</label>
