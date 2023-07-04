@@ -10,7 +10,6 @@ export default {
       message: String,
     },
   },
-  data() {},
 };
 </script>
 
