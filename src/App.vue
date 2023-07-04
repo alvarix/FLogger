@@ -1,5 +1,4 @@
 <script setup>
-import { devtools } from 'vue';
 import Note from './components/Note.vue'
 const testNote = {
   timestamp: new Date(),
