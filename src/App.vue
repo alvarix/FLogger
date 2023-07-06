@@ -3,27 +3,34 @@
     <h1>Flogger!</h1>
   </div>
   <AddNote :timestamp="timestamp" />
-  <Note :note="testNote" />
+  <NoteList :notes="testNotes" />
 </template>
 
 <script>
-import Note from "./components/Note.vue";
+import NoteList from "./components/NoteList.vue";
 import AddNote from "./components/AddNote.vue";
 
 export default {
   components: {
-    Note,
+    NoteList,
     AddNote,
   },
 
   data() {
     return {
       timestamp: Date.now(),
-      testNote: {
-        timestamp: new Date(),
-        tags: ["tag 1", "tag 2"],
-        message: "This is the note body message.",
-      },
+      testNotes: [
+      {
+          timestamp: new Date(),
+          tags: ["tag 1", "tag 2"],
+          message: "This is the note body message.",
+        },
+        {
+          timestamp: new Date(),
+          tags: ["tag 1", "tag 3"],
+          message: "This is the note TWO body message.",
+        },
+      ],
     };
   },
 
