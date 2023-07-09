@@ -10,6 +10,10 @@ export default {
       message: String,
     },
   },
+  data() {
+  		return {
+		}
+  } 
 };
 </script>
 

@@ -18,10 +18,10 @@ export default {
 
   data() {
     return {
-      timestamp: new Date(),
+      timestamp: new Date().toLocaleDateString(),
       testNotes: [
       {
-          timestamp: new Date(),
+          timestamp: new Date("7/6/2023").toLocaleDateString(),
           tags: ["tag 1", "tag 2"],
           message: "This is the note body message.",
         },
@@ -36,7 +36,6 @@ export default {
 
   methods: {
 		addNewNote(noteData) {
-			// console.log(noteData.timestamp);
 			this.testNotes.push ({ 
 				timestamp: Date(noteData.timestamp),
 				tags: noteData.tags.split(" "),
