@@ -13,7 +13,6 @@ export default {
 	// emits: ['newNote'],
 	data() {
 		return {
-			newTag: '',
 			form: {
 				timestampValue: this.timestamp,
 				tags: '',
@@ -23,13 +22,17 @@ export default {
 	},
 	methods: {
 		 submitAdd(event) {
-			 this.$emit('newNote', this.form);
+			 if (this.isValidDate() == true ) {
+				 this.$emit('newNote', this.form);
+			 } else {
+				alert('Please enter valid date');
+			 }
+
 		 },
 		 isValidDate: function() {
 			/*
 			https://codepen.io/wboka/pen/LXKVLb
 				Valid formats:
-
 				- M/D/YYYY
 				- M/DD/YYYY
 				- MM/D/YYYY
@@ -42,9 +45,7 @@ export default {
 			if (!/^(\d{1,2}\/\d{1,2}\/\d{4,}|\d{4,}-\d{1,2}-\d{1,2})$/.test(this.form.timestampValue)) {
 				return false;
 			}
-
 			this.isISO8601 = /^\d{4}-\d{1,2}-\d{1,2}$/.test(this.form.timestampValue);
-
 			// Get the month, day, and year parts
 			var parts = this.form.timestampValue.split(this.isISO8601 ? "-" : "/");
 			this.month = parseInt(parts[this.isISO8601 ? 1 : 0], 10);
@@ -79,7 +80,7 @@ export default {
 		<div>
 			<label for='time'>Time</label>
 			<input id='time' type="text" placeholder="timestampValue" v-on:change="isValidDate" v-on:keyup="isValidDate" v-model="form.timestampValue" required >
-			Is date valid?  <em v-text="isValidDate()"></em>
+			<!-- Is date valid?  <em v-text="isValidDate()"></em>-->
 		</div>
 		<div>
 			<label for="tags">Tags</label>
