@@ -13,6 +13,7 @@ export default {
 	// emits: ['newNote'],
 	data() {
 		return {
+			hasError: false,
 			form: {
 				timestampValue: this.timestamp,
 				tags: '',
@@ -25,11 +26,12 @@ export default {
 			 if (this.isValidDate() == true ) {
 				 this.$emit('newNote', this.form);
 			 } else {
-				alert('Please enter valid date');
+			 	this.hasError= true;
 			 }
 
 		 },
 		 isValidDate: function() {
+		 	this.hasError = false;
 			/*
 			https://codepen.io/wboka/pen/LXKVLb
 				Valid formats:
@@ -79,16 +81,17 @@ export default {
 	<form id='add-note' @submit.prevent="submitAdd">
 		<div>
 			<label for='time'>Time</label>
-			<input id='time' type="text" placeholder="timestampValue" v-on:change="isValidDate" v-on:keyup="isValidDate" v-model="form.timestampValue" required >
-			<!-- Is date valid?  <em v-text="isValidDate()"></em>-->
+			<input :class={error:hasError} id='time' type="text" placeholder="timestampValue" v-on:change="isValidDate" v-on:keyup="isValidDate" v-model="form.timestampValue" required >
+			
+			<em class='date-validation hidden' :class={error:hasError}>Please enter valid date</em>
 		</div>
 		<div>
 			<label for="tags">Tags</label>
-			<input type="text" v-model="form.tags">
+			<input type="text" v-model="form.tags" required>
 		</div>
 		<div>
 			<label for="entry">Entry</label>
-			<textarea id="entry" name="" cols="30" rows="10" v-model='form.entry'></textarea>
+			<textarea id="entry" name="" cols="30" rows="10" v-model='form.entry' required></textarea>
 		</div>
 		<div><input type="submit"></div>
 		
@@ -96,11 +99,23 @@ export default {
 </template>
 
 <style scoped>
-#add-note * {
+#add-note *:not(.date-validation) {
 	display:block;
 }
+
+input.error {
+	border:1px solid red;
+}
+
+.date-validation.error {
+	display:block;
+	color:red;
+}
+
 
 #add-note label {
 	margin-top: 20px;
 }
+
+
 </style>
