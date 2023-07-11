@@ -2,7 +2,7 @@
   <div>
     <h1>Flogger!</h1>
   </div>
-  <AddNote :timestamp="timestamp" />
+  <AddNote @newNote='addNewNote' :timestamp="timestamp" />
   <NoteList :notes="testNotes" />
 </template>
 
@@ -18,23 +18,33 @@ export default {
 
   data() {
     return {
-      timestamp: Date.now(),
+      timestamp: new Date().toLocaleDateString(),
       testNotes: [
       {
-          timestamp: new Date(),
+          timestamp: new Date("7/6/2023").toLocaleDateString(),
           tags: ["tag 1", "tag 2"],
           message: "This is the note body message.",
         },
-        {
-          timestamp: new Date(),
-          tags: ["tag 1", "tag 3"],
-          message: "This is the note TWO body message.",
-        },
+       // {
+         // timestamp: new Date(),
+          //tags: ["tag 1", "tag 3"],
+          //message: "This is the note TWO body message.",
+        //},
       ],
     };
   },
 
-  methods: {},
+  methods: {
+		addNewNote(noteData) {
+			this.testNotes.push ({ 
+				timestamp: Date(noteData.timestamp),
+				tags: noteData.tags.split(" "),
+				message: noteData.entry
+			});
+
+
+		}
+  },
 };
 </script>
 
