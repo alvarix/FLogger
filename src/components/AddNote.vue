@@ -81,7 +81,7 @@ export default {
 	<form id='add-note' @submit.prevent="submitAdd">
 		<div>
 			<label for='time'>Time</label>
-			<input :class={error:hasError} id='time' type="text" placeholder="timestampValue" v-on:change="isValidDate" v-on:keyup="isValidDate" v-model="form.timestampValue" required >
+			<input :class={error:hasError} id='time' type="text" placeholder="timestampValue" @input="isValidDate" v-model="form.timestampValue" required >
 			
 			<em class='date-validation hidden' :class={error:hasError}>Please enter valid date</em>
 		</div>
