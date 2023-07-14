@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Flogger!</h1>
+    <h1>FLogger!</h1>
   </div>
   <AddNote @newNote='addNewNote' :timestamp="timestamp" />
   <NoteList :notes="testNotes" />
