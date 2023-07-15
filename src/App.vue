@@ -2,6 +2,25 @@
   <div>
     <h1>FLogger!</h1>
   </div>
+  <button @click.prevent.stop="getTheFile()">open</button>
+  <div class="m-3 p-3 border rounded-md">
+    <div class="float-left mr-4 font-bold">dataFile:</div>
+    <div>
+      {{ dataFile ? dataFile.name : "no data file" }}
+    </div>
+  </div>
+  <div class="m-3 p-3 border rounded-md">
+    <div class="float-left mr-4 font-bold">dataFileLoaded:</div>
+    <div>
+      {{ dataFileLoaded }}
+    </div>
+  </div>
+  <div class="m-3 p-3 border rounded-md">
+    <div class="float-left mr-4 font-bold">dataFileText:</div>
+    <div>
+      {{ dataFileText ? dataFileText : "no data file text" }}
+    </div>
+  </div>
   <AddNote @newNote="addNewNote" :timestamp="timestamp" />
   <NoteList :notes="testNotes" />
 </template>
