@@ -2,24 +2,34 @@
   <div>
     <h1>FLogger!</h1>
   </div>
-  <button @click.prevent.stop="getTheFile()">open</button>
-  <div class="m-3 p-3 border rounded-md">
-    <div class="float-left mr-4 font-bold">dataFile:</div>
-    <div>
-      {{ dataFile ? dataFile.name : "no data file" }}
+  <div class="p-5">
+    <hr />
+    <input
+      id="filesInput"
+      ref="filesInput"
+      type="file"
+      accept="text/*"
+      @change="getTheFile"
+    />
+    <div class="m-3 p-3 border rounded-md">
+      <div class="float-left mr-4 font-bold">dataFile:</div>
+      <div>
+        {{ dataFile ? dataFile.name : "no data file" }}
+      </div>
     </div>
-  </div>
-  <div class="m-3 p-3 border rounded-md">
-    <div class="float-left mr-4 font-bold">dataFileLoaded:</div>
-    <div>
-      {{ dataFileLoaded }}
+    <div class="m-3 p-3 border rounded-md">
+      <div class="float-left mr-4 font-bold">dataFileLoaded:</div>
+      <div>
+        {{ dataFileLoaded }}
+      </div>
     </div>
-  </div>
-  <div class="m-3 p-3 border rounded-md">
-    <div class="float-left mr-4 font-bold">dataFileText:</div>
-    <div>
-      {{ dataFileText ? dataFileText : "no data file text" }}
+    <div class="m-3 p-3 border rounded-md">
+      <div class="float-left mr-4 font-bold">dataFileText:</div>
+      <div>
+        {{ dataFileText ? dataFileText : "no data file text" }}
+      </div>
     </div>
+    <hr />
   </div>
   <AddNote @newNote="addNewNote" :timestamp="timestamp" />
   <NoteList :notes="testNotes" />
@@ -55,8 +65,7 @@ export default {
       dataFileLoaded: false,
     };
   },
-  computed: {
-  },
+  computed: {},
   methods: {
     addNewNote(noteData) {
       this.testNotes.push({
@@ -65,38 +74,14 @@ export default {
         message: noteData.entry,
       });
     },
-    async getTheFileText() {
-      let fileText = undefined;
-      if (this.dataFileLoaded) fileText = await this.dataFile.name;
-      return fileText;
-    },
-    async getTheFile() {
-      const pickerOpts = {
-        types: [
-          {
-            description: "Text",
-            accept: {
-              "text/*": [".txt", ".text", ".data"],
-            },
-          },
-        ],
-        excludeAcceptAllOption: true,
-        multiple: false,
-      };
-
-      // Open file picker and destructure the result the first handle
-      const [fileHandle] = await window.showOpenFilePicker(pickerOpts);
-
-      // get file contents
-      fileHandle.getFile().then((f) => {
-        this.dataFile = f;
-        this.dataFileLoaded = true;
-        console.log(`dataFile loaded: `, this.dataFile);
-        this.dataFile.text().then(t=>{
+    getTheFile(event) {
+      console.log(`getTheFile: `, event.target.files);
+      for (const file of event.target.files) {
+        file.text().then((t) => {
           this.dataFileText = t;
           console.log(`dataFileText loaded: `, this.dataFileText);
         });
-      });
+      }
     },
   },
 };
