@@ -8,13 +8,17 @@
 
 <script setup>
 import { ref } from "vue";
+import { useDataFileStore } from "./stores/dataFile";
 import NoteList from "./components/NoteList.vue";
 import AddNote from "./components/AddNote.vue";
+
+const dataFileStore = useDataFileStore();
+// dataFileStore.dataFileLocation // <-- This will be used to save the location of the dataFile 
 
 // // COMPOSITION API: Doesn't use export default
 // export default {
 
-// // COMPOSITION API: Doesn't need the imported components declared 
+// // COMPOSITION API: Doesn't need the imported components declared
 //   components: {
 //     NoteList,
 //     AddNote,
@@ -64,7 +68,7 @@ const testNotes = ref([
 // 		}
 //   },
 function addNewNote(noteData) {
-// // COMPOSITION API: "this." isn't necessary to reference reactive state vars, but ".value" is
+  // // COMPOSITION API: "this." isn't necessary to reference reactive state vars, but ".value" is
   testNotes.value.push({
     timestamp: Date(noteData.timestamp),
     tags: noteData.tags.split(" "),
