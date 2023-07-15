@@ -2,24 +2,34 @@
   <div>
     <h1>FLogger!</h1>
   </div>
-  <button @click.prevent.stop="getTheFile()">open</button>
-  <div class="m-3 p-3 border rounded-md">
-    <div class="float-left mr-4 font-bold">dataFile:</div>
-    <div>
-      {{ dataFile ? dataFile.name : "no data file" }}
+  <div class="p-5">
+    <hr />
+    <input
+      id="filesInput"
+      ref="filesInput"
+      type="file"
+      accept="text/*"
+      @change="getTheFile"
+    />
+    <div class="m-3 p-3 border rounded-md">
+      <div class="float-left mr-4 font-bold">dataFile:</div>
+      <div>
+        {{ dataFile ? dataFile.name : "no data file" }}
+      </div>
     </div>
-  </div>
-  <div class="m-3 p-3 border rounded-md">
-    <div class="float-left mr-4 font-bold">dataFileLoaded:</div>
-    <div>
-      {{ dataFileLoaded }}
+    <div class="m-3 p-3 border rounded-md">
+      <div class="float-left mr-4 font-bold">dataFileLoaded:</div>
+      <div>
+        {{ dataFileLoaded }}
+      </div>
     </div>
-  </div>
-  <div class="m-3 p-3 border rounded-md">
-    <div class="float-left mr-4 font-bold">dataFileText:</div>
-    <div>
-      {{ dataFileText ? dataFileText : "no data file text" }}
+    <div class="m-3 p-3 border rounded-md">
+      <div class="float-left mr-4 font-bold">dataFileText:</div>
+      <div>
+        {{ dataFileText ? dataFileText : "no data file text" }}
+      </div>
     </div>
+    <hr />
   </div>
   <AddNote @newNote="addNewNote" :timestamp="timestamp" />
   <NoteList :notes="testNotes" />
@@ -32,7 +42,7 @@ import NoteList from "./components/NoteList.vue";
 import AddNote from "./components/AddNote.vue";
 
 const dataFileStore = useDataFileStore();
-// dataFileStore.dataFileLocation // <-- This will be used to save the location of the dataFile 
+// dataFileStore.dataFileLocation // <-- This will be used to save the location of the dataFile
 
 // // COMPOSITION API: Doesn't use export default
 // export default {
@@ -97,6 +107,23 @@ function addNewNote(noteData) {
 
 // // COMPOSITION API: Doesn't use export default
 // };
+
+// New refs and functions for dataFile
+const dataFile = ref(undefined);
+const dataFileText = ref(undefined);
+const dataFileLoaded = ref(false);
+
+function getTheFile(event) {
+  console.log(`getTheFile: `, event.target.files);
+  for (const file of event.target.files) {
+    dataFile.value = file;
+    file.text().then((t) => {
+      dataFileText.value = t;
+      console.log(`dataFileText loaded: `, dataFileText.value);
+      dataFileLoaded.value = true;
+    });
+  }
+}
 </script>
 
 <style scoped></style>
