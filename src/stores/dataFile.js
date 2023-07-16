@@ -1,5 +1,6 @@
 import { ref } from "vue";
 import { defineStore } from 'pinia'
+import { useLocalStorage } from '@vueuse/core'
 
 export const useDataFileStore = defineStore('dataFile', () => {
   // const count = ref(0)
@@ -9,6 +10,9 @@ export const useDataFileStore = defineStore('dataFile', () => {
   //   count.value++
   // }
   // return { count, name, doubleCount, increment }
-  const dataFileLocation = ref()
-  return { dataFileLocation }
+  const file = useLocalStorage(
+    'file',
+    undefined
+  )
+  return { file }
 })
