@@ -4,35 +4,35 @@
   </div>
   <div class="m-3 p-5 border rounded-lg w-full">
     <h2>Data file</h2>
-    <div v-if="v2_fileName" class="m-3 p-3 border rounded-md">
-      <div class="float-left mr-4 font-bold">v2_fileName:</div>
+    <div v-if="dataFileName" class="m-3 p-3 border rounded-md">
+      <div class="float-left mr-4 font-bold">dataFileName:</div>
       <div>
-        {{ v2_fileName }}
+        {{ dataFileName }}
       </div>
-      <div class="float-left mr-4 font-bold">v2_filePermissions:</div>
+      <div class="float-left mr-4 font-bold">dataFilePermissions:</div>
       <div>
-        {{ v2_filePermissions }}
+        {{ dataFilePermissions }}
       </div>
       <div>
         <button @click="closeDataFile">close file</button>
       </div>
     </div>
     <div
-      v-if="v2_filePermissions == 'prompt'"
+      v-if="dataFilePermissions == 'prompt'"
       class="m-3 p-3 border border-red-700 rounded-md"
     >
       <div class="float-left mr-4 font-bold">File activation required:</div>
       <div>
-        <button @click="v2_fileRequestPermission">grant access</button>
+        <button @click="dataFileClickToRequestPermission">grant access</button>
       </div>
     </div>
     <div
-      v-else-if="!['prompt', 'granted'].includes(v2_filePermissions)"
+      v-else-if="!['prompt', 'granted'].includes(dataFilePermissions)"
       class="m-3 p-3"
     >
       <!-- <div class="float-left mr-4 font-bold">v2_fileHandle picker:</div> -->
       <div>
-        <button ref="fh" @click="v2_clickToOpenFile">select a data file</button>
+        <button ref="fh" @click="dataFileClickToOpen">select a data file</button>
       </div>
     </div>
     <!-- <div class="m-3 p-3 border rounded-md">
@@ -53,12 +53,12 @@ import NoteList from "./components/NoteList.vue";
 import AddNote from "./components/AddNote.vue";
 
 const {
-  v2_fileName,
-  v2_filePermissions,
-  v2_clickToOpenFile,
-  v2_fileRequestPermission,
-  v2_saveFileData,
-  v2_fileClose,
+  dataFileName,
+  dataFilePermissions,
+  dataFileClickToOpen,
+  dataFileClickToRequestPermission,
+  dataFileSave,
+  dataFileClose,
 } = useDataFile(loadData);
 
 // // COMPOSITION API: Doesn't use export default
@@ -120,11 +120,11 @@ function addNewNote(noteData) {
     tags: noteData.tags.split(" "),
     message: noteData.entry,
   });
-  v2_saveFileData({ notes: testNotes.value });
+  dataFileSave({ notes: testNotes.value });
 }
 
 function closeDataFile() {
-  v2_fileClose();
+  dataFileClose();
   testNotes.value = [];
 }
 

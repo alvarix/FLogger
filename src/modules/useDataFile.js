@@ -13,33 +13,33 @@ import { useLocalStorage } from "@vueuse/core";
 // click a button to re-grant permission to the file.)
 
 export const useDataFile = (dataLoadedCallback) => {
-  const v2_fileHandle = ref({});
-  const v2_filePermissions = ref("");
-  const v2_fileOptions = { mode: "readwrite" };
+  const dataFileHandle = ref({});
+  const dataFilePermissions = ref("");
+  const dataFileOptions = { mode: "readwrite" };
   // store file name in localStorage so we can use it to
   // retrieve the file handle from indexedDB after page reload
-  const v2_fileName = useLocalStorage("v2_fileName", null);
-  const v2_fileDataStr = ref("");
+  const dataFileName = useLocalStorage("dataFileName", null);
+  const dataFileDataStr = ref("");
   // Open a db instance to save file references for later sessions
-  let v2_db;
-  let v2_dbRequest = indexedDB.open("v2_db");
-  v2_dbRequest.onerror = function (e) {
+  let dataFileDB;
+  let dataFileDBRequest = indexedDB.open("dataFileDB");
+  dataFileDBRequest.onerror = function (e) {
     console.error("Error opening database.", e);
   };
-  v2_dbRequest.onsuccess = function (e) {
-    v2_db = e.target.result;
+  dataFileDBRequest.onsuccess = function (e) {
+    dataFileDB = e.target.result;
 
-    if (v2_fileName.value) v2_reloadFileFromDB(v2_fileName.value);
+    if (dataFileName.value) dataFileReload(dataFileName.value);
   };
-  v2_dbRequest.onupgradeneeded = (event) => {
-    v2_db = event.target.result;
+  dataFileDBRequest.onupgradeneeded = (event) => {
+    dataFileDB = event.target.result;
 
-    v2_db.onerror = (event) => {
+    dataFileDB.onerror = (event) => {
       console.error("Error loading database.", event);
     };
 
     // Create an objectStore for this database
-    const v2_objectStore = v2_db.createObjectStore(
+    const dataFileObjectStore = dataFileDB.createObjectStore(
       "filerefs"
       // , {
       //   keyPath: "file_id",
@@ -47,18 +47,18 @@ export const useDataFile = (dataLoadedCallback) => {
     );
 
     // Define what data items the objectStore will contain
-    // v2_objectStore.createIndex("hours", "hours", { unique: false });
-    // v2_objectStore.createIndex("minutes", "minutes", { unique: false });
-    // v2_objectStore.createIndex("day", "day", { unique: false });
-    // v2_objectStore.createIndex("month", "month", { unique: false });
-    // v2_objectStore.createIndex("year", "year", { unique: false });
-    // v2_objectStore.createIndex("notified", "notified", { unique: false });
+    // dataFileObjectStore.createIndex("hours", "hours", { unique: false });
+    // dataFileObjectStore.createIndex("minutes", "minutes", { unique: false });
+    // dataFileObjectStore.createIndex("day", "day", { unique: false });
+    // dataFileObjectStore.createIndex("month", "month", { unique: false });
+    // dataFileObjectStore.createIndex("year", "year", { unique: false });
+    // dataFileObjectStore.createIndex("notified", "notified", { unique: false });
 
     console.log("Object store created.");
   };
-  console.log(`v2_db`, v2_db);
+  console.log(`dataFileDB`, dataFileDB);
 
-  async function v2_getTheFileHandle() {
+  async function dataFileGetFileHandle() {
     const pickerOpts = {
       types: [
         {
@@ -85,41 +85,43 @@ export const useDataFile = (dataLoadedCallback) => {
       return;
     }
     // get single file handler from possible array
-    const [v2_fileHandle] = pickerSelection;
-    return v2_fileHandle;
+    const [dataFileHandle] = pickerSelection;
+    return dataFileHandle;
   }
 
-  async function v2_clickToOpenFile() {
+  async function dataFileClickToOpen() {
     // get file handle
-    v2_fileHandle.value = await v2_getTheFileHandle();
-    v2_fileCheckPermissions();
-    console.log(`v2_fileHandle.value: `, v2_fileHandle.value);
-    if (!v2_fileHandle.value) {
+    dataFileHandle.value = await dataFileGetFileHandle();
+    dataFileCheckPermissions();
+    console.log(`dataFileHandle.value: `, dataFileHandle.value);
+    if (!dataFileHandle.value) {
       console.log(`no file handle`);
       return;
     }
-    v2_loadFile();
+    await dataFileLoad();
+
+    console.log(`dataFileName.value: `, dataFileName.value);
 
     // store the file handle in indexedDB to open the file later.
-    let v2_dbTransaction = v2_db.transaction(["filerefs"], "readwrite");
-    let v2_dbObjectStore = v2_dbTransaction.objectStore("filerefs");
-    console.log(`indexNames`, v2_dbObjectStore.indexNames);
-    console.log(`keyPath`, v2_dbObjectStore.keyPath);
-    console.log(`name`, v2_dbObjectStore.name);
-    console.log(`transaction`, v2_dbObjectStore.transaction);
-    console.log(`autoIncrement`, v2_dbObjectStore.autoIncrement);
-    let v2_dbRequest = v2_dbObjectStore.add(
-      v2_fileHandle.value,
-      v2_fileName.value
+    let dataFileDBTransaction = dataFileDB.transaction(["filerefs"], "readwrite");
+    let dataFileDBObjectStore = dataFileDBTransaction.objectStore("filerefs");
+    console.log(`indexNames`, dataFileDBObjectStore.indexNames);
+    console.log(`keyPath`, dataFileDBObjectStore.keyPath);
+    console.log(`name`, dataFileDBObjectStore.name);
+    console.log(`transaction`, dataFileDBObjectStore.transaction);
+    console.log(`autoIncrement`, dataFileDBObjectStore.autoIncrement);
+    let dataFileDBRequest = dataFileDBObjectStore.add(
+      dataFileHandle.value,
+      dataFileName.value
     );
-    v2_dbRequest.onsuccess = function (e) {
+    dataFileDBRequest.onsuccess = function (e) {
       console.log(e);
     };
   }
 
-  async function v2_saveFileData(fileDataObj) {
+  async function dataFileSave(fileDataObj) {
     // Create a FileSystemWritableFileStream to write to.
-    const writable = await v2_fileHandle.value.createWritable();
+    const writable = await dataFileHandle.value.createWritable();
 
     // Write the contents of the file to the stream.
     await writable.write(JSON.stringify(fileDataObj));
@@ -128,68 +130,69 @@ export const useDataFile = (dataLoadedCallback) => {
     await writable.close();
   }
 
-  function v2_fileClose() {
-    v2_fileHandle.value = undefined;
-    v2_filePermissions.value = "";
-    v2_fileName.value = "";
-    v2_fileDataStr.value = "";
+  function dataFileClose() {
+    dataFileHandle.value = undefined;
+    dataFilePermissions.value = "";
+    dataFileName.value = "";
+    dataFileDataStr.value = "";
   }
 
-  async function v2_fileCheckPermissions() {
-    v2_filePermissions.value = await v2_fileHandle.value.queryPermission(
-      v2_fileOptions
+  async function dataFileCheckPermissions() {
+    dataFilePermissions.value = await dataFileHandle.value.queryPermission(
+      dataFileOptions
     );
-    console.log(`v2_filePermissions`, v2_filePermissions);
+    console.log(`dataFilePermissions`, dataFilePermissions);
   }
 
-  async function v2_fileRequestPermission() {
-    v2_filePermissions.value = await v2_fileHandle.value.requestPermission(
-      v2_fileOptions
+  async function dataFileClickToRequestPermission() {
+    dataFilePermissions.value = await dataFileHandle.value.requestPermission(
+      dataFileOptions
     );
-    if (v2_filePermissions.value != "granted") {
+    if (dataFilePermissions.value != "granted") {
       console.log(`access request failed`);
       return;
     }
     console.log(`access request granted`);
-    v2_loadFile();
+    dataFileLoad();
   }
 
-  async function v2_loadFile() {
+  async function dataFileLoad() {
     try {
       // get file
-      let v2_file = await v2_fileHandle.value.getFile();
+      let dataFile = await dataFileHandle.value.getFile();
       // get file name
-      v2_fileName.value = v2_file.name;
+      dataFileName.value = dataFile.name;
       // get file contents
-      v2_fileDataStr.value = await v2_file.text();
+      dataFileDataStr.value = await dataFile.text();
       // parse file contents
-      let v2_fileDataObj = JSON.parse(v2_fileDataStr.value);
-      console.log(`v2_fileDataObj`, v2_fileDataObj);
-      dataLoadedCallback(v2_fileDataObj);
+      let dataFileDataObj = JSON.parse(dataFileDataStr.value);
+      console.log(`dataFileDataObj`, dataFileDataObj);
+      dataLoadedCallback(dataFileDataObj);
     } catch (e) {
       console.error(e);
       return;
     }
   }
 
-  async function v2_reloadFileFromDB(file_id) {
+  async function dataFileReload(file_id) {
     // Retrieve a file you've opened before. Show's no filepicker UI, but can show
     // some other permission prompt if the browser so desires.
     // The browser can choose when to allow or not allow this open.
-    console.log(`v2_db`, v2_db);
-    let v2_dbTransaction = v2_db.transaction(["filerefs"], "readonly");
-    let v2_dbObjectStore = v2_dbTransaction.objectStore("filerefs");
-    console.log(`indexNames`, v2_dbObjectStore.indexNames);
-    console.log(`keyPath`, v2_dbObjectStore.keyPath);
-    console.log(`name`, v2_dbObjectStore.name);
-    console.log(`transaction`, v2_dbObjectStore.transaction);
-    console.log(`autoIncrement`, v2_dbObjectStore.autoIncrement);
-    let v2_dbRequest = await v2_dbObjectStore.get(file_id);
-    v2_dbRequest.onsuccess = async function (e) {
-      v2_fileHandle.value = v2_dbRequest.result;
-      console.log(`v2_fileHandle.value: `, v2_fileHandle.value);
+    console.log(`dataFileReload file_id`, file_id);
+    console.log(`dataFileDB`, dataFileDB);
+    let dataFileDBTransaction = dataFileDB.transaction(["filerefs"], "readonly");
+    let dataFileDBObjectStore = dataFileDBTransaction.objectStore("filerefs");
+    console.log(`indexNames`, dataFileDBObjectStore.indexNames);
+    console.log(`keyPath`, dataFileDBObjectStore.keyPath);
+    console.log(`name`, dataFileDBObjectStore.name);
+    console.log(`transaction`, dataFileDBObjectStore.transaction);
+    console.log(`autoIncrement`, dataFileDBObjectStore.autoIncrement);
+    let dataFileDBRequest = await dataFileDBObjectStore.get(file_id);
+    dataFileDBRequest.onsuccess = async function (e) {
+      dataFileHandle.value = dataFileDBRequest.result;
+      console.log(`dataFileHandle.value: `, dataFileHandle.value);
 
-      if (!v2_fileHandle.value) {
+      if (!dataFileHandle.value) {
         console.log(`no result`);
         return;
       }
@@ -197,28 +200,28 @@ export const useDataFile = (dataLoadedCallback) => {
       // Permissions for the handle may have expired while the handle was stored
       // in IndexedDB. Before it is safe to use the handle we should request at
       // least read access to the handle again.
-      v2_fileCheckPermissions();
+      dataFileCheckPermissions();
 
       // // Rejects if file is no longer readable, either because it doesn't exist
       // // anymore or because the website no longer has permission to read it.
-      // let file = await v2_fileHandle.value.file();
+      // let file = await dataFileHandle.value.file();
       // // ... read from file
 
       // // Rejects if file is no longer writable, because the website no longer has
       // // permission to write to it.
-      // let file_writer = await v2_fileHandle.value.createWritable();
+      // let file_writer = await dataFileHandle.value.createWritable();
       // // ... write to file_writer
 
-      if (v2_filePermissions == "granted") v2_loadFile();
+      if (dataFilePermissions == "granted") dataFileLoad();
     };
   }
 
   return {
-    v2_fileName,
-    v2_filePermissions,
-    v2_clickToOpenFile,
-    v2_fileRequestPermission,
-    v2_saveFileData,
-    v2_fileClose,
+    dataFileName,
+    dataFilePermissions,
+    dataFileClickToOpen,
+    dataFileClickToRequestPermission,
+    dataFileSave,
+    dataFileClose,
   };
 };
