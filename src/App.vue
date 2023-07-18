@@ -2,132 +2,45 @@
   <div>
     <h1>FLogger!</h1>
   </div>
-  <div class="m-3 p-5 border rounded-lg">
-    <div class="m-3 p-3 border rounded-md">
-      <h2>Version 3</h2>
-    </div>
-    <div class="m-3 p-3 border rounded-md" style="flex: ~gap-1">
-      <button @click="v3_onOpen">Open</button>
-      <button @click="v3_useFSAref.create()">New file</button>
-      <button :disabled="!v3_useFSAref.file.value" @click="v3_onSave">
-        Save
-      </button>
-      <button
-        :disabled="!v3_useFSAref.file.value"
-        @click="v3_useFSAref.saveAs()"
-      >
-        Save as
-      </button>
-
-      <div class="m-3 p-3 border rounded-md">
-        <div>DataType</div>
-        <select v-model="v3_dataType" class="m-3 p-3 border rounded-md">
-          <option value="Text">Text</option>
-          <option value="ArrayBuffer">ArrayBuffer</option>
-          <option value="Blob">Blob</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="m-3 p-3 border rounded-md">
-      <pre class="code-block" lang="json">{{ v3_str }}</pre>
-    </div>
-
-    <div v-if="v3_content" class="m-3 p-3 border rounded-md">
-      Content
-      <textarea
-        v-if="typeof v3_content === 'string'"
-        v-model="v3_content"
-        cols="40"
-        class="m-3 p-3 border rounded-md"
-      />
-      <div v-else class="m-3 p-3 border rounded-md">{{ v3_content }}</div>
-    </div>
-  </div>
-  <div class="m-3 p-5 border rounded-lg">
-    <div class="m-3 p-3 border rounded-md">
-      <h2>useLocalSession test</h2>
-    </div>
-    <div class="m-3 p-3 border rounded-md">
-      <div class="float-left mr-4 font-bold">useLocalSessionTest:</div>
+  <div class="m-3 p-5 border rounded-lg w-full">
+    <h2>Data file</h2>
+    <div v-if="v2_fileName" class="m-3 p-3 border rounded-md">
+      <div class="float-left mr-4 font-bold">v2_fileName:</div>
       <div>
-        <input v-model="useLocalSessionTest" />
+        {{ v2_fileName }}
       </div>
-    </div>
-  </div>
-  <div class="m-3 p-5 border rounded-lg">
-    <div class="m-3 p-3 border rounded-md">
-      <h2>Version 2</h2>
-    </div>
-    <div class="m-3 p-3 border rounded-md">
-      <div class="float-left mr-4 font-bold">v2_fileHandle picker:</div>
+      <div class="float-left mr-4 font-bold">v2_filePermissions:</div>
       <div>
-        <button ref="fh" @click="v2_clickToGetTheFileHandle">picker</button>
+        {{ v2_filePermissions }}
       </div>
-    </div>
-    <div class="m-3 p-3 border rounded-md">
-      <div class="float-left mr-4 font-bold">v2_fileHandle:</div>
       <div>
-        {{ v2_fileHandle }}
+        <button @click="v2_fileClose">close file</button>
       </div>
     </div>
-    <div class="m-3 p-3 border rounded-md">
-      <div class="float-left mr-4 font-bold">v2_fileText:</div>
+    <div
+      v-if="v2_filePermissions == 'prompt'"
+      class="m-3 p-3 border border-red-700 rounded-md"
+    >
+      <div class="float-left mr-4 font-bold">File activation required:</div>
       <div>
-        {{ v2_fileText }}
+        <button @click="v2_fileRequestPermission">grant access</button>
       </div>
     </div>
-  </div>
-  <div class="m-3 p-5 border rounded-lg">
-    <div class="m-3 p-3 border rounded-md">
-      <h2>Version 1</h2>
-    </div>
-    <input
-      id="filesInput"
-      ref="filesInput"
-      type="file"
-      accept="text/*"
-      @change="v1_getTheFile"
-    />
-    <div class="m-3 p-3 border rounded-md">
-      <div class="float-left mr-4 font-bold">v1_fileData_uLS:</div>
+    <div
+      v-else-if="!['prompt', 'granted'].includes(v2_filePermissions)"
+      class="m-3 p-3"
+    >
+      <!-- <div class="float-left mr-4 font-bold">v2_fileHandle picker:</div> -->
       <div>
-        {{
-          v1_fileData_uLS
-            ? v1_fileData_uLS.webkitRelativePath + " / " + v1_fileData_uLS.name
-            : "no data file"
-        }}
+        <button ref="fh" @click="v2_clickToOpenFile">select a data file</button>
       </div>
     </div>
-    <div class="m-3 p-3 border rounded-md">
-      <div class="float-left mr-4 font-bold">v1_file:</div>
+    <!-- <div class="m-3 p-3 border rounded-md">
+      <div class="float-left mr-4 font-bold">v2_fileDataStr:</div>
       <div>
-        {{
-          v1_file
-            ? v1_file.webkitRelativePath + " / " + v1_file.name
-            : "no data file"
-        }}
+        {{ v2_fileDataStr }}
       </div>
-    </div>
-    <div class="m-3 p-3 border rounded-md">
-      <div class="float-left mr-4 font-bold">v1_file:</div>
-      <div>
-        {{ JSON.stringify(v1_file) }}
-      </div>
-    </div>
-    <div class="m-3 p-3 border rounded-md">
-      <div class="float-left mr-4 font-bold">v1_fileLoaded:</div>
-      <div>
-        {{ v1_fileLoaded }}
-      </div>
-    </div>
-    <div class="m-3 p-3 border rounded-md">
-      <div class="float-left mr-4 font-bold">v1_fileText:</div>
-      <div>
-        ?
-        {{ v1_fileText }}
-      </div>
-    </div>
+    </div> -->
   </div>
   <AddNote @newNote="addNewNote" :timestamp="timestamp" />
   <NoteList :notes="testNotes" />
@@ -172,11 +85,11 @@ import { useFileSystemAccess } from "@vueuse/core";
 const timestamp = ref(new Date().toLocaleDateString());
 
 const testNotes = ref([
-  {
-    timestamp: new Date("7/6/2023").toLocaleDateString(),
-    tags: ["tag 1", "tag 2"],
-    message: "This is the note body message.",
-  },
+  // {
+  //   timestamp: new Date("7/6/2023").toLocaleDateString(),
+  //   tags: ["tag 1", "tag 2"],
+  //   message: "This is the note body message.",
+  // },
   // {
   // timestamp: new Date(),
   //tags: ["tag 1", "tag 3"],
@@ -201,61 +114,33 @@ function addNewNote(noteData) {
     tags: noteData.tags.split(" "),
     message: noteData.entry,
   });
+  v2_saveFileData();
 }
 
 // // COMPOSITION API: Doesn't use export default
 // };
 
 // ************************************************************
-// VERSION 3 — useFileSystemAccess
-
-const v3_stringify = reactify(JSON.stringify);
-
-const v3_dataType = ref("Text"); // as Ref<'Text' | 'ArrayBuffer' | 'Blob'>
-const v3_useFSAref = useFileSystemAccess({
-  v3_dataType,
-  types: [
-    {
-      description: "text",
-      accept: {
-        "text/plain": [".txt", ".html"],
-      },
-    },
-  ],
-  excludeAcceptAllOption: true,
-});
-
-const v3_content = v3_useFSAref.data;
-const v3_str = v3_stringify(
-  reactive({
-    isSupported: v3_useFSAref.isSupported,
-    file: v3_useFSAref.file,
-    fileName: v3_useFSAref.fileName,
-    fileMIME: v3_useFSAref.fileMIME,
-    fileSize: v3_useFSAref.fileSize,
-    fileLastModified: v3_useFSAref.fileLastModified,
-  })
-);
-
-async function v3_onOpen() {
-  console.log(`res1 `, v3_useFSAref);
-  await v3_useFSAref.open();
-  console.log(`res2 `, v3_useFSAref);
-}
-async function v3_onSave() {
-  await v3_useFSAref.save();
-}
-
-// ************************************************************
 // useLocalSession test
 
-const useLocalSessionTest = useLocalStorage("useLocalSessionTest", "default");
-
 // ************************************************************
-// VERSION 2 — showOpenFilePicker + Indexed DB
+// This section includes data vars and method functions for
+// implementing File System Access API using showOpenFilePicker
+// + Indexed DB to store FileHandle across page reloads
+// Not supported in many browsers, see
+// https://developer.mozilla.org/en-US/docs/Web/API/Window/showOpenFilePicker#browser_compatibility
+// But might be the only option to store data in a file on the
+// user's system, and not require that they reopen the file on
+// every visit and every page load. (However, does require they
+// click a button to re-grant permission to the file.)
 
 const v2_fileHandle = ref({});
-const v2_fileText = ref("");
+const v2_filePermissions = ref("");
+const v2_fileOptions = { mode: "readwrite" };
+// store file name in localStorage so we can use it to
+// retrieve the file handle from indexedDB after page reload
+const v2_fileName = useLocalStorage("v2_fileName", null);
+const v2_fileDataStr = ref("");
 // Open a db instance to save file references for later sessions
 let v2_db;
 let v2_dbRequest = indexedDB.open("v2_db");
@@ -265,8 +150,7 @@ v2_dbRequest.onerror = function (e) {
 v2_dbRequest.onsuccess = function (e) {
   v2_db = e.target.result;
 
-  v2_reloadFileFromDB();
-
+  if (v2_fileName.value) v2_reloadFileFromDB(v2_fileName.value);
 };
 v2_dbRequest.onupgradeneeded = (event) => {
   v2_db = event.target.result;
@@ -293,35 +177,7 @@ v2_dbRequest.onupgradeneeded = (event) => {
 
   console.log("Object store created.");
 };
-console.log(`v2_db`,v2_db);
-
-
-async function v2_clickToGetTheFileHandle() {
-  v2_fileHandle.value = await v2_getTheFileHandle();
-  console.log(`v2_fileHandle: `, v2_fileHandle);
-  // get file contents
-  let v2_file = await v2_fileHandle.value.getFile();
-  v2_fileText.value = await v2_file.text();
-
-  if (v2_fileHandle) {
-    // Save the reference to open the file later.
-    let v2_dbTransaction = v2_db.transaction(["filerefs"], "readwrite");
-    let v2_dbObjectStore = v2_dbTransaction.objectStore("filerefs");
-    console.log(`indexNames`, v2_dbObjectStore.indexNames);
-    console.log(`keyPath`, v2_dbObjectStore.keyPath);
-    console.log(`name`, v2_dbObjectStore.name);
-    console.log(`transaction`, v2_dbObjectStore.transaction);
-    console.log(`autoIncrement`, v2_dbObjectStore.autoIncrement);
-    let v2_dbRequest = v2_dbObjectStore.add(v2_fileHandle.value, v2_file.name);
-    v2_dbRequest.onsuccess = function (e) {
-      console.log(e);
-    };
-
-    // Do other useful things with the opened file.
-  }
-
-  // ...
-}
+console.log(`v2_db`, v2_db);
 
 async function v2_getTheFileHandle() {
   const pickerOpts = {
@@ -338,20 +194,111 @@ async function v2_getTheFileHandle() {
   };
 
   // open file picker
-  const [v2_fileHandle] = await window.showOpenFilePicker(pickerOpts);
-
+  let pickerSelection;
+  try {
+    pickerSelection = await window.showOpenFilePicker(pickerOpts);
+  } catch (error) {
+    console.log("Error picking file, probably user canceled:", error);
+    return;
+  }
+  if (!pickerSelection) {
+    console.log("no picker selection");
+    return;
+  }
+  // get single file handler from possible array
+  const [v2_fileHandle] = pickerSelection;
   return v2_fileHandle;
-  // // get file contents
-  // const fileData = await v2_fileHandle.getFile();
-  // return fileData;
 }
 
-async function v2_reloadFileFromDB() {
+async function v2_clickToOpenFile() {
+  // get file handle
+  v2_fileHandle.value = await v2_getTheFileHandle();
+  v2_fileCheckPermissions();
+  console.log(`v2_fileHandle.value: `, v2_fileHandle.value);
+  if (!v2_fileHandle.value) {
+    console.log(`no file handle`);
+    return;
+  }
+  v2_loadFile();
+
+  // store the file handle in indexedDB to open the file later.
+  let v2_dbTransaction = v2_db.transaction(["filerefs"], "readwrite");
+  let v2_dbObjectStore = v2_dbTransaction.objectStore("filerefs");
+  console.log(`indexNames`, v2_dbObjectStore.indexNames);
+  console.log(`keyPath`, v2_dbObjectStore.keyPath);
+  console.log(`name`, v2_dbObjectStore.name);
+  console.log(`transaction`, v2_dbObjectStore.transaction);
+  console.log(`autoIncrement`, v2_dbObjectStore.autoIncrement);
+  let v2_dbRequest = v2_dbObjectStore.add(v2_fileHandle.value, v2_fileName.value);
+  v2_dbRequest.onsuccess = function (e) {
+    console.log(e);
+  };
+}
+
+async function v2_saveFileData() {
+  // Create a FileSystemWritableFileStream to write to.
+  const writable = await v2_fileHandle.value.createWritable();
+
+  // Write the contents of the file to the stream.
+  let dbDataObj = { notes: testNotes.value };
+  await writable.write(JSON.stringify(dbDataObj));
+
+  // Close the file and write the contents to disk.
+  await writable.close();
+}
+
+function v2_fileClose() {
+  v2_fileHandle.value = undefined;
+  v2_filePermissions.value = "";
+  v2_fileName.value = "";
+  v2_fileDataStr.value = "";
+  testNotes.value = [];
+}
+
+async function v2_fileCheckPermissions() {
+  v2_filePermissions.value = await v2_fileHandle.value.queryPermission(
+    v2_fileOptions
+  );
+  console.log(`v2_filePermissions`, v2_filePermissions);
+}
+
+async function v2_fileRequestPermission() {
+  v2_filePermissions.value = await v2_fileHandle.value.requestPermission(
+    v2_fileOptions
+  );
+  if (v2_filePermissions.value != "granted") {
+    console.log(`access request failed`);
+    return;
+  }
+  console.log(`access request granted`);
+  v2_loadFile();
+}
+
+async function v2_loadFile() {
+  try {
+    // get file
+    let v2_file = await v2_fileHandle.value.getFile();
+    // get file name
+    v2_fileName.value = v2_file.name;
+    // get file contents
+    v2_fileDataStr.value = await v2_file.text();
+    // parse file contents
+    let v2_fileDataObj = JSON.parse(v2_fileDataStr.value);
+    console.log(`v2_fileDataObj`, v2_fileDataObj);
+    if (v2_fileDataObj?.notes) {
+      testNotes.value = v2_fileDataObj.notes;
+    }
+  } catch (e) {
+    console.error(e);
+    return;
+  }
+}
+
+async function v2_reloadFileFromDB(file_id) {
   // Retrieve a file you've opened before. Show's no filepicker UI, but can show
   // some other permission prompt if the browser so desires.
   // The browser can choose when to allow or not allow this open.
-  let file_id = "notes data.txt"; // Some logic to determine which file you'd like to open
-  console.log(`v2_db`,v2_db);
+  console.log(`v2_db`, v2_db);
   let v2_dbTransaction = v2_db.transaction(["filerefs"], "readonly");
   let v2_dbObjectStore = v2_dbTransaction.objectStore("filerefs");
   console.log(`indexNames`, v2_dbObjectStore.indexNames);
@@ -366,17 +313,13 @@ async function v2_reloadFileFromDB() {
 
     if (!v2_fileHandle.value) {
       console.log(`no result`);
-      return
+      return;
     }
 
     // Permissions for the handle may have expired while the handle was stored
     // in IndexedDB. Before it is safe to use the handle we should request at
     // least read access to the handle again.
-    if ((await v2_fileHandle.value.queryPermission({mode:"readwrite"})) != "granted") {
-      // No longer allowed to access the handle.
-      console.log(`no access granted`);
-      return;
-    }
+    v2_fileCheckPermissions();
 
     // // Rejects if file is no longer readable, either because it doesn't exist
     // // anymore or because the website no longer has permission to read it.
@@ -388,49 +331,13 @@ async function v2_reloadFileFromDB() {
     // let file_writer = await v2_fileHandle.value.createWritable();
     // // ... write to file_writer
 
-    let v2_file = await v2_fileHandle.value.getFile();
-    v2_fileText.value = await v2_file.text();
+    if (v2_filePermissions == "granted") v2_loadFile();
   };
 }
-
-// ************************************************************
-// VERSION 1 — File input + Pinia
-
-const v1_store = useDataFileStore();
-// v1_store.file // <-- This will be used to save the location of the v1_file
-
-// New refs and functions for v1_file
-let v1_fileData_uLS = useLocalStorage("v1_fileData_uLS", {});
-const v1_file = computed(() => v1_store.file);
-const v1_fileText = computed(() => {
-  let text = "";
-  console.log(`v1_store.file?.text: `, v1_store.file?.text);
-  if (v1_store.file.text)
-    v1_store.file.text().then((t) => {
-      console.log(`v1_store.file.text t = `, t);
-      text = t;
-      console.log(`v1_fileText loaded: `, text);
-    });
-  return text;
-});
-const v1_fileLoaded = ref(false);
-
-function v1_getTheFile(event) {
-  console.log(`v1_getTheFile: `, event.target.files);
-  for (const file of event.target.files) {
-    v1_store.file = file; // <-- This will be used to save the location of the v1_file
-    v1_fileData_uLS = file;
-    v1_fileLoaded.value = true;
-  }
-}
-
-// ************************************************************
-
-onMounted(() => {
-  console.log(`v1_store`, v1_store);
-  console.log(`v1_store.file`, v1_store.file);
-  console.log(`v1_fileText`, v1_fileText.value);
-});
 </script>
 
-<style scoped></style>
+<style scoped>
+h2 {
+  font-size: 2em;
+}
+</style>
