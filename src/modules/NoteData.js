@@ -1,4 +1,3 @@
-<script>
 export default class NoteData {
 	date;
 	tags;
@@ -10,4 +9,3 @@ export default class NoteData {
     this.entry = entry;
   }
 }
-</script>

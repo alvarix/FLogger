@@ -1,16 +1,15 @@
 <script>
 import { ref } from "vue";
+import NoteData from '../modules/NoteData.js';
+
+
 
 export default {
   name: "Note",
   props: {
-    note: {
-      timestamp: Date,
-      tags: [String],
-      message: String,
-    },
-  },
-  data() {
+    note: NoteData,
+	},
+		data() {
   		return {
 		}
   } 
