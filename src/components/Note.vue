@@ -1,18 +1,15 @@
 <script>
 import { ref } from "vue";
-import NoteData from '../modules/NoteData.js';
-
-
+import NoteData from "../modules/NoteData.ts";
 
 export default {
   name: "Note",
   props: {
     note: NoteData,
-	},
-		data() {
-  		return {
-		}
-  } 
+  },
+  data() {
+    return {};
+  },
 };
 </script>
 
@@ -21,37 +18,37 @@ export default {
     <!-- 
       <div class="grid">
       <div class="grid-box">
-        <div><b>timestamp:</b></div>
-        <div>{{ note.timestamp }}</div>
+        <div><b>date:</b></div>
+        <div>{{ note.date }}</div>
       </div>
       <div class="grid-box">
         <div><b>tags:</b></div>
         <div v-for="tag in note.tags">{{ tag }}</div>
       </div>
       <div class="grid-box">
-        <div><b>message:</b></div>
-        <div>{{ note.message }}</div>
+        <div><b>entry:</b></div>
+        <div>{{ note.entry }}</div>
       </div>
     </div>
 
  -->
     <div class="grid">
-      <div class="grid-box"><b>timestamp:</b></div>
-      <div class="grid-box">{{ note.timestamp }}</div>
+      <div class="grid-box"><b>date:</b></div>
+      <div class="grid-box">{{ note.date }}</div>
       <div class="grid-box"><b>tags:</b></div>
       <div class="grid-box">
         <div v-for="tag in note.tags">{{ tag }}</div>
       </div>
-      <div class="grid-box"><b>message:</b></div>
-      <div class="grid-box">{{ note.message }}</div>
+      <div class="grid-box"><b>entry:</b></div>
+      <div class="grid-box">{{ note.entry }}</div>
     </div>
     <!-- <div class="flex">
-      <div class="flex-column-1"><b>timestamp:</b></div>
-      <div class="flex-column-2">{{ note.timestamp }}</div>
+      <div class="flex-column-1"><b>date:</b></div>
+      <div class="flex-column-2">{{ note.date }}</div>
       <div class="flex-column-1"><b>tags:</b></div>
       <div class="flex-column-2" v-for="tag in note.tags">{{ tag }}</div>
-      <div class="flex-column-1"><b>message:</b></div>
-      <div class="flex-column-2">{{ note.message }}</div>
+      <div class="flex-column-1"><b>entry:</b></div>
+      <div class="flex-column-2">{{ note.entry }}</div>
     </div> -->
   </div>
 </template>

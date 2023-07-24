@@ -7,6 +7,7 @@
 </template>
 
 <script>
+import NoteData from './modules/NoteData.ts';
 import NoteList from "./components/NoteList.vue";
 import AddNote from "./components/AddNote.vue";
 
@@ -18,13 +19,14 @@ export default {
 
   data() {
     return {
-      timestamp: new Date().toLocaleDateString(),
+      timestamp: new Date(), //.toLocaleDateString(),
       testNotes: [
-      {
-          timestamp: new Date("7/6/2023").toLocaleDateString(),
-          tags: ["tag 1", "tag 2"],
-          message: "This is the note body message.",
-        },
+        new NoteData(new Date("7/6/2023"), ["tag 1", "tag 2"], "This is the note body message."),
+      // {
+      //     timestamp: new Date("7/6/2023"), //.toLocaleDateString(),
+      //     tags: ["tag 1", "tag 2"],
+      //     message: "This is the note body message.",
+      //   },
        // {
          // timestamp: new Date(),
           //tags: ["tag 1", "tag 3"],
@@ -36,11 +38,7 @@ export default {
 
   methods: {
 		addNewNote(noteData) {
-			this.testNotes.push ({ 
-				timestamp: Date(noteData.timestamp),
-				tags: noteData.tags.split(" "),
-				message: noteData.entry
-			});
+			this.testNotes.push (noteData);
 
 
 		}

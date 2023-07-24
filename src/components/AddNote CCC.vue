@@ -1,0 +1,151 @@
+<script>
+import { ref } from 'vue'
+import NoteData from '../modules/NoteData.ts';
+// import Component from "Component"
+
+export default {
+	name: "AddNote",
+	components: {
+		// Component,
+	},
+	props: { 
+		timestamp: {
+			type: Date,
+			default: new Date(),
+		},
+	},
+	emits: ['newNote'],
+	data() {
+		return {
+			hasError: false,
+			form: new NoteData(
+				this.timestamp,
+				[],
+				'',
+			)
+		}
+	},
+	computed: {
+		dateInLocal() {
+			let d = this.form.date;
+			let newD = (new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString()).slice(0, -8);
+			return newD;
+		},
+		tagsAsString() {
+			if (this.form.tags?.join) {
+				return this.form.tags.join(' ');
+			} else {
+				return this.form.tags;
+			}
+		 },
+	},
+	methods: {
+		 submitAdd(event) {
+			//  if (this.isValidDate() == true ) {
+			// 	this.form.tags = this.form.tags.split(' ');
+				this.$emit('newNote', this.form);
+			//  } else {
+			//  	this.hasError= true;
+			//  }
+
+			},
+		 inputTags: function(event) {
+			if (event.target.value.split) {
+				this.form.tags = event.target.value.split(' ');
+			}
+			else {
+				this.form.tags = event.target.value;
+			}
+
+			},
+		 isValidDate: function() {
+		 	this.hasError = false;
+			// /*
+			// https://codepen.io/wboka/pen/LXKVLb
+			// 	Valid formats:
+			// 	- M/D/YYYY
+			// 	- M/DD/YYYY
+			// 	- MM/D/YYYY
+			// 	- MM/DD/YYYY
+			// 	- YYYY-M-D
+			// 	- YYYY-M-DD
+			// 	- YYYY-MM-D
+			// 	- YYYY-MM-DD
+			// */
+			// if (!/^(\d{1,2}\/\d{1,2}\/\d{4,}|\d{4,}-\d{1,2}-\d{1,2})$/.test(this.form.date)) {
+			// 	return false;
+			// }
+			// this.isISO8601 = /^\d{4}-\d{1,2}-\d{1,2}$/.test(this.form.date);
+			// // Get the month, day, and year parts
+			// var parts = this.form.date.split(this.isISO8601 ? "-" : "/");
+			// this.month = parseInt(parts[this.isISO8601 ? 1 : 0], 10);
+			// this.day = parseInt(parts[this.isISO8601 ? 2 : 1], 10);
+			// this.year = parseInt(parts[this.isISO8601 ? 0 : 2], 10);
+
+			// // Should be a valid javascript month 0-11
+			// if (this.month === 0 || this.month > 12) {
+			// 	return false;
+			// }
+
+			// // Valid month lengths
+			// var monthLength = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+			// // Check for leap years
+			// if (this.year % 400 === 0 || (this.year % 100 !== 0 && this.year % 4 === 0)) {
+			// 	this.isLeapYear = true;
+			// 	monthLength[1]++;
+			// } else {
+			// 	this.isLeapYear = false;
+			// }
+
+			// return this.day > 0 && this.day <= monthLength[this.month - 1];
+			return true;
+		}
+	},
+}
+</script>
+
+<template>
+  <h2>Add Entry</h2>
+	<form id='add-note' @submit.prevent="submitAdd">
+		<div>
+			<label for='time'>Time</label>
+			{{ form.date.toISOString() }}
+			<input :class={error:hasError} id='time' type="datetime-local" @input="event => isValidDate" :value="dateInLocal" required >
+			
+			<em class='date-validation hidden' :class={error:hasError}>Please enter valid date</em>
+		</div>
+		<div>
+			<label for="tags">Tags</label>
+			<input type="text" :value="tagsAsString" @input="inputTags" required>
+		</div>
+		<div>
+			<label for="entry">Entry</label>
+			<textarea id="entry" name="" cols="30" rows="10" v-model='form.entry' required></textarea>
+		</div>
+		<div><input type="submit"></div>
+		
+	</form>
+</template>
+
+<style scoped>
+#add-note *:not(.date-validation) {
+	display:block;
+}
+
+input.error {
+	border:1px solid red;
+}
+
+.date-validation.error {
+	display:block;
+	color:red;
+}
+
+
+#add-note label {
+	margin-top: 20px;
+}
+
+
+</style>

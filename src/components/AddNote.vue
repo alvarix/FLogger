@@ -1,5 +1,6 @@
 <script>
 import { ref } from 'vue'
+import NoteData from '../modules/NoteData.ts';
 // import Component from "Component"
 
 export default {
@@ -10,15 +11,11 @@ export default {
 	props: { 
 		timestamp: Date,
 	},
-	// emits: ['newNote'],
+	emits: ['newNote'],
 	data() {
 		return {
 			hasError: false,
-			form: {
-				timestampValue: this.timestamp,
-				tags: '',
-				entry: '',
-			}
+			form: new NoteData(this.timestamp, [], ''),
 		}
 	},
 	methods: {
@@ -44,12 +41,12 @@ export default {
 				- YYYY-MM-D
 				- YYYY-MM-DD
 			*/
-			if (!/^(\d{1,2}\/\d{1,2}\/\d{4,}|\d{4,}-\d{1,2}-\d{1,2})$/.test(this.form.timestampValue)) {
+			if (!/^(\d{1,2}\/\d{1,2}\/\d{4,}|\d{4,}-\d{1,2}-\d{1,2})$/.test(this.form.date)) {
 				return false;
 			}
-			this.isISO8601 = /^\d{4}-\d{1,2}-\d{1,2}$/.test(this.form.timestampValue);
+			this.isISO8601 = /^\d{4}-\d{1,2}-\d{1,2}$/.test(this.form.date);
 			// Get the month, day, and year parts
-			var parts = this.form.timestampValue.split(this.isISO8601 ? "-" : "/");
+			var parts = this.form.date.split(this.isISO8601 ? "-" : "/");
 			this.month = parseInt(parts[this.isISO8601 ? 1 : 0], 10);
 			this.day = parseInt(parts[this.isISO8601 ? 2 : 1], 10);
 			this.year = parseInt(parts[this.isISO8601 ? 0 : 2], 10);
@@ -81,7 +78,7 @@ export default {
 	<form id='add-note' @submit.prevent="submitAdd">
 		<div>
 			<label for='time'>Time</label>
-			<input :class={error:hasError} id='time' type="text" placeholder="timestampValue" @input="isValidDate" v-model="form.timestampValue" required >
+			<input :class={error:hasError} id='time' type="text" placeholder="timestampValue" @input="isValidDate" v-model="form.date" required >
 			
 			<em class='date-validation hidden' :class={error:hasError}>Please enter valid date</em>
 		</div>
