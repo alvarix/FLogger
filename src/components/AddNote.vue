@@ -10,7 +10,7 @@ export default {
 	props: { 
 		timestamp: Date,
 	},
-	// emits: ['newNote'],
+	emits: ['newNote'],
 	data() {
 		return {
 			hasError: false,
