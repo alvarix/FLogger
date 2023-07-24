@@ -1,45 +1,40 @@
 <template>
   <div>
     <h1>FLogger!</h1>
+		<NoteList :notes="testNotes" />
+		<AddNote @newNote='addNewNote' :date="timestamp" />
   </div>
-  <AddNote @newNote='addNewNote' :timestamp="timestamp" />
-  <NoteList :notes="testNotes" />
 </template>
 
 <script>
 import NoteList from "./components/NoteList.vue";
 import AddNote from "./components/AddNote.vue";
+import NoteData from './modules/NoteData.js';
 
 export default {
   components: {
     NoteList,
-    AddNote,
+    AddNote
   },
 
   data() {
     return {
-      timestamp: new Date().toLocaleDateString(),
       testNotes: [
-      {
-          timestamp: new Date("7/6/2023").toLocaleDateString(),
-          tags: ["tag 1", "tag 2"],
-          message: "This is the note body message.",
-        },
-       // {
-         // timestamp: new Date(),
-          //tags: ["tag 1", "tag 3"],
-          //message: "This is the note TWO body message.",
-        //},
-      ],
+				new NoteData(
+					new Date("7/6/2022").toLocaleDateString(),
+					['tag1','tagggg'], 
+					'this is texty'
+				),
+			]
     };
   },
 
   methods: {
 		addNewNote(noteData) {
 			this.testNotes.push ({ 
-				timestamp: Date(noteData.timestamp),
+				date: Date(noteData.timestamp),
 				tags: noteData.tags.split(" "),
-				message: noteData.entry
+				entry: noteData.entry
 			});
 
 
