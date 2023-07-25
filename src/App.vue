@@ -1,8 +1,8 @@
 <template>
   <div>
     <h1>FLogger!</h1>
+		<AddNote @newNote='addNewNote' />
 		<NoteList :notes="testNotes" />
-		<AddNote @newNote='addNewNote' :date="timestamp" />
   </div>
 </template>
 
@@ -31,11 +31,14 @@ export default {
 
   methods: {
 		addNewNote(noteData) {
-			this.testNotes.push ({ 
-				date: Date(noteData.timestamp),
-				tags: noteData.tags.split(" "),
-				entry: noteData.entry
-			});
+			this.testNotes.push (
+				new NoteData(
+					Date(noteData.date),
+				  noteData.tags.split(" "),	
+					noteData.entry
+				)
+
+			);
 
 
 		}

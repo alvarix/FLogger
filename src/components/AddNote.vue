@@ -1,33 +1,36 @@
 <script>
 import { ref } from 'vue'
-// import Component from "Component"
+import NoteData from '../modules/NoteData.js';
 
 export default {
 	name: "AddNote",
-	components: {
-		// Component,
-	},
+
 	props: { 
-		timestamp: Date,
+		timestamp: {
+			type: Date,
+			default: ()=> new Date().toLocaleDateString()
+		}
 	},
-	// emits: ['newNote'],
+	
+	emits: ['newNote'],
+
 	data() {
 		return {
 			hasError: false,
 			form: {
 				timestampValue: this.timestamp,
-				tags: '',
-				entry: '',
+				tags: 'tag2 tag',
+				entry: 'Change text',
 			}
 		}
 	},
 	methods: {
 		 submitAdd(event) {
-			 if (this.isValidDate() == true ) {
+//			 if (this.isValidDate() == true ) {
 				 this.$emit('newNote', this.form);
-			 } else {
-			 	this.hasError= true;
-			 }
+	//		 } else {
+	//		 	this.hasError= true;
+	//		 }
 
 		 },
 		 isValidDate: function() {
@@ -81,7 +84,7 @@ export default {
 	<form id='add-note' @submit.prevent="submitAdd">
 		<div>
 			<label for='time'>Time</label>
-			<input :class={error:hasError} id='time' type="text" placeholder="timestampValue" @input="isValidDate" v-model="form.timestampValue" required >
+			<input :class={error:hasError} id='time' type="text" :placeholder="form.timestampValue" @input="isValidDate" v-model="form.timestampValue" required >
 			
 			<em class='date-validation hidden' :class={error:hasError}>Please enter valid date</em>
 		</div>
