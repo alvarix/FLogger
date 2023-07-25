@@ -36,6 +36,7 @@ export default {
 					Date(noteData.date),
 				  noteData.tags.split(" "),	
 					noteData.entry
+
 				)
 
 			);

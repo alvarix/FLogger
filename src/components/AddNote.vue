@@ -8,7 +8,7 @@ export default {
 	props: { 
 		timestamp: {
 			type: Date,
-			default: ()=> new Date().toLocaleDateString()
+			default: () => new Date().toLocaleDateString()
 		}
 	},
 	
