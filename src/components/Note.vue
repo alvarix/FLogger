@@ -1,19 +1,12 @@
-<script>
+<script setup>
 import { ref } from "vue";
 import NoteData from '../modules/NoteData.js';
 
+const props = defineProps({
+	note: NoteData
+})
 
 
-export default {
-  name: "Note",
-  props: {
-    note: NoteData,
-	},
-		data() {
-  		return {
-		}
-  } 
-};
 </script>
 
 <template>
