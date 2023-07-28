@@ -3,18 +3,12 @@ import { ref } from 'vue'
 import NoteData from '../modules/NoteData.js';
 import { defineEmits } from 'vue';
 
-const props = defineProps({
-//	timestamp: {
-//			type: Date,
-//			default: () => new Date().toLocaleDateString()
-//	}
-})
 const emit = defineEmits(['newNote']);
 let hasError = ref(false);	
 
 let form = ref( 
 			new NoteData( 
-				new Date(),
+				new Date().toLocaleDateString(),
 				'tag2 tag',
 				'Change text',
 			),
