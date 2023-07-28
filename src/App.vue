@@ -1,50 +1,37 @@
 <template>
   <div>
     <h1>FLogger!</h1>
-		<AddNote @newNote='addNewNote' />
-		<NoteList :notes="testNotes" />
   </div>
+  <AddNote @newNote="addNewNote" :timestamp="timestamp" />
+  <NoteList :notes="testNotes" />
 </template>
 
-<script>
+<script setup>
+import { ref } from "vue";
 import NoteList from "./components/NoteList.vue";
 import AddNote from "./components/AddNote.vue";
 import NoteData from './modules/NoteData.js';
 
-export default {
-  components: {
-    NoteList,
-    AddNote
-  },
+const timestamp = ref(new Date().toLocaleDateString());
+const testNotes = ref([
+  	new NoteData(
+			new Date("7/6/2023").toLocaleDateString(),
+			["tag 1", "tag 2"],
+			"This is the note body message.",
+		)
+]);
 
-  data() {
-    return {
-      testNotes: [
-				new NoteData(
-					new Date("7/6/2022").toLocaleDateString(),
-					['tag1','tagggg'], 
-					'this is texty'
-				),
-			]
-    };
-  },
+function addNewNote(noteData) {
+	//console.log(noteData)
+  testNotes.value.push(
+		new NoteData(
+		new Date(noteData.value.date).toLocaleDateString(),
+		noteData.value.tags.split(" "),
+		noteData.value.entry
+		)
+	)
+}
 
-  methods: {
-		addNewNote(noteData) {
-			this.testNotes.push (
-				new NoteData(
-					Date(noteData.date),
-				  noteData.tags.split(" "),	
-					noteData.entry
-
-				)
-
-			);
-
-
-		}
-  },
-};
 </script>
 
 <style scoped></style>
