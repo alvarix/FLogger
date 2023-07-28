@@ -60,6 +60,16 @@ const {
   dataFileSave,
   dataFileClose,
 } = useDataFile(loadData);
+// That above is called a destructure assignment. 
+// See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
+// It is shorthand for this:
+//   const dataFile = useDataFile(loadData);
+//   const dataFileName = dataFile.dataFileName;
+//   const dataFilePermissions = dataFile.dataFilePermissions;
+//   const dataFileClickToOpen = dataFile.dataFileClickToOpen;
+//   const dataFileClickToRequestPermission = dataFile.dataFileClickToRequestPermission;
+//   const dataFileSave = dataFile.dataFileSave;
+//   const dataFileClose = dataFile.dataFileClose;
 
 // // COMPOSITION API: Doesn't use export default
 // export default {
@@ -128,9 +138,9 @@ function closeDataFile() {
   testNotes.value = [];
 }
 
-function loadData(dataObj) {
-  if (dataObj?.notes) {
-    testNotes.value = dataObj.notes;
+function loadData(dataFileObject) {
+  if (dataFileObject?.notes) {
+    testNotes.value = dataFileObject.notes;
   }
 }
 
