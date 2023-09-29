@@ -98,11 +98,13 @@ const {
 //   const dataFileClose = dataFile.dataFileClose;
 
 function closeDataFile() {
+  console.log('closeDataFile');
   dataFileClose();
   testNotes.value = [];
 }
 
 function loadData(dataFileObject) {
+  console.log('loadData', dataFileObject);
   if (dataFileObject?.notes) {
     testNotes.value = dataFileObject.notes.map((note) => {
       return new NoteData(note.date, note.tags, note.entry);

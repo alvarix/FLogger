@@ -92,7 +92,7 @@ export const useDataFile = (dataLoadedCallback) => {
   async function dataFileClickToOpen() {
     // get file handle
     dataFileHandle.value = await dataFileGetFileHandle();
-    dataFileCheckPermissions();
+    await dataFileCheckPermissions();
     console.log(`dataFileHandle.value: `, dataFileHandle.value);
     if (!dataFileHandle.value) {
       console.log(`no file handle`);
@@ -141,7 +141,7 @@ export const useDataFile = (dataLoadedCallback) => {
     dataFilePermissions.value = await dataFileHandle.value.queryPermission(
       dataFileOptions
     );
-    console.log(`dataFilePermissions`, dataFilePermissions);
+    console.log('dataFilePermissions.value', dataFilePermissions.value);
   }
 
   async function dataFileClickToRequestPermission() {
@@ -157,6 +157,7 @@ export const useDataFile = (dataLoadedCallback) => {
   }
 
   async function dataFileLoad() {
+    console.log(`dataFileLoad`);
     try {
       // get file
       let dataFile = await dataFileHandle.value.getFile();
@@ -200,7 +201,7 @@ export const useDataFile = (dataLoadedCallback) => {
       // Permissions for the handle may have expired while the handle was stored
       // in IndexedDB. Before it is safe to use the handle we should request at
       // least read access to the handle again.
-      dataFileCheckPermissions();
+      await dataFileCheckPermissions();
 
       // // Rejects if file is no longer readable, either because it doesn't exist
       // // anymore or because the website no longer has permission to read it.
@@ -212,7 +213,8 @@ export const useDataFile = (dataLoadedCallback) => {
       // let file_writer = await dataFileHandle.value.createWritable();
       // // ... write to file_writer
 
-      if (dataFilePermissions == "granted") dataFileLoad();
+      console.log('dataFilePermissions.value', dataFilePermissions.value);
+      if (dataFilePermissions.value == "granted") dataFileLoad();
     };
   }
 
