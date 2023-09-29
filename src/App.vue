@@ -32,7 +32,9 @@
     >
       <!-- <div class="float-left mr-4 font-bold">v2_fileHandle picker:</div> -->
       <div>
-        <button ref="fh" @click="dataFileClickToOpen">select a data file</button>
+        <button ref="fh" @click="dataFileClickToOpen">
+          select a data file
+        </button>
       </div>
     </div>
     <!-- <div class="m-3 p-3 border rounded-md">
@@ -51,26 +53,29 @@ import { ref } from "vue";
 import { useDataFile } from "./modules/useDataFile.js";
 import NoteList from "./components/NoteList.vue";
 import AddNote from "./components/AddNote.vue";
-import NoteData from './modules/NoteData.js';
+import NoteData from "./modules/NoteData.js";
 
 const timestamp = ref(new Date().toLocaleDateString());
 const testNotes = ref([
-  	new NoteData(
-			new Date("7/6/2023").toLocaleDateString(),
-			["tag 1", "tag 2"],
-			"This is the note body message.",
-		)
+  new NoteData(
+    new Date("7/6/2023").toLocaleDateString(),
+    ["tag 1", "tag 2"],
+    "This is the note body message."
+  ),
 ]);
 
 function addNewNote(noteData) {
-	//console.log(noteData)
+  //console.log(noteData)
   testNotes.value.push(
-		new NoteData(
-		new Date(noteData.value.date).toLocaleDateString(),
-		noteData.value.tags.split(" "),
-		noteData.value.entry
-		)
-	)
+    new NoteData(
+      new Date(noteData.value.date).toLocaleDateString(),
+      noteData.value.tags.split(" "),
+      noteData.value.entry
+    )
+  );
+  dataFileSave({
+    notes: testNotes.value
+  });
 }
 
 const {
@@ -81,7 +86,7 @@ const {
   dataFileSave,
   dataFileClose,
 } = useDataFile(loadData);
-// That above is called a destructure assignment. 
+// That above is called a destructure assignment.
 // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
 // It is shorthand for this:
 //   const dataFile = useDataFile(loadData);
@@ -99,10 +104,11 @@ function closeDataFile() {
 
 function loadData(dataFileObject) {
   if (dataFileObject?.notes) {
-    testNotes.value = dataFileObject.notes;
+    testNotes.value = dataFileObject.notes.map((note) => {
+      return new NoteData(note.date, note.tags, note.entry);
+    });
   }
 }
-
 </script>
 
 <style scoped>
