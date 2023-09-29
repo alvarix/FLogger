@@ -1,17 +1,17 @@
-<script>
-import Note from "./Note.vue";
+<script setup>
+import { ref } from 'vue'
+import Note from "./Note.vue"
 
-export default {
-  name: "NoteList",
-  components: { Note },
-  props: {
-    notes: {
+
+const props = defineProps({
+	notes: {
       type: Array,
       required: true,
       default: []
-    },
-  },
-};
+	},
+})
+
+
 </script>
 
 <template>

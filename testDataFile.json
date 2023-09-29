@@ -1,11 +1,72 @@
 {
-    "notes": [
-        {
-            "timestamp": "Fri Jul 28 2023 15:40:11 GMT-0400 (Eastern Daylight Time)",
-            "tags": [
-                "chad"
-            ],
-            "message": "data!"
-        }
-    ]
+  "notes": [
+    {
+      "date": "7/6/2023",
+      "tags": [
+        "tag 1",
+        "tag 2"
+      ],
+      "entry": "This is the note body message."
+    },
+    {
+      "date": "7/17/2023",
+      "tags": [
+        "chad",
+        "test db file"
+      ],
+      "entry": "testing db file"
+    },
+    {
+      "date": "Mon Jul 17 2023 22:04:31 GMT-0400 (Eastern Daylight Time)",
+      "tags": [
+        "chad"
+      ],
+      "entry": "test save 1"
+    },
+    {
+      "date": "Mon Jul 17 2023 22:04:51 GMT-0400 (Eastern Daylight Time)",
+      "tags": [
+        "chad"
+      ],
+      "entry": "test save 2"
+    },
+    {
+      "date": "Mon Jul 17 2023 23:45:04 GMT-0400 (Eastern Daylight Time)",
+      "tags": [
+        "chad"
+      ],
+      "entry": "save 3"
+    },
+    {
+      "date": "Mon Jul 17 2023 23:48:31 GMT-0400 (Eastern Daylight Time)",
+      "tags": [
+        "chad"
+      ],
+      "entry": "save 4"
+    },
+    {
+      "date": "9/26/2023",
+      "tags": [
+        "tag2",
+        "tag"
+      ],
+      "entry": "Change text"
+    },
+    {
+      "date": "9/26/2023",
+      "tags": [
+        "tag2",
+        "tag"
+      ],
+      "entry": "BINGO"
+    },
+    {
+      "date": "9/26/2023",
+      "tags": [
+        "tag2",
+        "tag"
+      ],
+      "entry": "BOINGO"
+    }
+  ]
 }

@@ -32,7 +32,9 @@
     >
       <!-- <div class="float-left mr-4 font-bold">v2_fileHandle picker:</div> -->
       <div>
-        <button ref="fh" @click="dataFileClickToOpen">select a data file</button>
+        <button ref="fh" @click="dataFileClickToOpen">
+          select a data file
+        </button>
       </div>
     </div>
     <!-- <div class="m-3 p-3 border rounded-md">
@@ -51,6 +53,30 @@ import { ref } from "vue";
 import { useDataFile } from "./modules/useDataFile.js";
 import NoteList from "./components/NoteList.vue";
 import AddNote from "./components/AddNote.vue";
+import NoteData from "./modules/NoteData.js";
+
+const timestamp = ref(new Date().toLocaleDateString());
+const testNotes = ref([
+  new NoteData(
+    new Date("7/6/2023").toLocaleDateString(),
+    ["tag 1", "tag 2"],
+    "This is the note body message."
+  ),
+]);
+
+function addNewNote(noteData) {
+  //console.log(noteData)
+  testNotes.value.push(
+    new NoteData(
+      new Date(noteData.value.date).toLocaleDateString(),
+      noteData.value.tags.split(" "),
+      noteData.value.entry
+    )
+  );
+  dataFileSave({
+    notes: testNotes.value
+  });
+}
 
 const {
   dataFileName,
@@ -60,7 +86,7 @@ const {
   dataFileSave,
   dataFileClose,
 } = useDataFile(loadData);
-// That above is called a destructure assignment. 
+// That above is called a destructure assignment.
 // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
 // It is shorthand for this:
 //   const dataFile = useDataFile(loadData);
@@ -71,68 +97,6 @@ const {
 //   const dataFileSave = dataFile.dataFileSave;
 //   const dataFileClose = dataFile.dataFileClose;
 
-// // COMPOSITION API: Doesn't use export default
-// export default {
-
-// // COMPOSITION API: Doesn't need the imported components declared
-//   components: {
-//     NoteList,
-//     AddNote,
-//   },
-
-// // COMPOSITION API: Reactive data are created using ref()
-//   data() {
-//     return {
-//       timestamp: new Date().toLocaleDateString(),
-//       testNotes: [
-//       {
-//           timestamp: new Date("7/6/2023").toLocaleDateString(),
-//           tags: ["tag 1", "tag 2"],
-//           message: "This is the note body message.",
-//         },
-//        // {
-//          // timestamp: new Date(),
-//           //tags: ["tag 1", "tag 3"],
-//           //message: "This is the note TWO body message.",
-//         //},
-//       ],
-//     };
-//   },
-const timestamp = ref(new Date().toLocaleDateString());
-
-const testNotes = ref([
-  // {
-  //   timestamp: new Date("7/6/2023").toLocaleDateString(),
-  //   tags: ["tag 1", "tag 2"],
-  //   message: "This is the note body message.",
-  // },
-  // {
-  // timestamp: new Date(),
-  //tags: ["tag 1", "tag 3"],
-  //message: "This is the note TWO body message.",
-  //},
-]);
-
-// // COMPOSITION API: Methods are declared as normal-looking functions.
-//   methods: {
-// 		addNewNote(noteData) {
-// 			this.testNotes.push ({
-// 				timestamp: Date(noteData.timestamp),
-// 				tags: noteData.tags.split(" "),
-// 				message: noteData.entry
-// 			});
-// 		}
-//   },
-function addNewNote(noteData) {
-  // // COMPOSITION API: "this." isn't necessary to reference reactive state vars, but ".value" is
-  testNotes.value.push({
-    timestamp: Date(noteData.timestamp),
-    tags: noteData.tags.split(" "),
-    message: noteData.entry,
-  });
-  dataFileSave({ notes: testNotes.value });
-}
-
 function closeDataFile() {
   dataFileClose();
   testNotes.value = [];
@@ -140,12 +104,11 @@ function closeDataFile() {
 
 function loadData(dataFileObject) {
   if (dataFileObject?.notes) {
-    testNotes.value = dataFileObject.notes;
+    testNotes.value = dataFileObject.notes.map((note) => {
+      return new NoteData(note.date, note.tags, note.entry);
+    });
   }
 }
-
-// // COMPOSITION API: Doesn't use export default
-// };
 </script>
 
 <style scoped>
