@@ -53,7 +53,7 @@ import { ref } from "vue";
 import { useDataFile } from "./modules/useDataFile.js";
 import NoteList from "./components/NoteList.vue";
 import AddNote from "./components/AddNote.vue";
-import NoteData from "./modules/NoteData.js";
+import NoteData from "./modules/NoteData.ts";
 
 const timestamp = ref(new Date().toLocaleDateString());
 const testNotes = ref([

@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "vue";
-import NoteData from '../modules/NoteData.js';
+import NoteData from '../modules/NoteData.ts';
 
 const props = defineProps({
 	note: NoteData
