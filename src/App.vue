@@ -59,7 +59,6 @@ const timestamp = ref(new Date().toLocaleDateString());
 const testNotes = ref([
   new NoteData(
     new Date("7/6/2023").toLocaleDateString(),
-    ["tag 1", "tag 2"],
     "This is the note body message."
   ),
 ]);
@@ -69,7 +68,6 @@ function addNewNote(noteData) {
   testNotes.value.push(
     new NoteData(
       new Date(noteData.value.date).toLocaleDateString(),
-      noteData.value.tags.split(" "),
       noteData.value.entry
     )
   );
@@ -107,7 +105,7 @@ function loadData(dataFileObject) {
   console.log('loadData', dataFileObject);
   if (dataFileObject?.notes) {
     testNotes.value = dataFileObject.notes.map((note) => {
-      return new NoteData(note.date, note.tags, note.entry);
+      return new NoteData(note.date, note.entry);
     });
   }
 }

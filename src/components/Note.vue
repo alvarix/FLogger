@@ -16,11 +16,6 @@ const props = defineProps({
 
       <div class="grid-box">{{ note.date }}</div>
 
-      <div class="grid-box"><b>tags:</b></div>
-
-      <div class="grid-box">
-        <div v-for="tag in note.tags">{{ tag }}</div>
-      </div>
       <div class="grid-box"><b>message:</b></div>
 
       <div class="grid-box">{{ note.entry }}</div>
