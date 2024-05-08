@@ -51,6 +51,7 @@ import { ref } from "vue";
 import { useDataFile } from "./modules/useDataFile.js";
 import NoteList from "./components/NoteList.vue";
 import AddNote from "./components/AddNote.vue";
+import UserAuth from "./components/UserAuth.vue";
 
 const {
   dataFileName,
