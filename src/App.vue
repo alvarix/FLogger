@@ -74,6 +74,30 @@ import { useDataFile } from "./modules/useDataFile.js";
 import NoteList from "./components/NoteList.vue";
 import AddNote from "./components/AddNote.vue";
 import UserAuth from "./components/UserAuth.vue";
+import NoteData from "./modules/NoteData.ts";
+
+const timestamp = ref(new Date().toLocaleDateString());
+const testNotes = ref([
+  new NoteData(
+    new Date("7/6/2023").toLocaleDateString(),
+    ["tag 1", "tag 2"],
+    "This is the note body message."
+  ),
+]);
+
+function addNewNote(noteData) {
+  //console.log(noteData)
+  testNotes.value.push(
+    new NoteData(
+      new Date(noteData.value.date).toLocaleDateString(),
+      noteData.value.tags.split(" "),
+      noteData.value.entry
+    )
+  );
+  dataFileSave({
+    notes: testNotes.value
+  });
+}
 
 const {
   dataFileName,
@@ -94,156 +118,20 @@ const {
 //   const dataFileSave = dataFile.dataFileSave;
 //   const dataFileClose = dataFile.dataFileClose;
 
-// // COMPOSITION API: Doesn't use export default
-// export default {
-
-// // COMPOSITION API: Doesn't need the imported components declared
-//   components: {
-//     NoteList,
-//     AddNote,
-//   },
-
-// // COMPOSITION API: Reactive data are created using ref()
-//   data() {
-//     return {
-//       timestamp: new Date().toLocaleDateString(),
-//       testNotes: [
-//       {
-//           timestamp: new Date("7/6/2023").toLocaleDateString(),
-//           tags: ["tag 1", "tag 2"],
-//           message: "This is the note body message.",
-//         },
-//        // {
-//          // timestamp: new Date(),
-//           //tags: ["tag 1", "tag 3"],
-//           //message: "This is the note TWO body message.",
-//         //},
-//       ],
-//     };
-//   },
-const timestamp = ref(new Date());
-
-const testNotes = ref([
-  // {
-  //   timestamp: new Date("7/6/2023").toLocaleDateString(),
-  //   tags: ["tag 1", "tag 2"],
-  //   message: "This is the note body message.",
-  // },
-  // {
-  // timestamp: new Date(),
-  //tags: ["tag 1", "tag 3"],
-  //message: "This is the note TWO body message.",
-  //},
-]);
-
-// // COMPOSITION API: Methods are declared as normal-looking functions.
-//   methods: {
-// 		addNewNote(noteData) {
-// 			this.testNotes.push ({
-// 				timestamp: Date(noteData.timestamp),
-// 				tags: noteData.tags.split(" "),
-// 				message: noteData.entry
-// 			});
-// 		}
-//   },
-function addNewNote(noteData) {
-  // // COMPOSITION API: "this." isn't necessary to reference reactive state vars, but ".value" is
-  testNotes.value.push({
-    timestamp: Date(noteData.timestamp),
-    tags: noteData.tags.split(" "),
-    message: noteData.entry,
-  });
-  dataFileSave({ notes: testNotes.value });
-}
-
 function closeDataFile() {
+  console.log('closeDataFile');
   dataFileClose();
   testNotes.value = [];
 }
 
 function loadData(dataFileObject) {
+  console.log('loadData', dataFileObject);
   if (dataFileObject?.notes) {
-    testNotes.value = dataFileObject.notes;
+    testNotes.value = dataFileObject.notes.map((note) => {
+      return new NoteData(note.date, note.tags, note.entry);
+    });
   }
 }
-
-// // COMPOSITION API: Doesn't use export default
-// };
-
-// // DROPBOX
-
-// // Standalone example to demonstrate codeflow.
-// // Start the server, hit localhost:3000 on the browser, and click through.
-// // On the server logs, you should have the auth code, as well as the token
-// // from exchanging it. This exchange is invisible to the app user
-
-// // const fetch = require('node-fetch');
-// import fetch from "isomorphic-fetch";
-// // const app = require('express')();
-
-// const hostname = "localhost";
-// const port = 5123;
-
-// const config = {
-//   fetch,
-//   clientId: "q5qja4ma5qcl0qc", //flogger-chad: q5qja4ma5qcl0qc //ORIGINAL EXAMPLE: 42zjexze6mfpf7x
-// };
-
-// // const { Dropbox } = require('dropbox'); // eslint-disable-line import/no-unresolved
-// import { Dropbox } from "dropbox";
-
-// console.log('1')
-// const dbx = new Dropbox(config);
-
-// const redirectUri = `http://${hostname}:${port}/auth`;
-
-// console.log('2')
-// const dbxAuthUri = await dbx.auth.getAuthenticationUrl(
-//   redirectUri,
-//   null,
-//   "code",
-//   "offline",
-//   null,
-//   "none",
-//   true
-// );
-// // .then((authUrl) => {
-// //   res.writeHead(302, { Location: authUrl });
-// //   res.end();
-// // });
-
-// console.log('3')
-
-// function doAuth() {
-//   response.redirectUri = dbxAuthUri;
-// }
-
-// app.get("/auth", (req, res) => {
-//   // eslint-disable-line no-unused-vars
-//   const { code } = req.query;
-//   console.log(`code:${code}`);
-
-//   dbx.auth
-//     .getAccessTokenFromCode(redirectUri, code)
-//     .then((token) => {
-//       console.log(`Token Result:${JSON.stringify(token)}`);
-//       dbx.auth.setRefreshToken(token.result.refresh_token);
-//       dbx
-//         .usersGetCurrentAccount()
-//         .then((response) => {
-//           console.log("response", response);
-//         })
-//         .catch((error) => {
-//           console.error(error);
-//         });
-//     })
-//     .catch((error) => {
-//       console.error(error);
-//     });
-//   res.end();
-// });
-
-// app.listen(port);
 </script>
 
 <style scoped>
