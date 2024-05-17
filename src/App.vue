@@ -2,6 +2,26 @@
   <div>
     <h1>FLogger!</h1>
   </div>
+  <UserAuth/>
+  <!-- <section class="container main">
+    <p>This example shows how to use PKCE in the browser</p>
+    <div id="pre-auth-section" style="display: none">
+      <button onClick="doAuth()">Start PKCE Auth Flow</button>
+
+      <p class="info">
+        Once authenticated, it will use the access token to list the files in
+        your root directory.
+      </p>
+    </div>
+
+    <div id="authed-section" style="display: none">
+      <p>
+        You have successfully authenticated. Below are the contents of your root
+        directory. They were fetched using the SDK and access token.
+      </p>
+      <ul id="files"></ul>
+    </div>
+  </section> -->
   <div class="m-3 p-5 border rounded-lg w-full">
     <h2>Data file</h2>
     <div v-if="dataFileName" class="m-3 p-3 border rounded-md">
@@ -32,7 +52,9 @@
     >
       <!-- <div class="float-left mr-4 font-bold">v2_fileHandle picker:</div> -->
       <div>
-        <button ref="fh" @click="dataFileClickToOpen">select a data file</button>
+        <button ref="fh" @click="dataFileClickToOpen">
+          select a data file
+        </button>
       </div>
     </div>
     <!-- <div class="m-3 p-3 border rounded-md">
@@ -61,7 +83,7 @@ const {
   dataFileSave,
   dataFileClose,
 } = useDataFile(loadData);
-// That above is called a destructure assignment. 
+// That above is called a destructure assignment.
 // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
 // It is shorthand for this:
 //   const dataFile = useDataFile(loadData);
@@ -99,7 +121,7 @@ const {
 //       ],
 //     };
 //   },
-const timestamp = ref(new Date().toLocaleDateString());
+const timestamp = ref(new Date());
 
 const testNotes = ref([
   // {
@@ -147,6 +169,81 @@ function loadData(dataFileObject) {
 
 // // COMPOSITION API: Doesn't use export default
 // };
+
+// // DROPBOX
+
+// // Standalone example to demonstrate codeflow.
+// // Start the server, hit localhost:3000 on the browser, and click through.
+// // On the server logs, you should have the auth code, as well as the token
+// // from exchanging it. This exchange is invisible to the app user
+
+// // const fetch = require('node-fetch');
+// import fetch from "isomorphic-fetch";
+// // const app = require('express')();
+
+// const hostname = "localhost";
+// const port = 5123;
+
+// const config = {
+//   fetch,
+//   clientId: "q5qja4ma5qcl0qc", //flogger-chad: q5qja4ma5qcl0qc //ORIGINAL EXAMPLE: 42zjexze6mfpf7x
+// };
+
+// // const { Dropbox } = require('dropbox'); // eslint-disable-line import/no-unresolved
+// import { Dropbox } from "dropbox";
+
+// console.log('1')
+// const dbx = new Dropbox(config);
+
+// const redirectUri = `http://${hostname}:${port}/auth`;
+
+// console.log('2')
+// const dbxAuthUri = await dbx.auth.getAuthenticationUrl(
+//   redirectUri,
+//   null,
+//   "code",
+//   "offline",
+//   null,
+//   "none",
+//   true
+// );
+// // .then((authUrl) => {
+// //   res.writeHead(302, { Location: authUrl });
+// //   res.end();
+// // });
+
+// console.log('3')
+
+// function doAuth() {
+//   response.redirectUri = dbxAuthUri;
+// }
+
+// app.get("/auth", (req, res) => {
+//   // eslint-disable-line no-unused-vars
+//   const { code } = req.query;
+//   console.log(`code:${code}`);
+
+//   dbx.auth
+//     .getAccessTokenFromCode(redirectUri, code)
+//     .then((token) => {
+//       console.log(`Token Result:${JSON.stringify(token)}`);
+//       dbx.auth.setRefreshToken(token.result.refresh_token);
+//       dbx
+//         .usersGetCurrentAccount()
+//         .then((response) => {
+//           console.log("response", response);
+//         })
+//         .catch((error) => {
+//           console.error(error);
+//         });
+//     })
+//     .catch((error) => {
+//       console.error(error);
+//     });
+//   res.end();
+// });
+
+// app.listen(port);
 </script>
 
 <style scoped>
