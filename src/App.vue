@@ -2,7 +2,9 @@
   <div>
     <h1>FLogger!</h1>
   </div>
-  <UserAuth/>
+  <Suspense>
+    <UserAuth/>
+  </Suspense>
   <!-- <section class="container main">
     <p>This example shows how to use PKCE in the browser</p>
     <div id="pre-auth-section" style="display: none">
