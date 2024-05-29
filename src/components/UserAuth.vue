@@ -63,13 +63,18 @@ if (hasRedirectedFromAuth.value) {
   console.log(`dbxAuthReturnUri`, dbxAuthReturnUri);
   console.log(`dbxAuthCode`, dbxAuthCode.value);
 
-  dbxAuth.setCodeVerifier(window.sessionStorage.getItem("codeVerifier"));
+  const codeVerifier = window.sessionStorage.getItem("codeVerifier")
+  console.log(`codeVerifier:`, codeVerifier)
+  dbxAuth.setCodeVerifier(codeVerifier);
+  console.log('step 1')
   dbxAuth
     // 1. Get token
     .getAccessTokenFromCode(dbxAuthReturnUri, dbxAuthCode)
     // 2. Use token to get files
     .then((response) => {
+      console.log('step 2')
       dbxAuth.setAccessToken(response.result.access_token);
+      console.log('step 3')
       var dbx = new Dropbox({
         auth: dbxAuth,
       });
@@ -79,6 +84,7 @@ if (hasRedirectedFromAuth.value) {
     })
     // 3. Set fileItems to display
     .then((response) => {
+      console.log('step 4')
       fileItems.value = response.result.entries.map((item) => {
         return {
           name: item.name,
