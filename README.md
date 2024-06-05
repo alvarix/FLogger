@@ -1,5 +1,9 @@
 # About the code
 
+Initialize
+* yarn install
+* yarn dev
+
 This app ... 
 * is created using Vue 3 + Vite
 * uses composition mode single file components
