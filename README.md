@@ -1,8 +1,17 @@
 # About the code
 
-Initialize
+Initialize Vue App
 * yarn install
 * yarn dev
+
+
+Dropbox Auth process
+* Dropbox flogger.notes@gmail.com
+* Create app folder 
+* https://www.dropbox.com/developers/apps
+* set Redirect URL
+* get client ID for SDK (App Key?)
+* Enable More users (Apply for Production Status)
 
 This app ... 
 * is created using Vue 3 + Vite
