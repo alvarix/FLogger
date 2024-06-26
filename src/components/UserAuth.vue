@@ -64,6 +64,7 @@ const hasRedirectedFromAuth = ref(!!dbxAuthCode.value);
 
 const fileItems = ref([]);
 const fileItemThumbnails = ref({});
+const fileContents = ref({});
 
 if (hasRedirectedFromAuth.value) {
   console.log(`dbxAuthReturnUri`, dbxAuthReturnUri);
@@ -128,6 +129,7 @@ if (accessToken) {
         console.log("item", item);
         return item;
       });
+      fetchFileContents(dbx, response.result.entries);
       dbxAuth.checkAndRefreshAccessToken();
       dbx
         .filesGetThumbnailBatch({
@@ -176,6 +178,22 @@ if (accessToken) {
         });
     });
 }
+
+const fetchFileContents = (dbx, entries) => {
+  entries.forEach((item) => {
+
+    dbx.filesDownload({ path: item.path_lower })
+      .then((response) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          fileContents.value[item.id] = e.target.result;
+        };
+        reader.readAsText(response.result.fileBlob);
+      })
+      .catch((error) => console.error(error));
+  });
+};
+
 
 const clearDbxSession = () => {
   console.log('clearDbxSession');
@@ -228,6 +246,9 @@ const clearDbxSession = () => {
               <img
                 :src="'data:image/jpeg;base64,' + fileItemThumbnails[item.id]"
               />
+            </li>
+            <li v-else="fileContents[item.id]">
+              Contents: <pre>{{ fileContents[item.id] }}</pre>
             </li>
           </ul>
         </li>
