@@ -64,6 +64,7 @@ const hasRedirectedFromAuth = ref(!!dbxAuthCode.value);
 
 const fileItems = ref([]);
 const fileItemThumbnails = ref({});
+const fileItemContents = ref({});
 
 if (hasRedirectedFromAuth.value) {
   console.log(`dbxAuthReturnUri`, dbxAuthReturnUri);
@@ -72,8 +73,6 @@ if (hasRedirectedFromAuth.value) {
   const codeVerifier = window.sessionStorage.getItem("codeVerifier");
   console.log(`codeVerifier:`, codeVerifier);
   dbxAuth.setCodeVerifier(codeVerifier);
-  const reloadUrl = removeAuthCodeFromUrl(window.location.href);
-  console.log("reloadUrl", reloadUrl);
   console.log("step 1");
   dbxAuth
     // 1. Get token
@@ -101,10 +100,11 @@ let accessToken = window.sessionStorage.getItem("accessToken");
 if (accessToken && accessToken != "") {
   console.log("step 3a from sessionStorage");
   dbxAuth.setAccessToken(accessToken);
-} else {
-  console.log("step 3b check from dbxAuth");
-  window.sessionStorage.removeItem("accessToken");
-  accessToken = dbxAuth.getAccessToken();
+  // Unclear if there's a scenario where the accessToken would already be set in the dbxAuth object
+  // } else {
+  //   console.log("step 3b check from dbxAuth");
+  //   window.sessionStorage.removeItem("accessToken");
+  //   accessToken = dbxAuth.getAccessToken();
 }
 
 console.log("accessToken:", accessToken);
@@ -128,10 +128,11 @@ if (accessToken) {
         console.log("item", item);
         return item;
       });
+      // 7. Get file thumbnails
       dbxAuth.checkAndRefreshAccessToken();
       dbx
         .filesGetThumbnailBatch({
-          entries: response.result.entries.map((item) => {
+          entries: fileItems.value.map((item) => {
             return {
               /**
                * The path to the image file you want to thumbnail.
@@ -169,16 +170,58 @@ if (accessToken) {
             }
           });
           return true;
-        })
-        .then(() => {
-          dbxAuth.checkAndRefreshAccessToken();
-          dbx.fileRequestsCreate;
         });
+
+      // // 8. At the same time we can query for file contents
+      // fileItems.value.forEach(getFileContents);
     });
 }
 
+const getFileContents = (file, index) => {
+  console.log("getFileContents", file, index);
+  // only get contents if it's a file that ends with '.json'
+  if (file[".tag"] == "file") {
+    dbxAuth.checkAndRefreshAccessToken();
+    dbx
+      .filesGetTemporaryLink({
+        /**
+         * The path to the file you want a temporary link to.
+         */
+        path: file.path_lower,
+      })
+      .then(async (response) => {
+        console.log(`Got link ${index}`, response);
+        if (response?.result?.metadata?.id == file.id) {
+          console.log(`Fetching file content ${index}`);
+          const link = response.result.link;
+          fileItemContents.value[file.id] = {
+            link: link,
+            content: undefined, // To be fetched
+          };
+          const contentStream = await fetch(link);
+          // Returns an object with body property that is a ReadableStream
+          // See https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream
+          console.log(`contentStream ${index}`, contentStream);
+          return new Response(contentStream.body, {
+            headers: contentStream.headers,
+          }).text();
+        }
+      })
+      .then((content) => {
+        console.log(`Got content ${index}`, content);
+        fileItemContents.value[file.id] = {
+          ...fileItemContents.value[file.id],
+          content: content,
+        };
+      })
+      .catch((e) => {
+        console.log("Error getting file content URL:", e.error || e);
+      });
+  }
+};
+
 const clearDbxSession = () => {
-  console.log('clearDbxSession');
+  console.log("clearDbxSession");
   window.sessionStorage.removeItem("accessToken");
   window.sessionStorage.removeItem("codeVerifier");
   dbxAuthCode.value = undefined;
@@ -186,8 +229,6 @@ const clearDbxSession = () => {
   fileItems.value = [];
   fileItemThumbnails.value = {};
 };
-
-
 </script>
 
 <template>
@@ -214,20 +255,27 @@ const clearDbxSession = () => {
         You have successfully authenticated. Below are the contents of your root
         directory. They were fetched using the SDK and access token.
       </p>
-      <div>{{ JSON.stringify(fileItemThumbnails.value) }}</div>
       <ul id="files">
-        <li v-for="item in fileItems">
-          <b>{{ item.path_display }}</b>
-          <ul class="item">
-            <li>type (".tag"): {{ item[".tag"] }}</li>
-            <li>name: {{ item.name }}</li>
-            <li>path_display: {{ item.path_display }}</li>
-            <li>path_lower: {{ item.path_lower }}</li>
-            <li>id: {{ item.id }}</li>
-            <li v-if="fileItemThumbnails[item.id]">
+        <li v-for="file in fileItems">
+          <b>{{ file.path_display }}</b>
+          <ul class="files">
+            <li>type (".tag"): {{ file[".tag"] }}</li>
+            <li v-if="file.name.endsWith('.json')">
+              name:
+              <a @click="() => getFileContents(file)">{{ file.name }}</a>
+            </li>
+            <li v-else>name: {{ file.name }}</li>
+            <!--   if (file[".tag"] == "file" && file?.name.endsWith(".json")) { -->
+            <li>path_display: {{ file.path_display }}</li>
+            <li>path_lower: {{ file.path_lower }}</li>
+            <li>id: {{ file.id }}</li>
+            <li v-if="fileItemThumbnails[file.id]">
               <img
-                :src="'data:image/jpeg;base64,' + fileItemThumbnails[item.id]"
+                :src="'data:image/jpeg;base64,' + fileItemThumbnails[file.id]"
               />
+            </li>
+            <li v-if="fileItemContents[file.id]">
+              <textarea>{{ fileItemContents[file.id].content }}</textarea>
             </li>
           </ul>
         </li>
