@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+  <title>Dropbox JavaScript SDK</title>
+  <link rel="stylesheet" href="/public/javascript/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.3/fetch.js"></script>
+  <script src="/__build__/Dropbox-sdk.min.js"></script>
+</head>
+<body>
+  <!-- Example layout boilerplate -->
+  <header class="page-header">
+    <div class="container">
+      <nav>
+        <a href="/public/javascript/">
+          <h1>
+            <img src="https://cfl.dropboxstatic.com/static/images/brand/logotype_white-vflRG5Zd8.svg" class="logo" />
+            JavaScript SDK Examples
+          </h1>
+        </a>
+        <a href="https://github.com/dropbox/dropbox-sdk-js/tree/main/examples/javascript" class="view-source">View Source</a>
+      </nav>
+      <h2 class="code">
+        <a href="/public/javascript/">examples</a> / team as user
+      </h2>
+    </div>
+  </header>
+
+  <!-- Example description and UI -->
+  <section class="container main">
+    <p>This example shows how to use the Dropbox class and the <code>selectUser</code> [<a href="https://dropbox.github.io/dropbox-sdk-js/Dropbox.html#Dropbox__anchor">docs</a>] parameter, to retreive a Dropbox class that is acting as a specific user on the team.</p>
+
+    <form onSubmit="return listFiles()">
+      <input type="text" id="access-token" placeholder="Access token" />
+      <input type="text" id="member-id" placeholder="Member ID" />
+      <button type="submit">Submit</button>
+    </form>
+
+    <!-- The files returned from the SDK will be added here -->
+    <ul id="files"></ul>
+
+    <p class="info">This endpoint requires a Dropbox Business API app key, <a href="https://www.dropbox.com/developers/documentation/http/teams">see here for more details</a>.</p>
+  </section>
+
+  <!-- Scripts to run example -->
+  <script>
+    function listFiles() {
+      var ACCESS_TOKEN = document.getElementById('access-token').value;
+      var MEMBER_ID = document.getElementById('member-id').value;
+      var dbx = new Dropbox.Dropbox({ accessToken: ACCESS_TOKEN , selectUser: MEMBER_ID});
+      dbx.filesListFolder({path: ''})
+        .then(function(response) {
+          displayFiles(response.result.entries);
+          console.log(response);
+        })
+        .catch(function(error) {
+          console.error(error.error || error);
+        });
+      return false;
+    }
+
+    function displayFiles(files) {
+      var filesList = document.getElementById('files');
+      var li;
+      for (var i = 0; i < files.length; i++) {
+        li = document.createElement('li');
+        li.appendChild(document.createTextNode(files[i].name));
+        filesList.appendChild(li);
+      }
+    }
+  </script>
+</body>
+</html>

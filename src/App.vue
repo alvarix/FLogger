@@ -2,6 +2,28 @@
   <div>
     <h1>FLogger!</h1>
   </div>
+  <Suspense>
+    <UserAuth/>
+  </Suspense>
+  <!-- <section class="container main">
+    <p>This example shows how to use PKCE in the browser</p>
+    <div id="pre-auth-section" style="display: none">
+      <button onClick="doAuth()">Start PKCE Auth Flow</button>
+
+      <p class="info">
+        Once authenticated, it will use the access token to list the files in
+        your root directory.
+      </p>
+    </div>
+
+    <div id="authed-section" style="display: none">
+      <p>
+        You have successfully authenticated. Below are the contents of your root
+        directory. They were fetched using the SDK and access token.
+      </p>
+      <ul id="files"></ul>
+    </div>
+  </section> -->
   <div class="m-3 p-5 border rounded-lg w-full">
     <h2>Data file</h2>
     <div v-if="dataFileName" class="m-3 p-3 border rounded-md">
@@ -53,6 +75,7 @@ import { ref } from "vue";
 import { useDataFile } from "./modules/useDataFile.js";
 import NoteList from "./components/NoteList.vue";
 import AddNote from "./components/AddNote.vue";
+import UserAuth from "./components/UserAuth.vue";
 import NoteData from "./modules/NoteData.ts";
 
 const timestamp = ref(new Date().toLocaleDateString());
