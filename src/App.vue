@@ -3,7 +3,7 @@
     <h1>FLogger!</h1>
   </div>
   <Suspense>
-    <UserAuth/>
+    <UserAuth />
   </Suspense>
   <!-- <section class="container main">
     <p>This example shows how to use PKCE in the browser</p>
@@ -67,7 +67,7 @@
     </div> -->
   </div>
   <AddNote @newNote="addNewNote" :timestamp="timestamp" />
-  <NoteList :notes="testNotes" />
+  <NoteList :notes="loadedNotes" />
 </template>
 
 <script setup>
@@ -77,25 +77,22 @@ import NoteList from "./components/NoteList.vue";
 import AddNote from "./components/AddNote.vue";
 import UserAuth from "./components/UserAuth.vue";
 import NoteData from "./modules/NoteData.ts";
+import { useLoadedNotes } from "./composables/useLoadedNotes.ts";
+
+const { loadedNotes, loadNotes, loadNote } = useLoadedNotes();
 
 const timestamp = ref(new Date().toLocaleDateString());
-const testNotes = ref([
-  new NoteData(
-    new Date("7/6/2023").toLocaleDateString(),
-    "This is the note body message."
-  ),
-]);
 
 function addNewNote(noteData) {
   //console.log(noteData)
-  testNotes.value.push(
+  loadNote(
     new NoteData(
       new Date(noteData.value.date).toLocaleDateString(),
       noteData.value.entry
     )
   );
   dataFileSave({
-    notes: testNotes.value
+    notes: loadedNotes.value,
   });
 }
 
@@ -119,17 +116,19 @@ const {
 //   const dataFileClose = dataFile.dataFileClose;
 
 function closeDataFile() {
-  console.log('closeDataFile');
+  console.log("closeDataFile");
   dataFileClose();
-  testNotes.value = [];
+  loadNotes([]);
 }
 
 function loadData(dataFileObject) {
-  console.log('loadData', dataFileObject);
+  console.log("loadData", dataFileObject);
   if (dataFileObject?.notes) {
-    testNotes.value = dataFileObject.notes.map((note) => {
-      return new NoteData(note.date, note.entry);
-    });
+    loadNotes(
+      dataFileObject.notes.map((note) => {
+        return new NoteData(note.date, note.entry);
+      })
+    );
   }
 }
 </script>

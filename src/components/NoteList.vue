@@ -1,23 +1,17 @@
-<script setup>
-import { ref } from 'vue'
-import Note from "./Note.vue"
+<script setup lang="ts">
+import { ref } from "vue";
+import Note from "./Note.vue";
+import { INote } from '../modules/NoteData'
 
-
-const props = defineProps({
-	notes: {
-      type: Array,
-      required: true,
-      default: []
-	},
-})
-
-
+const props = defineProps<{
+  notes: Array<INote>;
+}>();
 </script>
 
 <template>
   <h2>Note List</h2>
   <ul class="note-list">
-    <li v-for="(note) in notes">
+    <li v-for="note in notes">
       <Note :note="note" />
     </li>
   </ul>

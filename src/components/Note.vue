@@ -1,12 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
-import NoteData from '../modules/NoteData.ts';
+import { INote } from '../modules/NoteData'
 
-const props = defineProps({
-	note: NoteData
-})
-
-
+const props = defineProps<{
+  note: INote;
+}>();
 </script>
 
 <template>

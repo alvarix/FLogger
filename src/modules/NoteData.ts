@@ -1,3 +1,5 @@
+export interface INote extends NoteData {}
+
 export default class NoteData {
   date: Date;
   entry: string;
