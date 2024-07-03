@@ -1,11 +1,11 @@
+export interface INote extends NoteData {}
+
 export default class NoteData {
   date: Date;
-  tags: [string];
   entry: string;
 
-  constructor(date: Date, tags: [string], entry: string) {
+  constructor(date: Date, entry: string) {
     this.date = date;
-    this.tags = tags;
     this.entry = entry;
   }
 }

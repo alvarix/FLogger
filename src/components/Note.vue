@@ -1,28 +1,19 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
-import NoteData from '../modules/NoteData.ts';
+import { INote } from '../modules/NoteData'
 
-const props = defineProps({
-	note: NoteData
-})
-
-
+const props = defineProps<{
+  note: INote;
+}>();
 </script>
 
 <template>
   <div class="note">
     <div class="grid">
       <div class="grid-box"><b>timestamp:</b></div>
-
       <div class="grid-box">{{ note.date }}</div>
 
-      <div class="grid-box"><b>tags:</b></div>
-
-      <div class="grid-box">
-        <div v-for="tag in note.tags">{{ tag }}</div>
-      </div>
       <div class="grid-box"><b>message:</b></div>
-
       <div class="grid-box">{{ note.entry }}</div>
     </div>
   </div>
