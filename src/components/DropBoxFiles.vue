@@ -4,7 +4,7 @@ import fetch from "isomorphic-fetch";
 import qs from "qs";
 import { useLoadedNotes } from "../composables/useLoadedNotes.ts";
 
-const { loadNotesFromString } = useLoadedNotes();
+const { loadNotes, loadNotesFromString } = useLoadedNotes();
 
 const props = defineProps({});
 
@@ -166,11 +166,17 @@ const selectFile = (file) => {
         // load the file notes content
         loadNotesFromString(fileData);
         // set the loadedFile
+        loadedFile.value = { path: file.path_lower };
       };
       reader.readAsText(response.result.fileBlob);
     })
     .catch((error) => console.error(error));
 };
+
+const unselectFile = () => {
+  loadedFile.value = undefined;
+  loadNotes([]);
+}
 
 const clearDbxSession = () => {
   console.log("clearDbxSession");
@@ -188,51 +194,53 @@ const clearDbxSession = () => {
 <template>
   <!-- Example description and UI -->
   <section class="container main">
-    <p>This example shows how to use PKCE in the browser:</p>
+    <p>
+      To load files from your DropBox account, you need to connect to DropBox
+      and authorize Flogger.
+    </p>
     <div
       id="pre-auth-section"
       :style="{ display: accessToken ? 'none' : 'block' }"
     >
-      <button @click="doAuth">Start PKCE Auth Flow</button>
-
-      <p class="info">
-        Once authenticated, it will use the access token to list the files in
-        your root directory.
+      <button @click="doAuth">connect to DropBox</button>
+    </div>
+    
+    <div
+      id="authed-section"
+      :style="{ display: (accessToken) ? 'block' : 'none' }"
+    >
+      <p>
+        You are connected to DropBox.
       </p>
+      <button @click="clearDbxSession">forget DropBox connection</button>
     </div>
 
     <div
-      id="authed-section"
-      :style="{ display: accessToken ? 'block' : 'none' }"
+      id="files-section"
+      :style="{ display: !loadedFile ? 'block' : 'none' }"
     >
       <p>
-        You have successfully authenticated. Below are the contents of your root
-        directory. They were fetched using the SDK and access token.
+        Below are the .flogger files available in your of the App/flogger folder.
       </p>
       <ul id="files">
         <li v-for="item in fileItems">
-          <b>{{ item.path_display }}</b>
-          <ul class="item">
-            <li>type (".tag"): {{ item[".tag"] }}</li>
-            <li v-if="item.name.endsWith('.flogger')">
-              name:
-              <a href="#" @click="() => selectFile(item)">{{ item.name }}</a>
-            </li>
-            <li v-else>name: {{ item.name }}</li>
-            <li>path_display: {{ item.path_display }}</li>
-            <li>path_lower: {{ item.path_lower }}</li>
-            <li>id: {{ item.id }}</li>
-            <!-- Don't display file contents -->
-            <!-- <li v-else="fileContents[item.id]">
-              Contents:
-              <pre>{{ fileContents[item.id] }}</pre>
-            </li> -->
-          </ul>
+          <a href="#" @click.prevent="() => selectFile(item)">{{
+            item.path_display
+          }}</a>
         </li>
       </ul>
-      <button @click="clearDbxSession">clear</button>
     </div>
-  </section>
+
+    <div
+      id="loadedFile-section"
+      :style="{ display: loadedFile ? 'block' : 'none' }"
+    >
+      <p>
+        The loaded file is <b>{{loadedFile?.path}}</b>
+      </p>
+      <button @click="unselectFile">close file</button>
+    </div>
+</section>
 </template>
 
 <style scoped>
