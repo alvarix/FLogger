@@ -9,7 +9,6 @@ let hasError = ref(false);
 let form = ref( 
 			new NoteData( 
 				new Date().toLocaleDateString(),
-				'tag2 tag',
 				'Change text',
 			),
 );
@@ -34,10 +33,6 @@ const submitAdd = (event) => {
 			<input :class={error:hasError} id='time' type="text" :placeholder="form.date" v-model="form.date" required >
 			
 			<em class='date-validation hidden' :class={error:hasError}>Please enter valid date</em>
-		</div>
-		<div>
-			<label for="tags">Tags</label>
-			<input type="text" v-model="form.tags" required>
 		</div>
 		<div>
 			<label for="entry">Entry</label>
