@@ -28,7 +28,8 @@ const formattedDate = computed(() => formatDate(props.note.date));
   <div class="note">
       <h3>{{ formattedDate }}</h3>
 
-      <div><pre>{{ note.entry }}</pre></div>
+      <div><pre>{{ note.entry }}</pre></div> 
+      
   </div>
 </template>
 
