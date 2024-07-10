@@ -9,42 +9,27 @@ const props = defineProps<{
 
 <template>
   <div class="note">
-    <div class="grid">
-      <div class="grid-box"><b>timestamp:</b></div>
-      <div class="grid-box">{{ note.date }}</div>
+      <h3>{{ note.date }}</h3>
 
-      <div class="grid-box"><b>message:</b></div>
-      <div class="grid-box">{{ note.entry }}</div>
-    </div>
+      <div><pre>{{ note.entry }}</pre></div>
   </div>
 </template>
 
 <style scoped>
+h3 {
+  font-weight: 700;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+
 .note {
   text-align: left;
-  max-width: 490px;
+  max-width: 600px;
   border-radius: 14px;
   padding: 20px;
   border: 1px solid black;
 }
-.grid {
-  display: grid;
-  grid-gap: 10px;
-  grid-template-columns: repeat(
-    auto-fill,
-    minmax(100px, 1fr) minmax(200px, 2fr)
-  );
-}
-.grid-box {
-  background-color: #444;
-  color: #fff;
-  border-radius: 5px;
-  padding: 20px;
-  font-size: 150%;
-}
 
-.grid-box:nth-child(even) {
-  background-color: #ccc;
-  color: #000;
-}
+
 </style>
