@@ -22,19 +22,6 @@ const { loadedNotes, loadNotes, loadNote } = useLoadedNotes();
 
 const timestamp = ref(new Date().toLocaleDateString());
 
-function addNewNote(noteData) {
-  //console.log(noteData)
-  loadNote(
-    new NoteData(
-      new Date(noteData.value.date).toLocaleDateString(),
-      noteData.value.entry
-    )
-  );
-  dataFileSave({
-    notes: loadedNotes.value,
-  });
-}
-
 const {
   dataFileName,
   dataFilePermissions,
@@ -53,6 +40,19 @@ const {
 //   const dataFileClickToRequestPermission = dataFile.dataFileClickToRequestPermission;
 //   const dataFileSave = dataFile.dataFileSave;
 //   const dataFileClose = dataFile.dataFileClose;
+
+function addNewNote(noteData) {
+  //console.log(noteData)
+  loadNote(
+    new NoteData(
+      new Date(noteData.value.date).toLocaleDateString(),
+      noteData.value.entry
+    )
+  );
+  dataFileSave({
+    notes: loadedNotes.value,
+  });
+}
 
 function closeDataFile() {
   console.log("closeDataFile");
