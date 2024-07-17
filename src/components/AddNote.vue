@@ -3,18 +3,13 @@ import { ref } from 'vue'
 import NoteData from '../modules/NoteData.ts';
 import { defineEmits } from 'vue';
 
-const showDiv = ref(false);
-const toggleDiv = () => {
-          showDiv.value = !showDiv.value;
-        };
-
 const emit = defineEmits(['newNote']);
 let hasError = ref(false);	
 
 let form = ref( 
 			new NoteData( 
 				new Date().toLocaleDateString(),
-				'Change text',
+				'',
 			),
 );
 
@@ -32,20 +27,21 @@ const submitAdd = (event) => {
 
 <template>
 
-  <button @click="toggleDiv"><span v-if="showDiv">Close Entry Form</span><span v-else>Add Log Entry</span></button>
 
-	<form  v-if="showDiv" id='add-note' @submit.prevent="submitAdd">
-		<div>
-			<label for='time'>Time</label>
-			<input :class={error:hasError} id='time' type="text" :placeholder="form.date" v-model="form.date" required >
-			
-			<em class='date-validation hidden' :class={error:hasError}>Please enter valid date</em>
+
+
+	<form  id='add-note' @submit.prevent="submitAdd">
+		<div class="form-inner">
+			<div>
+				<input :class="['date', {error:hasError}]" id='time' type="text" :placeholder="form.date" v-model="form.date" required >
+				
+				<em class='date-validation hidden' :class={error:hasError}>Please enter valid date</em>
+			</div>
+			<div>
+				<textarea autofocus id="entry" name="" cols="30" rows="2" v-model='form.entry' required></textarea>
+			</div>
 		</div>
-		<div>
-			<label for="entry">Entry</label>
-			<textarea id="entry" name="" cols="30" rows="10" v-model='form.entry' required></textarea>
-		</div>
-		<div><input type="submit"></div>
+		<div><input type="submit" value="Add Entry"></div>
 		
 	</form>
 </template>
@@ -55,21 +51,31 @@ const submitAdd = (event) => {
 	display:block;
 }
 
+
+
 input.error {
 	border:1px solid red;
 }
 
-form {
-	background-color: #ccc;
-	padding: 10px;
-	border-radius: 10px;
-	margin: 30px 0;
-	max-width: 600px;
+.form-inner {
+    max-width: 600px;
+    border-radius: 14px;
+    padding: 20px;
+    border: 1px solid black;
+}
+
+input.date {
+	font-weight: bold;
+	font-size: 14px;
+	border: none;
 }
 
 input, textarea {
-	outline: 1px solid #999;
 	padding: 5px;
+}
+
+textarea {
+	width: 100%;
 }
 
 .date-validation.error {
@@ -77,6 +83,13 @@ input, textarea {
 	color:red;
 }
 
+input[type=submit] {
+	background-color: #ccc;
+	border-radius: 10px;
+	padding: 6px 10px;
+	margin-top: 10px;
+	cursor: pointer;
+}
 
 #add-note label {
 	margin-top: 20px;

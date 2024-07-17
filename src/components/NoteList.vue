@@ -9,7 +9,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <h2>Note List</h2>
+  
   <ul class="note-list">
     <li v-for="note in notes">
       <Note :note="note" />
@@ -21,7 +21,7 @@ const props = defineProps<{
 .note-list > li {
   border-radius: 14px;
   list-style: none;
-  padding: 0.5em;
-  margin: 0.5em;
+  margin-top: 10px;
+
 }
 </style>
