@@ -11,7 +11,7 @@
 
 <script setup>
 import { ref } from "vue";
-import { useDataFile } from "./modules/useDataFile.js";
+import { useDataFile } from "./modules/useDataFile";
 import NoteList from "./components/NoteList.vue";
 import AddNote from "./components/AddNote.vue";
 import DropBoxFiles from "./components/DropBoxFiles.vue";
@@ -23,10 +23,6 @@ const { loadedNotes, loadNotes, loadNote } = useLoadedNotes();
 const timestamp = ref(new Date().toLocaleDateString());
 
 const {
-  dataFileName,
-  dataFilePermissions,
-  dataFileClickToOpen,
-  dataFileClickToRequestPermission,
   dataFileSave,
   dataFileClose,
 } = useDataFile(loadData);
@@ -34,10 +30,6 @@ const {
 // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
 // It is shorthand for this:
 //   const dataFile = useDataFile(loadData);
-//   const dataFileName = dataFile.dataFileName;
-//   const dataFilePermissions = dataFile.dataFilePermissions;
-//   const dataFileClickToOpen = dataFile.dataFileClickToOpen;
-//   const dataFileClickToRequestPermission = dataFile.dataFileClickToRequestPermission;
 //   const dataFileSave = dataFile.dataFileSave;
 //   const dataFileClose = dataFile.dataFileClose;
 
