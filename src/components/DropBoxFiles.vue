@@ -44,7 +44,13 @@ const doAuth = () => {
       console.log("dbxAuth.codeVerifier", dbxAuth.codeVerifier);
       window.location.href = authUrl;
     })
-    .catch((error) => console.error(error));
+    .catch((error) => {
+      console.log(
+        `Error getting auth URL:`,
+        e?.message || e
+      );
+      clearDbxSession();
+    });
 };
 
 // Parses the url and gets the access token if it is in the urls hash
@@ -115,6 +121,7 @@ console.log("accessToken:", accessToken);
 
 if (accessToken) {
   // 4. Check/refresh token
+  console.log("step 4");
   dbxAuth.checkAndRefreshAccessToken();
   // 5. Use token to get files
   console.log("step 5");
@@ -135,6 +142,10 @@ if (accessToken) {
           return item;
         });
       // fetchFileContents(fileItems.value);
+    })
+    .catch((e) => {
+      console.log("Error listing dropbox folders:", e?.message || e);
+      clearDbxSession();
     });
 }
 
@@ -150,7 +161,13 @@ const fetchFileContents = (entries) => {
         };
         reader.readAsText(response.result.fileBlob);
       })
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        console.log(
+          `Error downloading file ${item.path_lower} :`,
+          e?.message || e
+        );
+        clearDbxSession();
+      });
   });
 };
 
@@ -170,13 +187,19 @@ const selectFile = (file) => {
       };
       reader.readAsText(response.result.fileBlob);
     })
-    .catch((error) => console.error(error));
+    .catch((error) => {
+      console.log(
+        `Error downloading file ${item.path_lower} :`,
+        e?.message || e
+      );
+      clearDbxSession();
+    });
 };
 
 const unselectFile = () => {
   loadedFile.value = undefined;
   loadNotes([]);
-}
+};
 
 const clearDbxSession = () => {
   console.log("clearDbxSession");
@@ -204,14 +227,12 @@ const clearDbxSession = () => {
     >
       <button @click="doAuth">connect to DropBox</button>
     </div>
-    
+
     <div
       id="authed-section"
-      :style="{ display: (accessToken) ? 'block' : 'none' }"
+      :style="{ display: accessToken ? 'block' : 'none' }"
     >
-      <p>
-        You are connected to DropBox.
-      </p>
+      <p>You are connected to DropBox.</p>
       <button @click="clearDbxSession">forget DropBox connection</button>
     </div>
 
@@ -220,7 +241,8 @@ const clearDbxSession = () => {
       :style="{ display: !loadedFile ? 'block' : 'none' }"
     >
       <p>
-        Below are the .flogger files available in your of the App/flogger folder.
+        Below are the .flogger files available in your of the App/flogger
+        folder.
       </p>
       <ul id="files">
         <li v-for="item in fileItems">
@@ -236,11 +258,11 @@ const clearDbxSession = () => {
       :style="{ display: loadedFile ? 'block' : 'none' }"
     >
       <p>
-        The loaded file is <b>{{loadedFile?.path}}</b>
+        The loaded file is <b>{{ loadedFile?.path }}</b>
       </p>
       <button @click="unselectFile">close file</button>
     </div>
-</section>
+  </section>
 </template>
 
 <style scoped>
