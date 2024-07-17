@@ -5,7 +5,7 @@
   <Suspense>
     <DropBoxFiles />
   </Suspense>
-  <AddNote @newNote="addNewNote" :timestamp="timestamp" />
+  <AddNote v-if="loadedNotes && loadedNotes.length > 0" @newNote="addNewNote" :timestamp="timestamp" />
   <NoteList :notes="loadedNotes" />
 </template>
 
