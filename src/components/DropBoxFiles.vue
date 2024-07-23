@@ -2,9 +2,9 @@
 import { ref } from "vue";
 import fetch from "isomorphic-fetch";
 import qs from "qs";
-import { useLoadedNotes } from "../composables/useLoadedNotes.ts";
+import { useLoadedEntries } from "../composables/useLoadedEntries.ts";
 
-const { loadNotes, loadNotesFromString } = useLoadedNotes();
+const { loadEntries, loadEntriesFromString } = useLoadedEntries();
 
 const props = defineProps({});
 
@@ -155,7 +155,7 @@ const fetchFileContents = (entries) => {
 };
 
 const selectFile = (file) => {
-  const { loadNotesFromString } = useLoadedNotes();
+  const { loadEntriesFromString } = useLoadedEntries();
   dbxAuth.checkAndRefreshAccessToken();
   dbx
     .filesDownload({ path: file.path_lower })
@@ -163,8 +163,8 @@ const selectFile = (file) => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const fileData = e.target.result;
-        // load the file notes content
-        loadNotesFromString(fileData);
+        // load the file entries content
+        loadEntriesFromString(fileData);
         // set the loadedFile
         loadedFile.value = { path: file.path_lower };
       };
@@ -175,7 +175,7 @@ const selectFile = (file) => {
 
 const unselectFile = () => {
   loadedFile.value = undefined;
-  loadNotes([]);
+  loadEntries([]);
 }
 
 const clearDbxSession = () => {
@@ -187,7 +187,7 @@ const clearDbxSession = () => {
   fileItems.value = [];
   fileContents.value = {};
   loadedFile.value = undefined;
-  loadNotesFromString();
+  loadEntriesFromString();
 };
 </script>
 
@@ -244,7 +244,7 @@ const clearDbxSession = () => {
 </template>
 
 <style scoped>
-#add-note *:not(.date-validation) {
+#add-entry *:not(.date-validation) {
   display: block;
 }
 
@@ -257,7 +257,7 @@ input.error {
   color: red;
 }
 
-#add-note label {
+#add-entry label {
   margin-top: 20px;
 }
 

@@ -1,24 +1,24 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import Note from "./Note.vue";
-import { INote } from '../modules/NoteData'
+import Entry from "./Entry.vue";
+import { IEntry } from '../modules/EntryData'
 
 const props = defineProps<{
-  notes: Array<INote>;
+  entries: Array<IEntry>;
 }>();
 </script>
 
 <template>
   
-  <ul class="note-list">
-    <li v-for="note in notes">
-      <Note :note="note" />
+  <ul class="entry-list">
+    <li v-for="entry in entries">
+      <Entry :entry="entry" />
     </li>
   </ul>
 </template>
 
 <style scoped>
-.note-list > li {
+.entry-list > li {
   border-radius: 14px;
   list-style: none;
   margin-top: 10px;
