@@ -4,6 +4,7 @@ import NoteData from '../modules/NoteData.ts';
 import { defineEmits } from 'vue';
 
 const emit = defineEmits(['newNote']);
+// as per compiler: [@vue/compiler-sfc] `defineEmits` is a compiler macro and no longer needs to be imported.
 let hasError = ref(false);	
 
 let form = ref( 
@@ -19,6 +20,7 @@ const submitAdd = (event) => {
 	 emit('newNote', form);
 //		 } else {
 //		 	this.hasError= true;
+
 //		 }
 
 };
