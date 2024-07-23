@@ -11,7 +11,7 @@
 
 <script setup>
 import { ref } from "vue";
-import { useDataFile } from "./modules/useDataFile.js";
+import { useDataFile } from "./modules/useDataFile";
 import NoteList from "./components/NoteList.vue";
 import AddNote from "./components/AddNote.vue";
 import DropBoxFiles from "./components/DropBoxFiles.vue";
@@ -21,6 +21,17 @@ import { useLoadedNotes } from "./composables/useLoadedNotes.ts";
 const { loadedNotes, loadNotes, loadNote } = useLoadedNotes();
 
 const timestamp = ref(new Date().toLocaleDateString());
+
+const {
+  dataFileSave,
+  dataFileClose,
+} = useDataFile(loadData);
+// That above is called a destructure assignment.
+// See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
+// It is shorthand for this:
+//   const dataFile = useDataFile(loadData);
+//   const dataFileSave = dataFile.dataFileSave;
+//   const dataFileClose = dataFile.dataFileClose;
 
 function addNewNote(noteData) {
   //console.log(noteData)
@@ -34,25 +45,6 @@ function addNewNote(noteData) {
     notes: loadedNotes.value,
   });
 }
-
-const {
-  dataFileName,
-  dataFilePermissions,
-  dataFileClickToOpen,
-  dataFileClickToRequestPermission,
-  dataFileSave,
-  dataFileClose,
-} = useDataFile(loadData);
-// That above is called a destructure assignment.
-// See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
-// It is shorthand for this:
-//   const dataFile = useDataFile(loadData);
-//   const dataFileName = dataFile.dataFileName;
-//   const dataFilePermissions = dataFile.dataFilePermissions;
-//   const dataFileClickToOpen = dataFile.dataFileClickToOpen;
-//   const dataFileClickToRequestPermission = dataFile.dataFileClickToRequestPermission;
-//   const dataFileSave = dataFile.dataFileSave;
-//   const dataFileClose = dataFile.dataFileClose;
 
 function closeDataFile() {
   console.log("closeDataFile");

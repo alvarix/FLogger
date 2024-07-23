@@ -1,5 +1,16 @@
 import { ref } from "vue";
 import { useLocalStorage } from "@vueuse/core";
+import { IFloggerDataFileComposable } from "./FloggerDataFileComposable";
+
+interface IDataFile extends IFloggerDataFileComposable {
+  dataFileClickToOpen: () => void;
+  dataFileClickToRequestPermission: () => void;
+  // Not sure if there's a reason to make these public, or part of the Flogger interface anyway
+  // dataFileGetFileHandle: () => FileSystemFileHandle[] | undefined;
+  // dataFileCheckPermissions: () => void;
+  // dataFileLoad: () => void // Calls dataLoadedCallback( dataFileDataObj )
+  // dataFileReload: (file_id: string) => void;
+}
 
 // ************************************************************
 // This section includes data vars and method functions for
@@ -12,7 +23,7 @@ import { useLocalStorage } from "@vueuse/core";
 // every visit and every page load. (However, does require they
 // click a button to re-grant permission to the file.)
 
-export const useDataFile = (dataLoadedCallback) => {
+export const useDataFile = (dataLoadedCallback): IDataFile => {
   const dataFileHandle = ref({});
   const dataFilePermissions = ref("");
   const dataFileOptions = { mode: "readwrite" };
@@ -103,7 +114,10 @@ export const useDataFile = (dataLoadedCallback) => {
     console.log(`dataFileName.value: `, dataFileName.value);
 
     // store the file handle in indexedDB to open the file later.
-    let dataFileDBTransaction = dataFileDB.transaction(["filerefs"], "readwrite");
+    let dataFileDBTransaction = dataFileDB.transaction(
+      ["filerefs"],
+      "readwrite"
+    );
     let dataFileDBObjectStore = dataFileDBTransaction.objectStore("filerefs");
     console.log(`indexNames`, dataFileDBObjectStore.indexNames);
     console.log(`keyPath`, dataFileDBObjectStore.keyPath);
@@ -141,7 +155,7 @@ export const useDataFile = (dataLoadedCallback) => {
     dataFilePermissions.value = await dataFileHandle.value.queryPermission(
       dataFileOptions
     );
-    console.log('dataFilePermissions.value', dataFilePermissions.value);
+    console.log("dataFilePermissions.value", dataFilePermissions.value);
   }
 
   async function dataFileClickToRequestPermission() {
@@ -181,7 +195,10 @@ export const useDataFile = (dataLoadedCallback) => {
     // The browser can choose when to allow or not allow this open.
     console.log(`dataFileReload file_id`, file_id);
     console.log(`dataFileDB`, dataFileDB);
-    let dataFileDBTransaction = dataFileDB.transaction(["filerefs"], "readonly");
+    let dataFileDBTransaction = dataFileDB.transaction(
+      ["filerefs"],
+      "readonly"
+    );
     let dataFileDBObjectStore = dataFileDBTransaction.objectStore("filerefs");
     console.log(`indexNames`, dataFileDBObjectStore.indexNames);
     console.log(`keyPath`, dataFileDBObjectStore.keyPath);
@@ -213,7 +230,7 @@ export const useDataFile = (dataLoadedCallback) => {
       // let file_writer = await dataFileHandle.value.createWritable();
       // // ... write to file_writer
 
-      console.log('dataFilePermissions.value', dataFilePermissions.value);
+      console.log("dataFilePermissions.value", dataFilePermissions.value);
       if (dataFilePermissions.value == "granted") dataFileLoad();
     };
   }
