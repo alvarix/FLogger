@@ -5,33 +5,33 @@
   <Suspense>
     <DropBoxFiles />
   </Suspense>
-  <AddNote @newNote="addNewNote" :timestamp="timestamp" />
-  <NoteList :notes="loadedNotes" />
+  <AddEntry @newEntry="addNewEntry" :timestamp="timestamp" />
+  <EntryList :entries="loadedEntries" />
 </template>
 
 <script setup>
 import { ref } from "vue";
 import { useDataFile } from "./modules/useDataFile.js";
-import NoteList from "./components/NoteList.vue";
-import AddNote from "./components/AddNote.vue";
+import EntryList from "./components/EntryList.vue";
+import AddEntry from "./components/AddEntry.vue";
 import DropBoxFiles from "./components/DropBoxFiles.vue";
-import NoteData from "./modules/NoteData.ts";
-import { useLoadedNotes } from "./composables/useLoadedNotes.ts";
+import EntryData from "./modules/EntryData.ts";
+import { useLoadedEntries } from "./composables/useLoadedEntries.ts";
 
-const { loadedNotes, loadNotes, loadNote } = useLoadedNotes();
+const { loadedEntries, loadEntries, loadEntry } = useLoadedEntries();
 
 const timestamp = ref(new Date().toLocaleDateString());
 
-function addNewNote(noteData) {
-  //console.log(noteData)
-  loadNote(
-    new NoteData(
-      new Date(noteData.value.date).toLocaleDateString(),
-      noteData.value.entry
+function addNewEntry(entryData) {
+  //console.log(entryData)
+  loadEntry(
+    new EntryData(
+      new Date(entryData.value.date).toLocaleDateString(),
+      entryData.value.entry
     )
   );
   dataFileSave({
-    notes: loadedNotes.value,
+    entries: loadedEntries.value,
   });
 }
 
@@ -57,15 +57,15 @@ const {
 function closeDataFile() {
   console.log("closeDataFile");
   dataFileClose();
-  loadNotes([]);
+  loadEntries([]);
 }
 
 function loadData(dataFileObject) {
   console.log("loadData", dataFileObject);
-  if (dataFileObject?.notes) {
-    loadNotes(
-      dataFileObject.notes.map((note) => {
-        return new NoteData(note.date, note.entry);
+  if (dataFileObject?.entries) {
+    loadEntries(
+      dataFileObject.entries.map((entry) => {
+        return new EntryData(entry.date, entry.entry);
       })
     );
   }

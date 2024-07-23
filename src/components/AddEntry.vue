@@ -1,14 +1,14 @@
 <script setup>
 import { ref } from 'vue'
-import NoteData from '../modules/NoteData.ts';
+import EntryData from '../modules/EntryData.ts';
 import { defineEmits } from 'vue';
 
-const emit = defineEmits(['newNote']);
+const emit = defineEmits(['newEntry']);
 // as per compiler: [@vue/compiler-sfc] `defineEmits` is a compiler macro and no longer needs to be imported.
 let hasError = ref(false);	
 
 let form = ref( 
-			new NoteData( 
+			new EntryData( 
 				new Date().toLocaleDateString(),
 				'',
 			),
@@ -17,7 +17,7 @@ let form = ref(
 const submitAdd = (event) => {
 //			 if (this.isValidDate() == true ) {
 	//console.log(form)
-	 emit('newNote', form);
+	 emit('newEntry', form);
 //		 } else {
 //		 	this.hasError= true;
 
@@ -32,7 +32,7 @@ const submitAdd = (event) => {
 
 
 
-	<form  id='add-note' @submit.prevent="submitAdd">
+	<form  id='add-entry' @submit.prevent="submitAdd">
 		<div class="form-inner">
 			<div>
 				<input :class="['date', {error:hasError}]" id='time' type="text" :placeholder="form.date" v-model="form.date" required >
@@ -49,7 +49,7 @@ const submitAdd = (event) => {
 </template>
 
 <style scoped>
-#add-note *:not(.date-validation) {
+#add-entry *:not(.date-validation) {
 	display:block;
 }
 
@@ -93,7 +93,7 @@ input[type=submit] {
 	cursor: pointer;
 }
 
-#add-note label {
+#add-entry label {
 	margin-top: 20px;
 }
 
