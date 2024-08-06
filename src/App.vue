@@ -22,19 +22,6 @@ const { loadedEntries, loadEntries, loadEntry } = useLoadedEntries();
 
 const timestamp = ref(new Date().toLocaleDateString());
 
-function addNewEntry(entryData) {
-  //console.log(entryData)
-  loadEntry(
-    new EntryData(
-      new Date(entryData.value.date).toLocaleDateString(),
-      entryData.value.entry
-    )
-  );
-  dataFileSave({
-    entries: loadedEntries.value,
-  });
-}
-
 const {
   dataFileName,
   dataFilePermissions,
@@ -53,6 +40,19 @@ const {
 //   const dataFileClickToRequestPermission = dataFile.dataFileClickToRequestPermission;
 //   const dataFileSave = dataFile.dataFileSave;
 //   const dataFileClose = dataFile.dataFileClose;
+
+function addNewEntry(entryData) {
+  //console.log(entryData)
+  loadEntry(
+    new EntryData(
+      new Date(entryData.value.date).toLocaleDateString(),
+      entryData.value.entry
+    )
+  );
+  dataFileSave({
+    entries: loadedEntries.value,
+  });
+}
 
 function closeDataFile() {
   console.log("closeDataFile");
