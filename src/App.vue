@@ -11,7 +11,7 @@
 
 <script setup>
 import { ref } from "vue";
-import { useDataFile } from "./modules/useDataFile.js";
+import { useDataFile } from "./modules/useDataFile";
 import EntryList from "./components/EntryList.vue";
 import AddEntry from "./components/AddEntry.vue";
 import DropBoxFiles from "./components/DropBoxFiles.vue";
