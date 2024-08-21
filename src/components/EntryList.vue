@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import Entry from "./Entry.vue";
-import { IEntry } from '../modules/EntryData'
+import Entry from "@/components/Entry.vue";
+import { IEntry } from '@/modules/EntryData'
 
 const props = defineProps<{
   entries: Array<IEntry>;

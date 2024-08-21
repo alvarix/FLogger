@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import fetch from "isomorphic-fetch";
 import qs from "qs";
-import { useLoadedEntries } from "../composables/useLoadedEntries.ts";
+import { useLoadedEntries } from "@/composables/useLoadedEntries.ts";
 
 const { loadEntries, loadEntriesFromString } = useLoadedEntries();
 

@@ -11,12 +11,12 @@
 
 <script setup>
 import { ref } from "vue";
-import { useDataFile } from "./modules/useDataFile";
-import EntryList from "./components/EntryList.vue";
-import AddEntry from "./components/AddEntry.vue";
-import DropBoxFiles from "./components/DropBoxFiles.vue";
-import EntryData from "./modules/EntryData.ts";
-import { useLoadedEntries } from "./composables/useLoadedEntries.ts";
+import { useDataFile } from "@/modules/useDataFile";
+import EntryList from "@/components/EntryList.vue";
+import AddEntry from "@/components/AddEntry.vue";
+import DropBoxFiles from "@/components/DropBoxFiles.vue";
+import EntryData from "@/modules/EntryData.ts";
+import { useLoadedEntries } from "@/composables/useLoadedEntries.ts";
 
 const { loadedEntries, loadEntries, loadEntry } = useLoadedEntries();
 
