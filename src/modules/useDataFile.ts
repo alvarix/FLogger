@@ -1,6 +1,6 @@
 import { ref } from "vue";
 import { useLocalStorage } from "@vueuse/core";
-import { IFloggerDataFileComposable } from "./FloggerDataFileComposable";
+import { IFloggerDataFileComposable } from "@/modules/FloggerDataFileComposable";
 
 interface IDataFile extends IFloggerDataFileComposable {
   dataFileClickToOpen: () => void;
