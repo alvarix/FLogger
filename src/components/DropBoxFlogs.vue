@@ -18,14 +18,6 @@ const selectFile = (file) => {
   openFlog(file);
 };
 
-function test() {
-  if (openFlogs.value.length == 0)
-    openFlogs.value.push({
-      url: "url",
-      loadedEntries: [],
-    });
-  openFlogs.value[0].loadEntries();
-}
 </script>
 
 <template>
@@ -65,7 +57,6 @@ function test() {
       </ul>
     </div>
   </section>
-  <button @click="test">test</button>
 </template>
 
 <style scoped>
