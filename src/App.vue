@@ -3,8 +3,9 @@
     <h1>FLogger!</h1>
   </div>
   <Suspense>
-    <DropBoxFiles />
+    <DropBoxFlogs />
   </Suspense>
+  <OpenFlogs/>
   <AddEntry @newEntry="addNewEntry" :timestamp="timestamp" />
   <EntryList :entries="loadedEntries" />
 </template>
@@ -14,9 +15,12 @@ import { ref } from "vue";
 import { useDataFile } from "@/modules/useDataFile";
 import EntryList from "@/components/EntryList.vue";
 import AddEntry from "@/components/AddEntry.vue";
+import DropBoxFlogs from "@/components/DropBoxFlogs.vue";
+import OpenFlogs from "@/components/OpenFlogs.vue";
 import DropBoxFiles from "@/components/DropBoxFiles.vue";
 import EntryData from "@/modules/EntryData.ts";
 import { useLoadedEntries } from "@/composables/useLoadedEntries.ts";
+
 
 const { loadedEntries, loadEntries, loadEntry } = useLoadedEntries();
 
