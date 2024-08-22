@@ -14,6 +14,14 @@ export function serializeEntries(entriesList: IEntry[]): string {
         , '' //start accumulatedValue with an empty string
     )
 }
+
+// Expects entryData string in this format:
+// 8/22/2024
+// Entry text
+// 
+// 8/22/2024
+// Entry text
+// 
 export function deserializeEntries(entryData: string): IEntry[] {
     const entriesList: (IEntry | undefined)[] = entryData
         // split text file at date delimiters
