@@ -10,7 +10,7 @@ const {
   loadFlogEntries,
 } = useDropboxFlogs();
 
-const { openFlogs, openFlog } = useFlogs();
+const { openFlog } = useFlogs();
 // const props = defineProps({});
 
 const selectFile = (file) => {
