@@ -1,5 +1,7 @@
 <script setup>
 import { useFlogs } from "@/composables/useFlogs";
+import AddEntry from "@/components/AddEntry.vue"
+import EntryList from "@/components/EntryList.vue"
 
 const { openFlogs, closeFlog } = useFlogs();
 // const props = defineProps({});
@@ -22,12 +24,9 @@ function addNewEntry(entryData) {
 <template>
   <!-- Example description and UI -->
   <section class="container main">
-    <div>
-      <h3>openFlogs</h3>
-      {{ JSON.stringify(openFlogs) }}
-    </div>
+    <h3>Open Flogs</h3>
     <div v-for="flog in openFlogs">
-      <h2>{{ flog.url }}</h2>
+      <h4>{{ flog.url }}</h4>
       <button @click.prevent="() => closeFlog(flog)">close flog</button>
       <AddEntry @newEntry="addNewEntry" :timestamp="timestamp" />
       <EntryList :entries="flog.entries" />

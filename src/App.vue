@@ -5,11 +5,16 @@
   <Suspense>
     <DropBoxFlogs />
   </Suspense>
+  <br />
+  <hr />
+  <LocalFileFlogs />
+  <br />
+  <hr />
   <OpenFlogs />
+  <br />
+  <hr />
   <AddEntry @newEntry="addNewEntry" :timestamp="timestamp" />
   <EntryList :entries="loadedEntries" />
-  <hr/>
-  <LocalFileFlogs/>
 </template>
 
 <script setup>
@@ -20,7 +25,7 @@ import AddEntry from "@/components/AddEntry.vue";
 import DropBoxFlogs from "@/components/DropBoxFlogs.vue";
 import OpenFlogs from "@/components/OpenFlogs.vue";
 import DropBoxFiles from "@/components/DropBoxFiles.vue";
-import LocalFileFlogs from "@/components/LocalFileFlogs.vue"
+import LocalFileFlogs from "@/components/LocalFileFlogs.vue";
 import EntryData from "@/modules/EntryData.ts";
 import { useLoadedEntries } from "@/composables/useLoadedEntries.ts";
 

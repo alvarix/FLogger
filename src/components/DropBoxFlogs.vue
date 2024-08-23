@@ -23,6 +23,7 @@ const selectFile = (file) => {
 <template>
   <!-- Example description and UI -->
   <section class="container main">
+    <h3>Dropbox Flogs</h3>
     <p>
       To load files from your DropBox account, you need to connect to DropBox
       and authorize Flogger.
