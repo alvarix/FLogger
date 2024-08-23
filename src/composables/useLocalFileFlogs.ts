@@ -218,7 +218,7 @@ export const useLocalFileFlogs = (dataLoadedCallback): IFileFlogs => {
             dataFileDataStr.value = await dataFile.text();
             // parse file contents
             selectedFileFlog.value = {
-                url: dataFileName.value,
+                url: 'local file: '+dataFileName.value,
                 permissions: dataFilePermissions.value,
                 loadedEntries: deserializeEntries(dataFileDataStr.value),
             }
