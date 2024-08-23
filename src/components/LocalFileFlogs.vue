@@ -17,7 +17,8 @@ async function openLocalFileFlog() {
 <template>
   <!-- Example description and UI -->
   <section class="container main">
-    <button @click="openLocalFileFlog">open file</button>
+    <h3>Local File Flogs</h3>
+    <button @click="openLocalFileFlog">Open Flog</button>
     <!-- <div>selectedFileFlog = {{ JSON.stringify(selectedFileFlog) }}</div>
     <div>url = {{ selectedFileFlog?.url }}</div>
     <div>permissions = {{ selectedFileFlog?.permissions }}</div>
@@ -26,27 +27,11 @@ async function openLocalFileFlog() {
 </template>
 
 <style scoped>
-#add-entry *:not(.date-validation) {
-  display: block;
+button {
+	border-radius: 10px;
+	padding: 6px 10px;
+	margin-top: 10px;
+	cursor: pointer;
 }
 
-input.error {
-  border: 1px solid red;
-}
-
-.date-validation.error {
-  display: block;
-  color: red;
-}
-
-#add-entry label {
-  margin-top: 20px;
-}
-
-ul {
-  border-radius: 14px;
-  list-style: disc;
-  padding: 0.5em;
-  margin: 0.5em;
-}
 </style>
