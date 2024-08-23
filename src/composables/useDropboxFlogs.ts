@@ -124,7 +124,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
                     .filter((item) => item.path_lower.endsWith(".flogger"))
                     .map((item) => {
                         console.log("mapping item", item);
-                        const newFlog: IDropboxFlog = { url: item.path_lower, loadedEntries: [] }
+                        const newFlog: IDropboxFlog = { url: 'dropbox file: '+item.path_lower, loadedEntries: [] }
                         return newFlog;
                     });
             })
