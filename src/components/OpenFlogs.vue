@@ -29,7 +29,7 @@ function addNewEntry(entryData) {
       <h4>{{ flog.url }}</h4>
       <button @click.prevent="() => closeFlog(flog)">close flog</button>
       <AddEntry @newEntry="addNewEntry" :timestamp="timestamp" />
-      <EntryList :entries="flog.entries" />
+      <EntryList :entries="flog.loadedEntries" />
     </div>
   </section>
 </template>
