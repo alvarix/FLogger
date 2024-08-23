@@ -5,7 +5,11 @@
   <Suspense>
     <DropBoxFlogs />
   </Suspense>
-  <OpenFlogs/>
+  <br />
+  <hr />
+  <OpenFlogs />
+  <br />
+  <hr />
   <AddEntry @newEntry="addNewEntry" :timestamp="timestamp" />
   <EntryList :entries="loadedEntries" />
 </template>
