@@ -1,7 +1,7 @@
 import { ref, Ref } from "vue";
 import { useLocalStorage } from "@vueuse/core";
 import { IEntry } from "@/modules/EntryData";
-import { IFlog } from "@/modules/Flog"
+import { deserializeEntries, IFlog } from "@/modules/Flog"
 
 export interface IFloggerDataFileComposable {
     dataFileName: string;
@@ -13,7 +13,7 @@ export interface IFloggerDataFileComposable {
     // launchRequestPermissionsFlow: () => void;
     // getFileHandleFromPicker: () => FileSystemFileHandle[] | undefined;
     // dataFileCheckPermissions: () => void; 
-    // dataFileLoad: () => void // Calls dataLoadedCallback( dataFileDataObj )
+    // dataFileLoad: () => void // Sets state vars dataFileName, selectedFileFlog
     // dataFileReload: (file_id: string) => void;
 }
 
@@ -27,10 +27,14 @@ export interface IFileFlog extends IFlog {
 }
 
 export interface IFileFlogs {
+    dataFilePermissions: Ref<string>;
     launchOpenFileFlow: () => void;
     launchRequestPermissionsFlow: () => void;
-    selectedFileFlog: IFileFlog;
-    loadFlogEntries: (flog: IFileFlog) => IEntry[]
+    selectedFileFlog: Ref<IFileFlog>;
+    // dataFileName: Ref<string>;
+    // loadFlogEntries: (flog: IFileFlog) => IEntry[]
+    dataFileSave: (fileDataObj: any) => void; // Should be fileDataObj: <SOME TYPE FOR FLOGGER FILE DATA>
+    dataFileClose: () => void;
 }
 // export interface IDropboxFlogs {
 //     launchConnectFlow: () => void
@@ -51,7 +55,7 @@ export interface IFileFlogs {
 // every visit and every page load. (However, does require they
 // click a button to re-grant permission to the file.)
 
-export const useDataFile = (dataLoadedCallback): IDataFileFlog => {
+export const useLocalFileFlogs = (dataLoadedCallback): IFileFlogs => {
     const dataFileHandle = ref({});
     const dataFilePermissions = ref("");
     const dataFileOptions = { mode: "readwrite" };
@@ -59,6 +63,7 @@ export const useDataFile = (dataLoadedCallback): IDataFileFlog => {
     // retrieve the file handle from indexedDB after page reload
     const dataFileName = useLocalStorage("dataFileName", null);
     const dataFileDataStr = ref("");
+    const selectedFileFlog = ref<IFileFlog>()
     // Open a db instance to save file references for later sessions
     let dataFileDB;
     let dataFileDBRequest = indexedDB.open("dataFileDB");
@@ -137,7 +142,10 @@ export const useDataFile = (dataLoadedCallback): IDataFileFlog => {
             return;
         }
         await dataFileCheckPermissions();
+        if (dataFilePermissions.value == "prompt") await launchRequestPermissionsFlow()
+
         if (dataFilePermissions.value == "granted") await dataFileLoad();
+        else return
         // await dataFileLoad();
 
         console.log(`dataFileName.value: `, dataFileName.value);
@@ -209,9 +217,11 @@ export const useDataFile = (dataLoadedCallback): IDataFileFlog => {
             // get file contents
             dataFileDataStr.value = await dataFile.text();
             // parse file contents
-            let dataFileDataObj = JSON.parse(dataFileDataStr.value);
-            console.log(`dataFileDataObj`, dataFileDataObj);
-            dataLoadedCallback(dataFileDataObj);
+            selectedFileFlog.value = {
+                url: dataFileName.value,
+                permissions: dataFilePermissions.value,
+                loadedEntries: deserializeEntries(dataFileDataStr.value),
+            }
         } catch (e) {
             console.error(e);
             return;
@@ -265,7 +275,8 @@ export const useDataFile = (dataLoadedCallback): IDataFileFlog => {
     }
 
     return {
-        dataFileName,
+        // dataFileName,
+        selectedFileFlog,
         dataFilePermissions,
         launchOpenFileFlow,
         launchRequestPermissionsFlow,
