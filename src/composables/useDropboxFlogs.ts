@@ -20,7 +20,7 @@ export interface IDropboxFlogs {
 const {
     launchConnectFlow,
     hasConnection,
-    clearConnection,
+    clearConnection: clearFileConnection,
     availableFiles,
     loadFileContent,
 } = useDropboxFiles()
@@ -59,6 +59,11 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
             { path: flogUrlToFilePath(flog.url) },
             (content) => { flog.loadedEntries = deserializeEntries(content) }
         )
+    }
+
+    const clearConnection = () => {
+        clearFileConnection()
+        availableFlogs.value = []
     }
 
     return {
