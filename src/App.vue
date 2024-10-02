@@ -2,14 +2,16 @@
   <div>
     <h1>FLogger!</h1>
   </div>
-  <Suspense>
-    <DropBoxFlogs />
-  </Suspense>
-  <br />
-  <hr />
-  <LocalFileFlogs />
-  <br />
-  <hr />
+  <div v-if="openFlogs.length == 0">
+    <Suspense>
+      <DropBoxFlogs />
+    </Suspense>
+    <br />
+    <hr />
+    <LocalFileFlogs />
+    <br />
+    <hr />
+  </div>
   <OpenFlogs />
   <br />
   <hr />
@@ -27,8 +29,10 @@ import OpenFlogs from "@/components/OpenFlogs.vue";
 import DropBoxFiles from "@/components/DropBoxFiles.vue";
 import LocalFileFlogs from "@/components/LocalFileFlogs.vue";
 import EntryData from "@/modules/EntryData.ts";
+import { useFlogs } from "@/composables/useFlogs";
 import { useLoadedEntries } from "@/composables/useLoadedEntries.ts";
 
+const { openFlogs } = useFlogs();
 const { loadedEntries, loadEntries, loadEntry } = useLoadedEntries();
 
 const timestamp = ref(new Date().toLocaleDateString());
