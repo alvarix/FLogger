@@ -5,6 +5,8 @@ import { Dropbox, DropboxAuth } from "dropbox";
 
 export interface IDropboxFile {
     path: string;
+    content?: string;
+    rev?: string;
 }
 
 export interface IDropboxFiles {
@@ -12,7 +14,8 @@ export interface IDropboxFiles {
     hasConnection: Ref<boolean>
     clearConnection: () => void
     availableFiles: Ref<IDropboxFile[]>
-    loadFileContent: (file: IDropboxFile, callback: (content: string) => any) => void
+    loadFileContent: (file: IDropboxFile, callback: (result: { rev: string, content: string }) => any) => void,
+    saveFileContent: (file: IDropboxFile, callback: () => any) => void
 }
 
 export const useDropboxFiles = (): IDropboxFiles => {
@@ -121,10 +124,10 @@ export const useDropboxFiles = (): IDropboxFiles => {
             .then((response) => {
                 console.log("step 6");
                 availableFiles.value = response.result.entries
-                    .filter((item) => item.path_lower.endsWith(".flogger"))
+                    .filter((item) => (item.path_lower.endsWith(".flogger") || item.path_lower.endsWith(".flogger.txt")))
                     .map((item) => {
                         console.log("mapping item", item);
-                        const newFile: IDropboxFile = { path: item.path_lower }
+                        const newFile: IDropboxFile = { path: item.path_lower, rev: item[".tag"] }
                         return newFile;
                     });
             })
@@ -172,7 +175,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
         availableFiles.value = [];
     }
 
-    const loadFileContent = async (file: IDropboxFile, callback: (content: string) => any) => {
+    const loadFileContent = async (file: IDropboxFile, callback: (result: { rev: string, content: string }) => any) => {
         console.log('loadFileContent file', file)
 
         dbxAuth.checkAndRefreshAccessToken();
@@ -182,7 +185,12 @@ export const useDropboxFiles = (): IDropboxFiles => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const fileData = e.target.result;
-                    callback(fileData as string)
+                    callback(
+                        {
+                            rev: response.result.rev,
+                            content: fileData as string
+                        }
+                    )
                 };
                 //@ts-expect-error - dbx doesn't have typing for fileBlob for some reason
                 reader.readAsText(response.result.fileBlob);
@@ -196,11 +204,37 @@ export const useDropboxFiles = (): IDropboxFiles => {
             });
     }
 
+    const saveFileContent = async (file: IDropboxFile, callback: () => any) => {
+        console.log('saveFileContent file', file)
+
+        dbxAuth.checkAndRefreshAccessToken();
+        await dbx
+            .filesUpload(
+                {
+                    path: file.path,
+                    contents: file.content,
+                    mode: { ".tag": "update", "update": file.rev }
+                }
+            )
+            .then((response) => {
+                console.log(response)
+                callback()
+            })
+            .catch((error) => {
+                console.log(
+                    `Error uploading file ${file.path} :`,
+                    error.error.error_summary
+                );
+                // clearConnection();
+            });
+    }
+
     return {
         launchConnectFlow,
         hasConnection,
         clearConnection,
         availableFiles,
         loadFileContent,
+        saveFileContent,
     }
 }
