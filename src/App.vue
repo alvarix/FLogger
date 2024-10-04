@@ -15,7 +15,6 @@
   <OpenFlogs />
   <br />
   <hr />
-  <AddEntry @newEntry="addNewEntry" :timestamp="timestamp" />
   <EntryList :entries="loadedEntries" />
 </template>
 
