@@ -1,10 +1,10 @@
 
 10/04/2024
 #pseudo-code
-    - 
+    - DBX broke? Trying to json encode
 - implement DBX save    
     - Add Entry
-        - Uncaught ReferenceError: loadEntry is not defined
+        - Uncaught ReferenceError: loadEntry is not defined (on a local file)
     - copy, edit buttons added to each Entry
     - copy
         - add current Entry text to Add Entry form 
@@ -34,8 +34,10 @@ In the last branch 'save to source file for Dropbox' Chad
     - useDropboxFlogs.ts   
         - saveFlogEntries  
         - back to #first-try - let's skip over to local files
+        
     - useLocalFileFlogs.ts
-        - 
+        - not implemented there
+      
 
 #questions
     - why are interfaces extended from classes
