@@ -53,17 +53,24 @@ const submitAdd = (event) => {
 	display:block;
 }
 
-
-
 input.error {
 	border:1px solid red;
+}
+
+input[type='submit'],
+.form-inner,
+.form-inner * {
+	background-color:cornsilk;
 }
 
 .form-inner {
     max-width: 600px;
     border-radius: 14px;
     padding: 20px;
-    border: 1px solid black;
+}
+.form-inner,
+input[type='submit'] {
+	border: 1px solid #ccc;
 }
 
 input.date {
@@ -86,7 +93,6 @@ textarea {
 }
 
 input[type=submit] {
-	background-color: #ccc;
 	border-radius: 10px;
 	padding: 6px 10px;
 	margin-top: 10px;

@@ -1,4 +1,14 @@
 10/04/2024
+In the last branch 'save to source file for Dropbox' Chad 
+    - useFlogs.ts
+        - add addEntryToFlog and SaveFlogToSource functions to return
+            - unless im mistaken, looks like just a start - determining if source is local or DBX
+        - also imports saveFlogEntries from useDropboxFlogs()
+    - useDropboxFlogs.ts   
+        - saveFlogEntries  
+
+
+10/04/2024
 src/composables/useDropboxFiles.ts (chad)
     -   interfaces for DBX files and file list
         - the file list interface contains methods for launching and clearing DBX connection
@@ -18,6 +28,16 @@ Terms
 - Flog:  A .flogger.txt file
 - Entry: A flog pushed into an array seperate by date, and output in our app currently in a rounded corner box
 
+
 To Do
 - make flog.url display in openFlogs.vue formattable (ie HTML)
     - ie. seperate flog.url into slug (for logic) and label (for display)
+- If in DBX - list DBX info (Username and/or URL, Folder, etc)
+
+
+Bugs
+- chad/save-to-source
+    - tried testing to see if button was present
+        - none for local
+        - dbx: file returning nan/nan/nan like my file did when I had the date misformatted
+            - it asked to connect to flogger-ccc4 but doesnt seem to correlate to files im seeing in DBX website
