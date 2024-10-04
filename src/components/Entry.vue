@@ -28,7 +28,7 @@ const formattedDate = computed(() => formatDate(props.entry.date));
   <div class="entry">
       <h3>{{ formattedDate }}</h3>
 
-      <div><pre>{{ entry.entry }}</pre></div> 
+      <div><pre class="entry__pre">{{ entry.entry }}</pre></div> 
       
   </div>
 </template>
@@ -47,6 +47,12 @@ h3 {
   border-radius: 14px;
   padding: 20px;
   border: 1px solid black;
+}
+
+.entry__pre {
+  white-space: pre-wrap;
+  font-size: 12px;
+  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
 }
 
 

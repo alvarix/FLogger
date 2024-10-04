@@ -24,10 +24,9 @@ function addNewEntry(entryData) {
 <template>
   <!-- Example description and UI -->
   <section class="container main">
-    <h3>Open Flogs</h3>
     <div v-for="flog in openFlogs">
       <AddEntry @newEntry="addNewEntry" :timestamp="timestamp" />
-      <h4>{{ flog.url }}</h4>
+      <h4 v-html="flog.url"></h4>
       <button @click.prevent="() => closeFlog(flog)">close flog</button>
       <EntryList :entries="flog.loadedEntries" />
     </div>
