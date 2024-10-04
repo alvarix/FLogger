@@ -1,20 +1,24 @@
 import { ref, Ref, watch } from "vue"
-import { IFlog, deserializeEntries } from "@/modules/Flog"
+import { IFlog, deserializeEntries, serializeEntries } from "@/modules/Flog"
 import { useDropboxFiles } from "@/composables/useDropboxFiles"
 
-export interface IDropboxFlog extends IFlog {}
+export interface IDropboxFlog extends IFlog {
+    rev: string;
+}
 
 export interface IDropboxFlogs {
     // pass through from useDropboxFiles
-    launchConnectFlow: () => void; 
+    launchConnectFlow: () => void;
     // pass through from useDropboxFiles
-    hasConnection: Ref<boolean>; 
+    hasConnection: Ref<boolean>;
     // pass through from useDropboxFiles
-    clearConnection: () => void; 
+    clearConnection: () => void;
     // map availableFiles from from useDropboxFiles to flogs
-    availableFlogs: Ref<IDropboxFlog[]>; 
+    availableFlogs: Ref<IDropboxFlog[]>;
     // makes use of loadFileContent from useDropboxFiles
-    loadFlogEntries: (flog: IDropboxFlog) => void; 
+    loadFlogEntries: (flog: IDropboxFlog) => void;
+    // makes use of ... from useDropboxFiles
+    saveFlogEntries: (flog: IDropboxFlog) => void;
 }
 
 const {
@@ -23,6 +27,7 @@ const {
     clearConnection: clearFileConnection,
     availableFiles,
     loadFileContent,
+    saveFileContent,
 } = useDropboxFiles()
 
 const filePathToFlogUrl = (path: string): string => {
@@ -57,7 +62,22 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
         console.log('loadFlogEntries flog', flog)
         loadFileContent(
             { path: flogUrlToFilePath(flog.url) },
-            (content) => { flog.loadedEntries = deserializeEntries(content) }
+            (result) => {
+                flog.loadedEntries = deserializeEntries(result.content)
+                flog.rev = result.rev;
+            }
+        )
+    }
+
+    const saveFlogEntries = (flog: IDropboxFlog) => {
+        console.log('saveFlogEntries flog', flog)
+        saveFileContent(
+            {
+                path: flogUrlToFilePath(flog.url),
+                rev: flog.rev,
+                content: serializeEntries(flog.loadedEntries)
+            },
+            () => { } // can parameterize so calling app gets notice once save is complete 
         )
     }
 
@@ -72,5 +92,6 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
         clearConnection,
         availableFlogs,
         loadFlogEntries,
+        saveFlogEntries,
     }
 }
