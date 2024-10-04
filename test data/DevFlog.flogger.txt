@@ -1,0 +1,12 @@
+10/4/24
+- src/composables/useDropboxFiles.ts (chad)
+    -   interfaces for DBX files and file list
+        - the file list interface contains methods for launching and clearing DBX connection
+        - though I cant see where those methods exist - I assume in the DBX SDK but dont see the connection 
+
+
+
+- Use this file as data source
+    - outputs NaN/NaN/NaN in the app, doesn't like tabs or dashes?
+
+
