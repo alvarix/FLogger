@@ -1,12 +1,23 @@
-10/4/24
-- src/composables/useDropboxFiles.ts (chad)
+10/04/2024
+src/composables/useDropboxFiles.ts (chad)
     -   interfaces for DBX files and file list
         - the file list interface contains methods for launching and clearing DBX connection
         - though I cant see where those methods exist - I assume in the DBX SDK but dont see the connection 
+        - eponymous const
+            - will come back to this bcs it deals with DBX sdk complexity. Would rather focus on local files for now.
 
 
 
 - Use this file as data source
     - outputs NaN/NaN/NaN in the app, doesn't like tabs or dashes?
+        - problem was date format, year must be yyyy
 
 
+
+Terms
+- Flog:  A .flogger.txt file
+- Entry: A flog pushed into an array seperate by date, and output in our app currently in a rounded corner box
+
+To Do
+- make flog.url display in openFlogs.vue formattable (ie HTML)
+    - ie. seperate flog.url into slug (for logic) and label (for display)
