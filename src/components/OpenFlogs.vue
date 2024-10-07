@@ -1,4 +1,5 @@
 <script setup>
+import { ref } from "vue";
 import { useFlogs } from "@/composables/useFlogs";
 import AddEntry from "@/components/AddEntry.vue"
 import EntryList from "@/components/EntryList.vue"
@@ -18,17 +19,23 @@ function addNewEntry(entryData) {
     entries: openFlogs.value,
   });
 }
+const copiedEntry = ref(null); // Initialize reactive copiedEntry
+
+const handleCopyEntry = (entry) => {
+  copiedEntry.value = entry;
+  console.log('Copy event received in parent:', copiedEntry.value)
+}
 
 </script>
 
 <template>
   <!-- Example description and UI -->
   <section class="container main">
-    <div v-for="flog in openFlogs">
-      <AddEntry @newEntry="addNewEntry" :timestamp="timestamp" />
+    <div v-for="flog in openFlogs" :key="flog.id">
+      <AddEntry @newEntry="addNewEntry" :timestamp="timestamp" :copiedEntry="copiedEntry" />
       <h4>{{ flog.url }}</h4>
       <button @click.prevent="() => closeFlog(flog)">close flog</button>
-      <EntryList :entries="flog.loadedEntries" />
+      <EntryList :entries="flog.loadedEntries" @copy-entry="handleCopyEntry" />
     </div>
   </section>
 </template>

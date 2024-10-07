@@ -6,6 +6,13 @@ import { IEntry } from '@/modules/EntryData'
 const props = defineProps<{
   entries: Array<IEntry>;
 }>();
+
+const emit = defineEmits(['copy-entry']);
+function copyEntry(entry) {
+  // Emit the event to the parent with the copied entry data
+  emit('copy-entry', entry);
+}
+
 </script>
 
 <template>
@@ -13,6 +20,7 @@ const props = defineProps<{
   <ul class="entry-list">
     <li v-for="entry in entries">
       <Entry :entry="entry" />
+      <button @click="copyEntry(entry)">Copy Entry</button>
     </li>
   </ul>
 </template>

@@ -1,9 +1,17 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch, onMounted, nextTick  } from 'vue'
 import EntryData from '../modules/EntryData.ts';
 import { defineEmits } from 'vue';
 
+
+const props = defineProps({
+  copiedEntry: Object // Accept the copied entry as a prop
+});
+
+
 const emit = defineEmits(['newEntry']);
+const newEntry = ref('');  // Initialize newEntry as a reactive variable
+
 // as per compiler: [@vue/compiler-sfc] `defineEmits` is a compiler macro and no longer needs to be imported.
 let hasError = ref(false);	
 
@@ -25,6 +33,30 @@ const submitAdd = (event) => {
 
 };
 
+// Function to automatically resize the textarea based on content
+const autoResizeTextarea = () => {
+  const textarea = document.getElementById('entry');
+  if (textarea) {
+    textarea.style.height = 'auto'; // Reset height to shrink if needed
+    textarea.style.height = `${textarea.scrollHeight}px`; // Set the height based on scrollHeight
+  }
+};
+
+
+watch(() => props.copiedEntry, (newVal) => {
+	console.log('New copiedEntry received:', newVal);
+
+  if (newVal && newVal.entry) {
+    form.value.entry = newVal.entry; // Prepopulate the textarea with the copied entry
+	const addEntryForm = document.getElementById('add-entry');
+
+	nextTick(() => autoResizeTextarea()); // Adjust the textarea size after the DOM update
+
+    if (addEntryForm) {
+      addEntryForm.scrollIntoView({ behavior: 'smooth' }); // Smooth scroll to the form
+    }
+  }
+});
 </script>
 
 <template>
@@ -102,6 +134,5 @@ input[type=submit] {
 #add-entry label {
 	margin-top: 20px;
 }
-
 
 </style>
