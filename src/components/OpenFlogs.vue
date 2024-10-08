@@ -23,7 +23,6 @@ const copiedEntry = ref(null); // Initialize reactive copiedEntry
 
 const handleCopyEntry = (entry) => {
   copiedEntry.value = entry;
-  console.log('Copy event received in parent:', copiedEntry.value)
 }
 
 </script>

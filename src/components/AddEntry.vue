@@ -44,8 +44,6 @@ const autoResizeTextarea = (el_id) => {
 
 
 watch(() => props.copiedEntry, (newVal) => {
-	console.log('New copiedEntry received:', newVal);
-
   if (newVal && newVal.entry) {
     form.value.entry = newVal.entry; // Prepopulate the textarea with the copied entry
 	const addEntryForm = document.getElementById('add-entry');
