@@ -3,6 +3,7 @@
     <h1>FLogger!</h1>
   </div>
   <div v-if="openFlogs.length == 0">
+      <AddEntry @newEntry="addNewEntry" :timestamp="timestamp" />
     <Suspense>
       <DropBoxFlogs />
     </Suspense>
@@ -15,7 +16,6 @@
   <OpenFlogs />
   <br />
   <hr />
-  <AddEntry @newEntry="addNewEntry" :timestamp="timestamp" />
   <EntryList :entries="loadedEntries" />
 </template>
 
@@ -43,5 +43,9 @@ function addNewEntry(entryData) {
 <style scoped>
 h2 {
   font-size: 2em;
+}
+
+* {
+  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
 }
 </style>
