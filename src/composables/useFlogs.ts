@@ -1,12 +1,16 @@
 import { ref } from "vue"
 import { IFlog } from "@/modules/Flog"
 import { IEntry } from '@/modules/EntryData'
-import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
-// import { useLocalFileFlogs } from "@/composables/useLocalFileFlogs";
+import { useDropboxFlogs, IDropboxFlog } from "@/composables/useDropboxFlogs";
+import { useLocalFileFlogs, IFileFlog } from "@/composables/useLocalFileFlogs";
 
 const {
-    saveFlogEntries,
+    saveFlogEntries: saveFlogEntries_dropbox,
 } = useDropboxFlogs();
+
+const {
+    saveFlogEntries: saveFlogEntries_localFiles,
+} = useLocalFileFlogs(()=>{});
 
 //   const { selectedFileFlog, launchOpenFileFlow, launchRequestPermissionsFlow } = useLocalFileFlogs();
 
@@ -32,24 +36,17 @@ export const useFlogs = () => {
     }
 
     const addEntryToFlog = (entry: IEntry, flog: IFlog) => {
-        const sourceType = flog.url.split(':')[0];
-        switch (sourceType) {
-            case 'local file':
-                break;
-            case 'dropbox':
-                break;
-            default:
-        }
+        flog.loadedEntries.push(entry)
     }
 
     const saveFlogToSource = (flog: IFlog) => {
         const sourceType = flog.url.split(':')[0];
-        console.log('saveFlogToSource, sourceType = ', sourceType)
         switch (sourceType) {
             case 'local file':
+                saveFlogEntries_localFiles(flog as IFileFlog)
                 break;
             case 'dropbox':
-                saveFlogEntries(flog)
+                saveFlogEntries_dropbox(flog as IDropboxFlog)
                 break;
             default:
         }

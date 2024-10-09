@@ -1,27 +1,7 @@
 import { ref, Ref } from "vue";
 import { useLocalStorage } from "@vueuse/core";
 import { IEntry } from "@/modules/EntryData";
-import { deserializeEntries, IFlog } from "@/modules/Flog"
-
-export interface IFloggerDataFileComposable {
-    dataFileName: string;
-    dataFilePermissions: string;
-    dataFileSave: (fileDataObj: any) => void; // Should be fileDataObj: <SOME TYPE FOR FLOGGER FILE DATA>
-    dataFileClose: () => void;
-    // Not sure if there's a reason to make these public, or part of the Flogger interface anyway
-    // launchOpenFileFlow: () => void;
-    // launchRequestPermissionsFlow: () => void;
-    // getFileHandleFromPicker: () => FileSystemFileHandle[] | undefined;
-    // dataFileCheckPermissions: () => void; 
-    // dataFileLoad: () => void // Sets state vars dataFileName, selectedFileFlog
-    // dataFileReload: (file_id: string) => void;
-}
-
-
-interface IDataFileFlog extends IFloggerDataFileComposable {
-    launchOpenFileFlow: () => void;
-    launchRequestPermissionsFlow: () => void;
-}
+import { IFlog, deserializeEntries, serializeEntries } from "@/modules/Flog"
 
 export interface IFileFlog extends IFlog {
 }
@@ -35,6 +15,8 @@ export interface IFileFlogs {
     // loadFlogEntries: (flog: IFileFlog) => IEntry[]
     dataFileSave: (fileDataObj: any) => void; // Should be fileDataObj: <SOME TYPE FOR FLOGGER FILE DATA>
     dataFileClose: () => void;
+    saveFlogEntries: (flog: IFileFlog) => void;
+
 }
 // export interface IDropboxFlogs {
 //     launchConnectFlow: () => void
@@ -100,7 +82,6 @@ export const useLocalFileFlogs = (dataLoadedCallback): IFileFlogs => {
 
         console.log("Object store created.");
     };
-    console.log(`dataFileDB`, dataFileDB);
 
     async function getFileHandleFromPicker() {
         const pickerOpts = {
@@ -136,7 +117,6 @@ export const useLocalFileFlogs = (dataLoadedCallback): IFileFlogs => {
     async function launchOpenFileFlow() {
         // get file handle
         dataFileHandle.value = await getFileHandleFromPicker();
-        console.log(`dataFileHandle.value: `, dataFileHandle.value);
         if (!dataFileHandle.value) {
             console.log(`no file handle`);
             return;
@@ -148,19 +128,17 @@ export const useLocalFileFlogs = (dataLoadedCallback): IFileFlogs => {
         else return
         // await dataFileLoad();
 
-        console.log(`dataFileName.value: `, dataFileName.value);
-
         // store the file handle in indexedDB to open the file later.
         let dataFileDBTransaction = dataFileDB.transaction(
             ["filerefs"],
             "readwrite"
         );
         let dataFileDBObjectStore = dataFileDBTransaction.objectStore("filerefs");
-        console.log(`indexNames`, dataFileDBObjectStore.indexNames);
-        console.log(`keyPath`, dataFileDBObjectStore.keyPath);
-        console.log(`name`, dataFileDBObjectStore.name);
-        console.log(`transaction`, dataFileDBObjectStore.transaction);
-        console.log(`autoIncrement`, dataFileDBObjectStore.autoIncrement);
+        // console.log(`indexNames`, dataFileDBObjectStore.indexNames);
+        // console.log(`keyPath`, dataFileDBObjectStore.keyPath);
+        // console.log(`name`, dataFileDBObjectStore.name);
+        // console.log(`transaction`, dataFileDBObjectStore.transaction);
+        // console.log(`autoIncrement`, dataFileDBObjectStore.autoIncrement);
         let dataFileDBRequest = dataFileDBObjectStore.add(
             dataFileHandle.value,
             dataFileName.value
@@ -192,7 +170,6 @@ export const useLocalFileFlogs = (dataLoadedCallback): IFileFlogs => {
         dataFilePermissions.value = await dataFileHandle.value.queryPermission(
             dataFileOptions
         );
-        console.log("dataFilePermissions.value", dataFilePermissions.value);
     }
 
     async function launchRequestPermissionsFlow() {
@@ -208,7 +185,6 @@ export const useLocalFileFlogs = (dataLoadedCallback): IFileFlogs => {
     }
 
     async function dataFileLoad() {
-        console.log(`dataFileLoad`);
         try {
             // get file
             let dataFile = await dataFileHandle.value.getFile();
@@ -218,7 +194,7 @@ export const useLocalFileFlogs = (dataLoadedCallback): IFileFlogs => {
             dataFileDataStr.value = await dataFile.text();
             // parse file contents
             selectedFileFlog.value = {
-                url: 'local file: '+dataFileName.value,
+                url: 'local file: ' + dataFileName.value,
                 permissions: dataFilePermissions.value,
                 loadedEntries: deserializeEntries(dataFileDataStr.value),
             }
@@ -232,22 +208,19 @@ export const useLocalFileFlogs = (dataLoadedCallback): IFileFlogs => {
         // Retrieve a file you've opened before. Show's no filepicker UI, but can show
         // some other permission prompt if the browser so desires.
         // The browser can choose when to allow or not allow this open.
-        console.log(`dataFileReload file_id`, file_id);
-        console.log(`dataFileDB`, dataFileDB);
         let dataFileDBTransaction = dataFileDB.transaction(
             ["filerefs"],
             "readonly"
         );
         let dataFileDBObjectStore = dataFileDBTransaction.objectStore("filerefs");
-        console.log(`indexNames`, dataFileDBObjectStore.indexNames);
-        console.log(`keyPath`, dataFileDBObjectStore.keyPath);
-        console.log(`name`, dataFileDBObjectStore.name);
-        console.log(`transaction`, dataFileDBObjectStore.transaction);
-        console.log(`autoIncrement`, dataFileDBObjectStore.autoIncrement);
+        // console.log(`indexNames`, dataFileDBObjectStore.indexNames);
+        // console.log(`keyPath`, dataFileDBObjectStore.keyPath);
+        // console.log(`name`, dataFileDBObjectStore.name);
+        // console.log(`transaction`, dataFileDBObjectStore.transaction);
+        // console.log(`autoIncrement`, dataFileDBObjectStore.autoIncrement);
         let dataFileDBRequest = await dataFileDBObjectStore.get(file_id);
         dataFileDBRequest.onsuccess = async function (e) {
             dataFileHandle.value = dataFileDBRequest.result;
-            console.log(`dataFileHandle.value: `, dataFileHandle.value);
 
             if (!dataFileHandle.value) {
                 console.log(`no result`);
@@ -269,9 +242,20 @@ export const useLocalFileFlogs = (dataLoadedCallback): IFileFlogs => {
             // let file_writer = await dataFileHandle.value.createWritable();
             // // ... write to file_writer
 
-            console.log("dataFilePermissions.value", dataFilePermissions.value);
             if (dataFilePermissions.value == "granted") await dataFileLoad();
         };
+    }
+
+    async function saveFlogEntries(flog: IFileFlog) {
+        // Create a FileSystemWritableFileStream to write to.
+        // @ts-expect-error -- dataFileHandle ref isn't typed well yet
+        const writable = await dataFileHandle.value.createWritable();
+
+        // Write the contents of the file to the stream.
+        await writable.write(serializeEntries(flog.loadedEntries));
+
+        // Close the file and write the contents to disk.
+        await writable.close();
     }
 
     return {
@@ -282,6 +266,7 @@ export const useLocalFileFlogs = (dataLoadedCallback): IFileFlogs => {
         launchRequestPermissionsFlow,
         dataFileSave,
         dataFileClose,
+        saveFlogEntries
     };
 };
 

@@ -7,9 +7,15 @@ export interface IFlog {
 }
 
 export function serializeEntries(entriesList: IEntry[]): string {
+    console.log('entriesList', entriesList)
     return entriesList.reduce<string>(
         (accumulatedValue, currentEntry, index) => {
-            return accumulatedValue + `\n\n${currentEntry.date.toDateString()}\n${currentEntry.entry}`
+            console.log(currentEntry)
+            const entryString = `${currentEntry.date.toLocaleDateString()}`
+                + "\n"
+                + `${currentEntry.entry}`
+            console.log(currentEntry, entryString)
+            return accumulatedValue + ((index > 0) ? '\n\n' : '') + entryString
         }
         , '' //start accumulatedValue with an empty string
     )

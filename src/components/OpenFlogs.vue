@@ -1,24 +1,23 @@
 <script setup>
+import { ref } from "vue";
 import { useFlogs } from "@/composables/useFlogs";
-import AddEntry from "@/components/AddEntry.vue"
-import EntryList from "@/components/EntryList.vue"
+import EntryData from '@/modules/EntryData.ts';
+import AddEntry from "@/components/AddEntry.vue";
+import EntryList from "@/components/EntryList.vue";
 
-const { openFlogs, closeFlog } = useFlogs();
+const { openFlogs, closeFlog, addEntryToFlog, saveFlogToSource } = useFlogs();
 // const props = defineProps({});
 
-function addNewEntry(entryData) {
-  //console.log(entryData)
-  loadEntry(
-    new EntryData(
-      new Date(entryData.value.date).toLocaleDateString(),
-      entryData.value.entry
-    )
+function addNewEntry(entryData, flog) {
+  const newEntry = new EntryData(
+    new Date(entryData.value.date),
+    entryData.value.entry
   );
-  dataFileSave({
-    entries: openFlogs.value,
-  });
+  addEntryToFlog(newEntry, flog);
+  saveFlogToSource(flog);
 }
 
+const getTimestamp = () => ref(new Date().toLocaleDateString());
 </script>
 
 <template>
@@ -28,8 +27,11 @@ function addNewEntry(entryData) {
     <div v-for="flog in openFlogs">
       <h4>{{ flog.url }}</h4>
       <button @click.prevent="() => closeFlog(flog)">close flog</button>
-      <AddEntry @newEntry="addNewEntry" :timestamp="timestamp" />
-      <EntryList :entries="flog.loadedEntries" />
+      <AddEntry
+        @newEntry="(entryData) => addNewEntry(entryData, flog)"
+        :timestamp="getTimestamp()"
+      />
+      <EntryList v-if="flog.loadedEntries" :entries="flog.loadedEntries" />
     </div>
   </section>
 </template>
