@@ -25,7 +25,7 @@ export const useFlogs = () => {
     ) => {
         if (!openFlogs.value.includes(newFlog)) {
             const temp = openFlogs.value
-            openFlogs.value.push(newFlog)
+            openFlogs.value.unshift(newFlog)
         }
     }
 
@@ -36,7 +36,7 @@ export const useFlogs = () => {
     }
 
     const addEntryToFlog = (entry: IEntry, flog: IFlog) => {
-        flog.loadedEntries.push(entry)
+        flog.loadedEntries.unshift(entry)
     }
 
     const saveFlogToSource = (flog: IFlog) => {
