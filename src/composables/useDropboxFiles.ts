@@ -23,8 +23,9 @@ export const useDropboxFiles = (): IDropboxFiles => {
 
     const hostname = "localhost";
     const port = 5173;
-    var CLIENT_ID = "irjhf3obwytvv53"; //flogger-ccc4
-    //"lsu851xgok0qryy"; //Flogger Starscream
+    var CLIENT_ID = "85vbmd9vlyyb5kp" //Flogger data
+    //"irjhf3obwytvv53"; //flogger-ccc4
+        //"lsu851xgok0qryy"; //Flogger Starscream
     //"k2i486lvdpfjyhj"; //"q5qja4ma5qcl0qc"; //flogger-chad: q5qja4ma5qcl0qc //ORIGINAL EXAMPLE: 42zjexze6mfpf7x
 
     const config = {

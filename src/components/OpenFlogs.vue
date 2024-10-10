@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import { useFlogs } from "@/composables/useFlogs";
-import EntryData from '@/modules/EntryData.ts';
+import EntryData from "@/modules/EntryData.ts";
 import AddEntry from "@/components/AddEntry.vue";
 import EntryList from "@/components/EntryList.vue";
 
@@ -20,7 +20,7 @@ const copiedEntry = ref(null); // Initialize reactive copiedEntry
 
 const handleCopyEntry = (entry) => {
   copiedEntry.value = entry;
-}
+};
 
 const getTimestamp = () => ref(new Date().toLocaleDateString());
 </script>
@@ -29,11 +29,11 @@ const getTimestamp = () => ref(new Date().toLocaleDateString());
   <!-- Example description and UI -->
   <section class="container main">
     <div v-for="flog in openFlogs" :key="flog.id">
-      <AddEntry @newEntry="addNewEntry" :timestamp="timestamp" :copiedEntry="copiedEntry" />
       <h4>{{ flog.url }}</h4>
       <button @click.prevent="() => closeFlog(flog)">close flog</button>
       <AddEntry
         @newEntry="(entryData) => addNewEntry(entryData, flog)"
+        :copiedEntry="copiedEntry"
         :timestamp="getTimestamp()"
       />
       <EntryList :entries="flog.loadedEntries" @copy-entry="handleCopyEntry" />
