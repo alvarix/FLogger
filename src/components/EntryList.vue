@@ -19,8 +19,8 @@ function changeEntry(actionName,entry) {
   <ul class="entry-list">
     <li v-for="entry in entries">
       <Entry :entry="entry" />
-      <button @click="changeEntry('copy',entry)">Copy Entry</button>
-      <button @click="changeEntry('delete',entry)">Delete Entry</button>
+      <button class='entry__btn' @click="changeEntry('copy',entry)">Copy</button>
+      <button class='entry__btn entry__btn--warn' @click="changeEntry('delete',entry)">Delete</button>
     </li>
   </ul>
 </template>
@@ -30,6 +30,27 @@ function changeEntry(actionName,entry) {
   border-radius: 14px;
   list-style: none;
   margin-top: 10px;
-
 }
+
+button {
+  cursor: pointer;
+}
+
+.entry__btn {
+  font-size: 10px;
+  padding: 2px 4px;
+  margin: 3px 5px 0 0;
+  color: #999;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.entry__btn:hover {
+  color: #000
+}
+
+.entry__btn--warn:hover {
+  color:red;
+}
+
 </style>
