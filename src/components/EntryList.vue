@@ -7,10 +7,9 @@ const props = defineProps<{
   entries: Array<IEntry>;
 }>();
 
-const emit = defineEmits(['copy-entry']);
-function copyEntry(entry) {
-  // Emit the event to the parent with the copied entry data
-  emit('copy-entry', entry);
+const emit = defineEmits(['copy-entry','delete-entry']);
+function changeEntry(actionName,entry) {
+  emit(`${actionName}-entry`, entry);
 }
 
 </script>
@@ -20,7 +19,8 @@ function copyEntry(entry) {
   <ul class="entry-list">
     <li v-for="entry in entries">
       <Entry :entry="entry" />
-      <button @click="copyEntry(entry)">Copy Entry</button>
+      <button @click="changeEntry('copy',entry)">Copy Entry</button>
+      <button @click="changeEntry('delete',entry)">Delete Entry</button>
     </li>
   </ul>
 </template>
