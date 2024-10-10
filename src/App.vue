@@ -9,7 +9,7 @@
     </Suspense>
     <br />
     <hr />
-    <LocalFileFlogs />
+    <!-- <LocalFileFlogs /> -->
     <br />
     <hr />
   </div>
@@ -25,7 +25,7 @@ import EntryList from "@/components/EntryList.vue";
 import AddEntry from "@/components/AddEntry.vue";
 import DropBoxFlogs from "@/components/DropBoxFlogs.vue";
 import OpenFlogs from "@/components/OpenFlogs.vue";
-import LocalFileFlogs from "@/components/LocalFileFlogs.vue";
+// import LocalFileFlogs from "@/components/LocalFileFlogs.vue";
 import { useFlogs } from "@/composables/useFlogs";
 import { useLoadedEntries } from "@/composables/useLoadedEntries.ts";
 
