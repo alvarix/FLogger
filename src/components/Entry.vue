@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { INote } from '../modules/NoteData'
+import { IEntry } from '../modules/EntryData'
 
 const props = defineProps<{
-  note: INote;
+  entry: IEntry;
 }>();
 
 // Utility function to format timestamp to MM/DD/YYYY
@@ -15,8 +15,8 @@ function formatDate(timestamp: string | number | Date): string {
   return `${month}/${day}/${year}`;
 }
 
-// Computed property to format the note date
-const formattedDate = computed(() => formatDate(props.note.date));
+// Computed property to format the entry date
+const formattedDate = computed(() => formatDate(props.entry.date));
 
 
 </script>
@@ -25,10 +25,10 @@ const formattedDate = computed(() => formatDate(props.note.date));
 
 
 <template>
-  <div class="note">
+  <div class="entry">
       <h3>{{ formattedDate }}</h3>
 
-      <div><pre>{{ note.entry }}</pre></div> 
+      <div><pre class="entry__pre">{{ entry.entry }}</pre></div> 
       
   </div>
 </template>
@@ -41,12 +41,18 @@ h3 {
 }
 
 
-.note {
+.entry {
   text-align: left;
   max-width: 600px;
   border-radius: 14px;
   padding: 20px;
   border: 1px solid black;
+}
+
+.entry__pre {
+  white-space: pre-wrap;
+  font-size: 12px;
+  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
 }
 
 

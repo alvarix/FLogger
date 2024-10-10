@@ -2,78 +2,50 @@
   <div>
     <h1>FLogger!</h1>
   </div>
-  <Suspense>
-    <DropBoxFiles />
-  </Suspense>
-  <AddNote v-if="loadedNotes && loadedNotes.length > 0" @newNote="addNewNote" :timestamp="timestamp" />
-  <NoteList :notes="loadedNotes" />
+  <div v-if="openFlogs.length == 0">
+      <AddEntry @newEntry="addNewEntry" :timestamp="timestamp" />
+    <Suspense>
+      <DropBoxFlogs />
+    </Suspense>
+    <br />
+    <hr />
+    <LocalFileFlogs />
+    <br />
+    <hr />
+  </div>
+  <OpenFlogs />
+  <br />
+  <hr />
+  <EntryList :entries="loadedEntries" />
 </template>
 
 <script setup>
 import { ref } from "vue";
-import { useDataFile } from "./modules/useDataFile.js";
-import NoteList from "./components/NoteList.vue";
-import AddNote from "./components/AddNote.vue";
-import DropBoxFiles from "./components/DropBoxFiles.vue";
-import NoteData from "./modules/NoteData.ts";
-import { useLoadedNotes } from "./composables/useLoadedNotes.ts";
+import EntryList from "@/components/EntryList.vue";
+import AddEntry from "@/components/AddEntry.vue";
+import DropBoxFlogs from "@/components/DropBoxFlogs.vue";
+import OpenFlogs from "@/components/OpenFlogs.vue";
+import LocalFileFlogs from "@/components/LocalFileFlogs.vue";
+import { useFlogs } from "@/composables/useFlogs";
+import { useLoadedEntries } from "@/composables/useLoadedEntries.ts";
 
-const { loadedNotes, loadNotes, loadNote } = useLoadedNotes();
+const { openFlogs } = useFlogs();
+const { loadedEntries, loadEntries, loadEntry } = useLoadedEntries();
 
 const timestamp = ref(new Date().toLocaleDateString());
 
-function addNewNote(noteData) {
-  //console.log(noteData)
-  loadNote(
-    new NoteData(
-      new Date(noteData.value.date).toLocaleDateString(),
-      noteData.value.entry
-    )
-  );
-  dataFileSave({
-    notes: loadedNotes.value,
-  });
+function addNewEntry(entryData) {
+  console.log('Not implemented yet')
 }
 
-const {
-  dataFileName,
-  dataFilePermissions,
-  dataFileClickToOpen,
-  dataFileClickToRequestPermission,
-  dataFileSave,
-  dataFileClose,
-} = useDataFile(loadData);
-// That above is called a destructure assignment.
-// See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
-// It is shorthand for this:
-//   const dataFile = useDataFile(loadData);
-//   const dataFileName = dataFile.dataFileName;
-//   const dataFilePermissions = dataFile.dataFilePermissions;
-//   const dataFileClickToOpen = dataFile.dataFileClickToOpen;
-//   const dataFileClickToRequestPermission = dataFile.dataFileClickToRequestPermission;
-//   const dataFileSave = dataFile.dataFileSave;
-//   const dataFileClose = dataFile.dataFileClose;
-
-function closeDataFile() {
-  console.log("closeDataFile");
-  dataFileClose();
-  loadNotes([]);
-}
-
-function loadData(dataFileObject) {
-  console.log("loadData", dataFileObject);
-  if (dataFileObject?.notes) {
-    loadNotes(
-      dataFileObject.notes.map((note) => {
-        return new NoteData(note.date, note.entry);
-      })
-    );
-  }
-}
 </script>
 
 <style scoped>
 h2 {
   font-size: 2em;
+}
+
+* {
+  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
 }
 </style>

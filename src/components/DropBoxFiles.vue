@@ -2,9 +2,9 @@
 import { ref } from "vue";
 import fetch from "isomorphic-fetch";
 import qs from "qs";
-import { useLoadedNotes } from "../composables/useLoadedNotes.ts";
+import { useLoadedEntries } from "@/composables/useLoadedEntries.ts";
 
-const { loadNotes, loadNotesFromString } = useLoadedNotes();
+const { loadEntries, loadEntriesFromString } = useLoadedEntries();
 
 const props = defineProps({});
 
@@ -44,7 +44,13 @@ const doAuth = () => {
       console.log("dbxAuth.codeVerifier", dbxAuth.codeVerifier);
       window.location.href = authUrl;
     })
-    .catch((error) => console.error(error));
+    .catch((error) => {
+      console.log(
+        `Error getting auth URL:`,
+        e?.message || e
+      );
+      clearDbxSession();
+    });
 };
 
 // Parses the url and gets the access token if it is in the urls hash
@@ -115,6 +121,7 @@ console.log("accessToken:", accessToken);
 
 if (accessToken) {
   // 4. Check/refresh token
+  console.log("step 4");
   dbxAuth.checkAndRefreshAccessToken();
   // 5. Use token to get files
   console.log("step 5");
@@ -135,6 +142,10 @@ if (accessToken) {
           return item;
         });
       // fetchFileContents(fileItems.value);
+    })
+    .catch((e) => {
+      console.log("Error listing dropbox folders:", e?.message || e);
+      clearDbxSession();
     });
 }
 
@@ -150,12 +161,18 @@ const fetchFileContents = (entries) => {
         };
         reader.readAsText(response.result.fileBlob);
       })
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        console.log(
+          `Error downloading file ${item.path_lower} :`,
+          e?.message || e
+        );
+        clearDbxSession();
+      });
   });
 };
 
 const selectFile = (file) => {
-  const { loadNotesFromString } = useLoadedNotes();
+  const { loadEntriesFromString } = useLoadedEntries();
   dbxAuth.checkAndRefreshAccessToken();
   dbx
     .filesDownload({ path: file.path_lower })
@@ -163,19 +180,25 @@ const selectFile = (file) => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const fileData = e.target.result;
-        // load the file notes content
-        loadNotesFromString(fileData);
+        // load the file entries content
+        loadEntriesFromString(fileData);
         // set the loadedFile
         loadedFile.value = { path: file.path_lower };
       };
       reader.readAsText(response.result.fileBlob);
     })
-    .catch((error) => console.error(error));
+    .catch((error) => {
+      console.log(
+        `Error downloading file ${item.path_lower} :`,
+        e?.message || e
+      );
+      clearDbxSession();
+    });
 };
 
 const unselectFile = () => {
   loadedFile.value = undefined;
-  loadNotes([]);
+  loadEntries([]);
 }
 
 const clearDbxSession = () => {
@@ -187,7 +210,7 @@ const clearDbxSession = () => {
   fileItems.value = [];
   fileContents.value = {};
   loadedFile.value = undefined;
-  loadNotesFromString();
+  loadEntriesFromString();
 };
 </script>
 
@@ -204,14 +227,12 @@ const clearDbxSession = () => {
     >
       <button @click="doAuth">connect to DropBox</button>
     </div>
-    
+
     <div
       id="authed-section"
-      :style="{ display: (accessToken) ? 'block' : 'none' }"
+      :style="{ display: accessToken ? 'block' : 'none' }"
     >
-      <p>
-        You are connected to DropBox.
-      </p>
+      <p>You are connected to DropBox.</p>
       <button @click="clearDbxSession">forget DropBox connection</button>
     </div>
 
@@ -220,7 +241,8 @@ const clearDbxSession = () => {
       :style="{ display: !loadedFile ? 'block' : 'none' }"
     >
       <p>
-        Below are the .flogger files available in your of the App/flogger folder.
+        Below are the .flogger files available in your of the App/flogger
+        folder.
       </p>
       <ul id="files">
         <li v-for="item in fileItems">
@@ -236,15 +258,15 @@ const clearDbxSession = () => {
       :style="{ display: loadedFile ? 'block' : 'none' }"
     >
       <p>
-        The loaded file is <b>{{loadedFile?.path}}</b>
+        The loaded file is <b>{{ loadedFile?.path }}</b>
       </p>
       <button @click="unselectFile">close file</button>
     </div>
-</section>
+  </section>
 </template>
 
 <style scoped>
-#add-note *:not(.date-validation) {
+#add-entry *:not(.date-validation) {
   display: block;
 }
 
@@ -257,7 +279,7 @@ input.error {
   color: red;
 }
 
-#add-note label {
+#add-entry label {
   margin-top: 20px;
 }
 

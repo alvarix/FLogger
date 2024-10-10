@@ -1,0 +1,83 @@
+
+10/04/2024
+#pseudo-code
+    - DBX broke? Trying to json encode
+- implement DBX save    
+    - Add Entry
+        - Uncaught ReferenceError: loadEntry is not defined (on a local file)
+    - copy, edit buttons added to each Entry
+    - copy
+        - add current Entry text to Add Entry form 
+        - strip out date?
+        - add metadata {copied from m/d/yyy }
+    - edit  
+        - change current Entry into textArea
+        - add Save button
+            - trigger 
+
+    - add metadata
+        - { 
+        Edited on 6/30/2024
+        Copied from 6/7/2024
+        }
+
+
+
+10/04/2024
+#analysis
+#second-try
+In the last branch 'save to source file for Dropbox' Chad 
+    - useFlogs.ts
+        - add addEntryToFlog and SaveFlogToSource functions to return
+            - unless im mistaken, looks like just a start - determining if source is local or DBX
+        - also imports saveFlogEntries from useDropboxFlogs()
+    - useDropboxFlogs.ts   
+        - saveFlogEntries  
+        - back to #first-try - let's skip over to local files
+        
+    - useLocalFileFlogs.ts
+        - not implemented there
+      
+
+#questions
+    - why are interfaces extended from classes
+        - I see examples where a class `animal` is extended to interface `dog`
+        - Is this so in the future we can more atomically subdivide classes if need be?
+
+
+#analysis
+#first try
+src/composables/useDropboxFiles.ts (chad)
+    -   interfaces for DBX files and file list
+        - the file list interface contains methods for launching and clearing DBX connection
+        - though I cant see where those methods exist - I assume in the DBX SDK but dont see the connection 
+        - eponymous const
+            - will come back to this bcs it deals with DBX sdk complexity. Would rather focus on local files for now.
+
+10/04/2024
+#dev-notes
+
+- Use this file as data source
+    - outputs NaN/NaN/NaN in the app, doesn't like tabs or dashes?
+        - problem was date format, year must be yyyy
+
+
+
+Terms
+- Flog:  A .flogger.txt file
+- Entry: A flog pushed into an array seperate by date, and output in our app currently in a rounded corner box
+
+
+To Do
+- make flog.url display in openFlogs.vue formattable (ie HTML)
+    - ie. seperate flog.url into slug (for logic) and label (for display)
+- If in DBX - list DBX info (Username and/or URL, Folder, etc)
+- #roadmap How to handle multiple entries on same day
+
+
+Bugs
+- chad/save-to-source
+    - tried testing to see if button was present
+        - none for local
+        - dbx: file returning nan/nan/nan like my file did when I had the date misformatted
+            - it asked to connect to flogger-ccc4 but doesnt seem to correlate to files im seeing in DBX website

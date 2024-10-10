@@ -1,6 +1,6 @@
-export interface INote extends NoteData {}
+export interface IEntry extends EntryData {}
 
-export default class NoteData {
+export default class EntryData {
   date: Date;
   entry: string;
 
