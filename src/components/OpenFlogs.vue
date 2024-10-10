@@ -22,9 +22,18 @@ const handleCopyEntry = (entry) => {
   copiedEntry.value = entry;
 };
 
-const handleDeleteEntry = ( flog, entry ) => {
-  deleteEntryFromFlog( flog, entry )
-}
+// Handle entry deletion with confirmation
+const handleDeleteEntry = (flog, entry) => {
+  const confirmDelete = window.confirm('Are you sure you want to delete this entry?');
+  
+  // If the user confirms deletion, proceed with removing the entry
+  if (confirmDelete) {
+    deleteEntryFromFlog(flog, entry); // Delete the entry
+    console.log('Entry deleted successfully');
+  } else {
+    console.log('Entry deletion canceled');
+  }
+};
 
 const getTimestamp = () => ref(new Date().toLocaleDateString());
 </script>
