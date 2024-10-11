@@ -1,6 +1,7 @@
 import { ref, Ref, watch } from "vue"
 import { IFlog, deserializeEntries, serializeEntries } from "@/modules/Flog"
 import { useDropboxFiles } from "@/composables/useDropboxFiles"
+import { IDropboxFile } from "@/composables/useDropboxFiles";
 
 export interface IDropboxFlog extends IFlog {
     rev: string;
@@ -19,6 +20,7 @@ export interface IDropboxFlogs {
     loadFlogEntries: (flog: IDropboxFlog) => void;
     // makes use of ... from useDropboxFiles
     saveFlogEntries: (flog: IDropboxFlog) => void;
+    addFlog: (flog: IDropboxFlog) => void;
 }
 
 const {
@@ -28,6 +30,7 @@ const {
     availableFiles,
     loadFileContent,
     saveFileContent,
+    addFile
 } = useDropboxFiles()
 
 const filePathToFlogUrl = (path: string): string => {
@@ -74,9 +77,25 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
         saveFileContent(
             {
                 path: flogUrlToFilePath(flog.url),
-                rev: flog.rev,
+                // rev is required, but I'm not 100% sure of usage. 
+                // Might be required like this to ensure writing new version of current version. 
+                // Or, it might allow specing a new rev to version rather than overwrite.
+                rev: flog.rev, 
                 content: serializeEntries(flog.loadedEntries)
-            },
+            } as IDropboxFile,
+            () => { } // can parameterize so calling app gets notice once save is complete 
+        )
+    }
+
+    const addFlog = (flog: IDropboxFlog) => {
+        console.log('addFlog flog', flog)
+        addFile(
+            {
+                path: flogUrlToFilePath(flog.url),
+                // Is rev needed for mode add?
+                // rev: flog.rev, 
+                content: serializeEntries(flog.loadedEntries)
+            } as IDropboxFile,
             () => { } // can parameterize so calling app gets notice once save is complete 
         )
     }
@@ -93,5 +112,6 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
         availableFlogs,
         loadFlogEntries,
         saveFlogEntries,
+        addFlog,
     }
 }

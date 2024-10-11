@@ -1,6 +1,7 @@
 <script setup>
 import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
 import { useFlogs } from "@/composables/useFlogs";
+import AddFlog from "@/components/AddFlog.vue";
 
 const {
   launchConnectFlow,
@@ -8,6 +9,7 @@ const {
   clearConnection,
   availableFlogs,
   loadFlogEntries,
+  addFlog
 } = useDropboxFlogs();
 
 const { openFlog } = useFlogs();
@@ -18,6 +20,13 @@ const selectFile = (file) => {
   openFlog(file);
 };
 
+function handleAddFlog(flogData) {
+  console.log("Not implemented yet", flogData.value.filename);
+  addFlog({
+    url: flogData.value.filename + ".flogger.txt",
+    loadedEntries: [],
+  });
+}
 </script>
 
 <template>
@@ -41,6 +50,7 @@ const selectFile = (file) => {
     >
       <p>You are connected to DropBox.</p>
       <button @click="clearConnection">forget DropBox connection</button>
+      <AddFlog @newFlog="handleAddFlog" />
     </div>
 
     <div id="files-section">

@@ -6,10 +6,12 @@ import { useLocalFileFlogs, IFileFlog } from "@/composables/useLocalFileFlogs";
 
 const {
     saveFlogEntries: saveFlogEntries_dropbox,
+    addFlog: addFlog_dropbox
 } = useDropboxFlogs();
 
 const {
     saveFlogEntries: saveFlogEntries_localFiles,
+    addFlog: addFlog_localFiles
 } = useLocalFileFlogs(()=>{});
 
 //   const { selectedFileFlog, launchOpenFileFlow, launchRequestPermissionsFlow } = useLocalFileFlogs();
@@ -70,12 +72,26 @@ export const useFlogs = () => {
         }
     }
 
+    const addFlogToSource = (flog: IFlog) => {
+        const sourceType = flog.url.split(':')[0];
+        switch (sourceType) {
+            case 'local file':
+                addFlog_localFiles(flog as IFileFlog)
+                break;
+            case 'dropbox':
+                addFlog_dropbox(flog as IDropboxFlog)
+                break;
+            default:
+        }
+    }
+
     return {
         openFlogs,
         openFlog,
         closeFlog,
         addEntryToFlog,
         saveFlogToSource,
-        deleteEntryFromFlog
+        deleteEntryFromFlog,
+        addFlogToSource
     }
 }

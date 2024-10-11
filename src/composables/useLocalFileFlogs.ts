@@ -16,7 +16,7 @@ export interface IFileFlogs {
     dataFileSave: (fileDataObj: any) => void; // Should be fileDataObj: <SOME TYPE FOR FLOGGER FILE DATA>
     dataFileClose: () => void;
     saveFlogEntries: (flog: IFileFlog) => void;
-
+    addFlog: (flog: IFileFlog) => void;
 }
 // export interface IDropboxFlogs {
 //     launchConnectFlow: () => void
@@ -258,6 +258,18 @@ export const useLocalFileFlogs = (dataLoadedCallback): IFileFlogs => {
         await writable.close();
     }
 
+    async function addFlog(flog: IFileFlog) {
+        // Create a FileSystemWritableFileStream to write to.
+        // @ts-expect-error -- dataFileHandle ref isn't typed well yet
+        const writable = await dataFileHandle.value.createWritable();
+
+        // Write the contents of the file to the stream.
+        await writable.write(serializeEntries(flog.loadedEntries));
+
+        // Close the file and write the contents to disk.
+        await writable.close();
+    }
+
     return {
         // dataFileName,
         selectedFileFlog,
@@ -266,7 +278,8 @@ export const useLocalFileFlogs = (dataLoadedCallback): IFileFlogs => {
         launchRequestPermissionsFlow,
         dataFileSave,
         dataFileClose,
-        saveFlogEntries
+        saveFlogEntries,
+        addFlog
     };
 };
 
