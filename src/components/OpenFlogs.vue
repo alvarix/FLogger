@@ -5,7 +5,7 @@ import EntryData from "@/modules/EntryData.ts";
 import AddEntry from "@/components/AddEntry.vue";
 import EntryList from "@/components/EntryList.vue";
 
-const { openFlogs, closeFlog, addEntryToFlog, saveFlogToSource } = useFlogs();
+const { openFlogs, closeFlog, addEntryToFlog, deleteEntryFromFlog ,saveFlogToSource } = useFlogs();
 // const props = defineProps({});
 
 function addNewEntry(entryData, flog) {
@@ -22,6 +22,19 @@ const handleCopyEntry = (entry) => {
   copiedEntry.value = entry;
 };
 
+// Handle entry deletion with confirmation
+const handleDeleteEntry = (flog, entry) => {
+  const confirmDelete = window.confirm('Are you sure you want to delete this entry?');
+  
+  // If the user confirms deletion, proceed with removing the entry
+  if (confirmDelete) {
+    deleteEntryFromFlog(flog, entry); // Delete the entry
+    console.log('Entry deleted successfully');
+  } else {
+    console.log('Entry deletion canceled');
+  }
+};
+
 const getTimestamp = () => ref(new Date().toLocaleDateString());
 </script>
 
@@ -36,7 +49,8 @@ const getTimestamp = () => ref(new Date().toLocaleDateString());
         :copiedEntry="copiedEntry"
         :timestamp="getTimestamp()"
       />
-      <EntryList :entries="flog.loadedEntries" @copy-entry="handleCopyEntry" />
+      <EntryList :entries="flog.loadedEntries" @copy-entry="handleCopyEntry" 
+      @delete-entry="(entry) => handleDeleteEntry(flog, entry)" />
     </div>
   </section>
 </template>

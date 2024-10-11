@@ -25,7 +25,7 @@ export const useFlogs = () => {
     ) => {
         if (!openFlogs.value.includes(newFlog)) {
             const temp = openFlogs.value
-            openFlogs.value.push(newFlog)
+            openFlogs.value.unshift(newFlog)
         }
     }
 
@@ -36,8 +36,26 @@ export const useFlogs = () => {
     }
 
     const addEntryToFlog = (entry: IEntry, flog: IFlog) => {
-        flog.loadedEntries.push(entry)
+        flog.loadedEntries.unshift(entry)
     }
+
+    const deleteEntryFromFlog = (flog: IFlog, entry: IEntry) => {
+        if (!flog || !Array.isArray(flog.loadedEntries)) {
+            console.error('Flog or flog.loadedEntries is undefined or not an array');
+            return;
+        }
+        // Find the index of the entry to delete
+        const deleteEntryIndex = flog.loadedEntries.findIndex(flogEntry => flogEntry.id === entry.id);
+        if (deleteEntryIndex !== -1) {
+            // Remove the entry
+            flog.loadedEntries.splice(deleteEntryIndex, 1);
+    
+            // Save the updated flog to the source to persist the changes
+            saveFlogToSource(flog);
+        } else {
+            console.error('Entry not found in flog.loadedEntries');
+        }
+    };
 
     const saveFlogToSource = (flog: IFlog) => {
         const sourceType = flog.url.split(':')[0];
@@ -57,6 +75,7 @@ export const useFlogs = () => {
         openFlog,
         closeFlog,
         addEntryToFlog,
-        saveFlogToSource
+        saveFlogToSource,
+        deleteEntryFromFlog
     }
 }
