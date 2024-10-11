@@ -7,7 +7,22 @@ const props = defineProps<{
   entries: Array<IEntry>;
 }>();
 
-const emit = defineEmits(['copy-entry','delete-entry']);
+
+// Track the currently editing entry ID
+const editingEntryId = ref(null);
+
+// Function to check if the entry is in editing mode
+const isEditingEntry = (index) => {
+  return editingEntryId.value === index;
+};
+
+// Function to set the editing mode for a specific entry
+const setEditing = (index) => {
+  //alert(index)
+  editingEntryId.value = index;
+};
+
+const emit = defineEmits(['copy-entry','delete-entry', 'edit-entry']);
 function changeEntry(actionName,entry) {
   emit(`${actionName}-entry`, entry);
 }
@@ -17,9 +32,10 @@ function changeEntry(actionName,entry) {
 <template>
   
   <ul class="entry-list">
-    <li v-for="entry in entries">
-      <Entry :entry="entry" />
+    <li v-for="(entry, index) in entries" :key="index">
+      <Entry :entry="entry" :isEditing="isEditingEntry(index)" />
       <button class='entry__btn' @click="changeEntry('copy',entry)">Copy</button>
+      <button class='entry__btn' @click="setEditing(index)">Edit</button>
       <button class='entry__btn entry__btn--warn' @click="changeEntry('delete',entry)">Delete</button>
     </li>
   </ul>

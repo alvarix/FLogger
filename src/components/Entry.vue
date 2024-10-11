@@ -4,6 +4,7 @@ import { IEntry } from '../modules/EntryData'
 
 const props = defineProps<{
   entry: IEntry;
+  isEditing: boolean;
 }>();
 
 // Utility function to format timestamp to MM/DD/YYYY
@@ -28,9 +29,10 @@ const formattedDate = computed(() => formatDate(props.entry.date));
   <div class="entry">
       <h3>{{ formattedDate }}</h3>
 
-      <div><pre class="entry__pre">{{ entry.entry }}</pre></div> 
-      
-  </div>
+      <div v-if="!isEditing"><pre class="entry__pre">{{ entry.entry }}</pre></div> 
+      <!-- Display a textarea if editing -->
+      <textarea class='entry__textarea' v-else @blur="save" v-model="entry.entry"></textarea>
+    </div>
 </template>
 
 <style scoped>
@@ -53,6 +55,12 @@ h3 {
   white-space: pre-wrap;
   font-size: 12px;
   font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+}
+
+.entry__textarea {
+  width: 100%;
+  height: auto;
+  background-color: cornsilk;
 }
 
 

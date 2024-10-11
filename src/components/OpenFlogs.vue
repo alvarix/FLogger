@@ -17,10 +17,12 @@ function addNewEntry(entryData, flog) {
   saveFlogToSource(flog);
 }
 const copiedEntry = ref(null); // Initialize reactive copiedEntry
+let isEditing = ref(false);
 
 const handleCopyEntry = (entry) => {
   copiedEntry.value = entry;
 };
+
 
 // Handle entry deletion with confirmation
 const handleDeleteEntry = (flog, entry) => {
@@ -49,8 +51,11 @@ const getTimestamp = () => ref(new Date().toLocaleDateString());
         :copiedEntry="copiedEntry"
         :timestamp="getTimestamp()"
       />
-      <EntryList :entries="flog.loadedEntries" @copy-entry="handleCopyEntry" 
-      @delete-entry="(entry) => handleDeleteEntry(flog, entry)" />
+      <EntryList :entries="flog.loadedEntries" 
+      :isEditing = "isEditing"
+      @copy-entry="handleCopyEntry" 
+      @delete-entry="(entry) => handleDeleteEntry(flog, entry)" 
+      />
     </div>
   </section>
 </template>
