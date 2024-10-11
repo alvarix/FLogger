@@ -15,7 +15,8 @@ export interface IDropboxFiles {
     clearConnection: () => void
     availableFiles: Ref<IDropboxFile[]>
     loadFileContent: (file: IDropboxFile, callback: (result: { rev: string, content: string }) => any) => void,
-    saveFileContent: (file: IDropboxFile, callback: () => any) => void
+    saveFileContent: (file: IDropboxFile, callback: () => any) => void,
+    addFile: (file: IDropboxFile, callback: () => any) => void
 }
 
 export const useDropboxFiles = (): IDropboxFiles => {
@@ -25,7 +26,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
     const port = 5173;
     var CLIENT_ID = "85vbmd9vlyyb5kp" //Flogger data
     //"irjhf3obwytvv53"; //flogger-ccc4
-        //"lsu851xgok0qryy"; //Flogger Starscream
+    //"lsu851xgok0qryy"; //Flogger Starscream
     //"k2i486lvdpfjyhj"; //"q5qja4ma5qcl0qc"; //flogger-chad: q5qja4ma5qcl0qc //ORIGINAL EXAMPLE: 42zjexze6mfpf7x
 
     const config = {
@@ -230,6 +231,32 @@ export const useDropboxFiles = (): IDropboxFiles => {
             });
     }
 
+    const addFile = async (file: IDropboxFile, callback: () => any) => {
+        console.log('addFile file', file)
+
+        dbxAuth.checkAndRefreshAccessToken();
+        await dbx
+            .filesUpload(
+                {
+                    // Must add the slash in front of paths. This is relative to the root of the app folder in Dropbox
+                    path: "/" + file.path,
+                    contents: file.content,
+                    mode: { ".tag": "add" }
+                }
+            )
+            .then((response) => {
+                console.log(response)
+                callback()
+            })
+            .catch((error) => {
+                console.log(
+                    `Error uploading file ${file.path} :`,
+                    error.error.error_summary
+                );
+                // clearConnection();
+            });
+    }
+
     return {
         launchConnectFlow,
         hasConnection,
@@ -237,5 +264,6 @@ export const useDropboxFiles = (): IDropboxFiles => {
         availableFiles,
         loadFileContent,
         saveFileContent,
+        addFile,
     }
 }
