@@ -60,8 +60,7 @@ export const useFlogs = () => {
     };
 
     const saveFlogToSource = (flog: IFlog) => {
-        const sourceType = flog.url.split(':')[0];
-        switch (sourceType) {
+        switch (flog.sourceType) {
             case 'local file':
                 saveFlogEntries_localFiles(flog as IFileFlog)
                 break;
@@ -73,8 +72,7 @@ export const useFlogs = () => {
     }
 
     const addFlogToSource = (flog: IFlog) => {
-        const sourceType = flog.url.split(':')[0];
-        switch (sourceType) {
+        switch (flog.sourceType) {
             case 'local file':
                 addFlog_localFiles(flog as IFileFlog)
                 break;
