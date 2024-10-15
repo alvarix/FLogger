@@ -1,20 +1,18 @@
 import { IEntry } from './EntryData'
 
 export interface IFlog {
+    sourceType: "dropbox" | "local file",
     url: string,
     permissions?: string,
     loadedEntries: IEntry[],
 }
 
 export function serializeEntries(entriesList: IEntry[]): string {
-    console.log('entriesList', entriesList)
     return entriesList.reduce<string>(
         (accumulatedValue, currentEntry, index) => {
-            console.log(currentEntry)
             const entryString = `${currentEntry.date.toLocaleDateString()}`
                 + "\n"
                 + `${currentEntry.entry}`
-            console.log(currentEntry, entryString)
             return accumulatedValue + ((index > 0) ? '\n\n' : '') + entryString
         }
         , '' //start accumulatedValue with an empty string
