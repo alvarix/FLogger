@@ -59,6 +59,23 @@ export const useFlogs = () => {
         }
     };
 
+    const editEntryFromFlog = (flog: IFlog, entry: IEntry) => {
+        if (!flog || !Array.isArray(flog.loadedEntries)) {
+            console.error('Flog or flog.loadedEntries is undefined or not an array');
+            return;
+        }
+        // Find the index of the entry to delete
+        const editEntryIndex = flog.loadedEntries.findIndex(flogEntry => flogEntry.id === entry.id);
+        if (editEntryIndex !== -1) {
+            // Update the entry at the found index
+            flog.loadedEntries[editEntryIndex] = { ...flog.loadedEntries[editEntryIndex], ...entry };
+            // Save the updated flog to the source to persist the changes
+            saveFlogToSource(flog);
+        } else {
+            console.error('Entry not found in flog.loadedEntries');
+        }
+    }
+
     const saveFlogToSource = (flog: IFlog) => {
         const sourceType = flog.url.split(':')[0];
         switch (sourceType) {
@@ -92,6 +109,7 @@ export const useFlogs = () => {
         addEntryToFlog,
         saveFlogToSource,
         deleteEntryFromFlog,
+        editEntryFromFlog,
         addFlogToSource
     }
 }

@@ -2,6 +2,12 @@
 import { ref } from "vue";
 import Entry from "@/components/Entry.vue";
 import { IEntry } from '@/modules/EntryData'
+import { useFlogs } from "@/composables/useFlogs";
+
+const { 
+  editEntryFromFlog
+} = useFlogs();
+
 
 const props = defineProps<{
   entries: Array<IEntry>;
@@ -18,14 +24,33 @@ const isEditingEntry = (index) => {
 
 // Function to set the editing mode for a specific entry
 const setEditing = (index) => {
-  //alert(index)
   editingEntryId.value = index;
 };
 
-const emit = defineEmits(['copy-entry','delete-entry', 'edit-entry']);
+const emit = defineEmits([
+  'copy-entry',
+  'delete-entry', 
+  'edit-entry',
+  'update-entry-grandparent'
+]);
+
+// Emit event to the grandparent
+//const emit = defineEmits<{
+ // (e: , updatedEntry: IEntry): void;
+//}>();
 function changeEntry(actionName,entry) {
   emit(`${actionName}-entry`, entry);
 }
+
+
+// Function to catch update from child and emit to grandparent
+function emitUpdateToGrandparent(updatedEntry: IEntry) {
+  console.log('emitUpdateToGrandparent() called');
+  console.log('Forwarding updated entry to grandparent:', updatedEntry);
+  emit('update-entry-grandparent', updatedEntry);
+}
+
+
 
 </script>
 
@@ -33,7 +58,11 @@ function changeEntry(actionName,entry) {
   
   <ul class="entry-list">
     <li v-for="(entry, index) in entries" :key="index">
-      <Entry :entry="entry" :isEditing="isEditingEntry(index)" />
+      <Entry 
+        :entry="entry" 
+        :isEditing="isEditingEntry(index)" 
+        @update-entry="handleUpdateEntry"
+        />
       <button class='entry__btn' @click="changeEntry('copy',entry)">Copy</button>
       <button class='entry__btn' @click="setEditing(index)">Edit</button>
       <button class='entry__btn entry__btn--warn' @click="changeEntry('delete',entry)">Delete</button>

@@ -5,7 +5,14 @@ import EntryData from "@/modules/EntryData.ts";
 import AddEntry from "@/components/AddEntry.vue";
 import EntryList from "@/components/EntryList.vue";
 
-const { openFlogs, closeFlog, addEntryToFlog, deleteEntryFromFlog ,saveFlogToSource } = useFlogs();
+const { 
+  openFlogs, 
+  closeFlog, 
+  addEntryToFlog, 
+  deleteEntryFromFlog,
+  editEntryFromFlog,
+  saveFlogToSource 
+} = useFlogs();
 // const props = defineProps({});
 
 function addNewEntry(entryData, flog) {
@@ -37,6 +44,18 @@ const handleDeleteEntry = (flog, entry) => {
   }
 };
 
+// Function to handle the update event from the grandchild and update flog
+function handleUpdateEntry(updatedEntry) {
+  console.log('handleUpdateEntry() in grandparent called');
+  console.log('Received updated entry:', updatedEntry);
+
+  if (flog.value) {
+    editEntryFromFlog(flog.value, updatedEntry);
+  } else {
+    console.error('flog is not defined or initialized');
+  }
+};
+
 const getTimestamp = () => ref(new Date().toLocaleDateString());
 </script>
 
@@ -53,8 +72,10 @@ const getTimestamp = () => ref(new Date().toLocaleDateString());
       />
       <EntryList :entries="flog.loadedEntries" 
       :isEditing = "isEditing"
+      @edit-entry="editEntryFromFlog" 
       @copy-entry="handleCopyEntry" 
       @delete-entry="(entry) => handleDeleteEntry(flog, entry)" 
+      @update-entry-grandparent="handleUpdateEntry"
       />
     </div>
   </section>

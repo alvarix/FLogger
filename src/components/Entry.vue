@@ -7,6 +7,12 @@ const props = defineProps<{
   isEditing: boolean;
 }>();
 
+
+// Emits an event to the parent
+const emit = defineEmits<{
+  (e: 'update-entry', updatedEntry: IEntry): void;
+}>();
+
 // Utility function to format timestamp to MM/DD/YYYY
 function formatDate(timestamp: string | number | Date): string {
   const date = new Date(timestamp);
@@ -19,6 +25,12 @@ function formatDate(timestamp: string | number | Date): string {
 // Computed property to format the entry date
 const formattedDate = computed(() => formatDate(props.entry.date));
 
+// Function to emit the update when blur occurs
+function save() {
+  emit('update-entry', props.entry);
+  console.log('save() called - emitting event to parent');
+  console.log('Updated entry:', props.entry);
+}
 
 </script>
 
