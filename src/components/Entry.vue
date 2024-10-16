@@ -75,5 +75,12 @@ h3 {
   background-color: cornsilk;
 }
 
+@media (prefers-color-scheme: dark) {
+  .entry__textarea {
+    background-color: #999;
+  }
+}
+
+
 
 </style>
