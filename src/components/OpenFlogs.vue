@@ -45,12 +45,12 @@ const handleDeleteEntry = (flog, entry) => {
 };
 
 // Function to handle the update event from the grandchild and update flog
-function handleUpdateEntry(updatedEntry) {
+const handleUpdateEntry = (flog, updatedEntry) => {
   console.log('handleUpdateEntry() in grandparent called');
   console.log('Received updated entry:', updatedEntry);
 
-  if (flog.value) {
-    editEntryFromFlog(flog.value, updatedEntry);
+  if (flog) {
+    editEntryFromFlog(flog, updatedEntry);
   } else {
     console.error('flog is not defined or initialized');
   }
@@ -75,7 +75,7 @@ const getTimestamp = () => ref(new Date().toLocaleDateString());
       @edit-entry="editEntryFromFlog" 
       @copy-entry="handleCopyEntry" 
       @delete-entry="(entry) => handleDeleteEntry(flog, entry)" 
-      @update-entry-grandparent="handleUpdateEntry"
+      @update-entry-grandparent="(entry) => handleUpdateEntry(flog, entry)" 
       />
     </div>
   </section>

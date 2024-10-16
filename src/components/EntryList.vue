@@ -4,11 +4,6 @@ import Entry from "@/components/Entry.vue";
 import { IEntry } from '@/modules/EntryData'
 import { useFlogs } from "@/composables/useFlogs";
 
-const { 
-  editEntryFromFlog
-} = useFlogs();
-
-
 const props = defineProps<{
   entries: Array<IEntry>;
 }>();
@@ -61,7 +56,7 @@ function emitUpdateToGrandparent(updatedEntry: IEntry) {
       <Entry 
         :entry="entry" 
         :isEditing="isEditingEntry(index)" 
-        @update-entry="handleUpdateEntry"
+        @update-entry="emitUpdateToGrandparent"
         />
       <button class='entry__btn' @click="changeEntry('copy',entry)">Copy</button>
       <button class='entry__btn' @click="setEditing(index)">Edit</button>

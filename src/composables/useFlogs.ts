@@ -61,7 +61,7 @@ export const useFlogs = () => {
 
     const editEntryFromFlog = (flog: IFlog, entry: IEntry) => {
         if (!flog || !Array.isArray(flog.loadedEntries)) {
-            console.error('Flog or flog.loadedEntries is undefined or not an array');
+            console.error(`Flog or flog.loadedEntries is undefined or not an array: ${flog}`);
             return;
         }
         // Find the index of the entry to delete
