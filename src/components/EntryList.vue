@@ -26,7 +26,7 @@ const emit = defineEmits([
   'copy-entry',
   'delete-entry', 
   'edit-entry',
-  'update-entry-grandparent'
+  'update-entry'
 ]);
 
 // Emit event to the grandparent
@@ -39,10 +39,10 @@ function changeEntry(actionName,entry) {
 
 
 // Function to catch update from child and emit to grandparent
-function emitUpdateToGrandparent(updatedEntry: IEntry) {
-  console.log('emitUpdateToGrandparent() called');
+function updateEntry(updatedEntry: IEntry) {
+  console.log('updateEntry() called');
   console.log('Forwarding updated entry to grandparent:', updatedEntry);
-  emit('update-entry-grandparent', updatedEntry);
+  emit('update-entry', updatedEntry);
 }
 
 
@@ -56,7 +56,7 @@ function emitUpdateToGrandparent(updatedEntry: IEntry) {
       <Entry 
         :entry="entry" 
         :isEditing="isEditingEntry(index)" 
-        @update-entry="emitUpdateToGrandparent"
+        @update-entry="updateEntry"
         />
       <button class='entry__btn' @click="changeEntry('copy',entry)">Copy</button>
       <button class='entry__btn' @click="setEditing(index)">Edit</button>

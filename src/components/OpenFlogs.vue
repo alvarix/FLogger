@@ -75,7 +75,7 @@ const getTimestamp = () => ref(new Date().toLocaleDateString());
       @edit-entry="editEntryFromFlog" 
       @copy-entry="handleCopyEntry" 
       @delete-entry="(entry) => handleDeleteEntry(flog, entry)" 
-      @update-entry-grandparent="(entry) => handleUpdateEntry(flog, entry)" 
+      @update-entry="(entry) => handleUpdateEntry(flog, entry)" 
       />
     </div>
   </section>
