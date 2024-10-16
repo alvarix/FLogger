@@ -73,7 +73,6 @@ const toggleButton = () => {
         :isEditing="isEditingEntry(index)" 
         @stop-editing="stopEditingEntry(index)" 
         @update-entry="updateEntry"
-        @update-isEditing="(isEditing) => entry.isEditing = isEditing"
 
         />
       <button class='entry__btn' @click="changeEntry('copy',entry)">Copy</button>
