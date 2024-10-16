@@ -9,6 +9,24 @@ const props = defineProps<{
 }>();
 
 
+const emit = defineEmits([
+  'copy-entry',
+  'delete-entry', 
+  'edit-entry',
+  'update-entry'
+]);
+
+function changeEntry(actionName,entry) {
+  emit(`${actionName}-entry`, entry);
+}
+
+// Function to catch update from child and emit to grandparent
+function updateEntry(updatedEntry: IEntry) {
+  console.log('updateEntry() called');
+  console.log('Forwarding updated entry to grandparent:', updatedEntry);
+  emit('update-entry', updatedEntry);
+}
+
 // Track the currently editing entry ID
 const editingEntryId = ref(null);
 
@@ -21,31 +39,6 @@ const isEditingEntry = (index) => {
 const setEditing = (index) => {
   editingEntryId.value = index;
 };
-
-const emit = defineEmits([
-  'copy-entry',
-  'delete-entry', 
-  'edit-entry',
-  'update-entry'
-]);
-
-// Emit event to the grandparent
-//const emit = defineEmits<{
- // (e: , updatedEntry: IEntry): void;
-//}>();
-function changeEntry(actionName,entry) {
-  emit(`${actionName}-entry`, entry);
-}
-
-
-// Function to catch update from child and emit to grandparent
-function updateEntry(updatedEntry: IEntry) {
-  console.log('updateEntry() called');
-  console.log('Forwarding updated entry to grandparent:', updatedEntry);
-  emit('update-entry', updatedEntry);
-}
-
-
 
 </script>
 
