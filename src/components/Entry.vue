@@ -5,12 +5,14 @@ import { IEntry } from '../modules/EntryData'
 const props = defineProps<{
   entry: IEntry;
   isEditing: boolean;
+  index: number;
 }>();
 
 
 // Emits an event to the parent
 const emit = defineEmits([
-  'update-entry'
+  'update-entry',
+  'stop-editing'
 ]);
 
 // Utility function to format timestamp to MM/DD/YYYY
@@ -28,6 +30,8 @@ const formattedDate = computed(() => formatDate(props.entry.date));
 // Function to emit the update when blur occurs
 function save(entry) {
   emit('update-entry', entry);
+  emit('stop-editing', props.index);
+
   console.log('save() called - emitting event to parent');
   console.log('Updated entry:', entry);
 }
