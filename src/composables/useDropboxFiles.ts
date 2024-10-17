@@ -22,7 +22,7 @@ export interface IDropboxFiles {
 export const useDropboxFiles = (): IDropboxFiles => {
 
 
-    const hostname = "localhost";
+    const hostname = import.meta.env.VERCEL_URL;
     const port = 5173;
     var CLIENT_ID = "85vbmd9vlyyb5kp" //Flogger data
     //"irjhf3obwytvv53"; //flogger-ccc4
@@ -141,6 +141,8 @@ export const useDropboxFiles = (): IDropboxFiles => {
 
     const launchConnectFlow = () => {
         console.log("launchConnectFlow");
+        console.log("dbxAuthReturnUri", dbxAuthReturnUri);
+        
         dbxAuth
             .getAuthenticationUrl(
                 dbxAuthReturnUri,
