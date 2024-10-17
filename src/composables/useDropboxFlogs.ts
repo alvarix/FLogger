@@ -75,7 +75,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
                 rev: flog.rev, 
                 content: serializeEntries(flog.loadedEntries)
             } as IDropboxFile,
-            () => { } // can parameterize so calling app gets notice once save is complete 
+            (result) => { flog.rev = result.rev } // can parameterize so calling app gets notice once save is complete 
         )
     }
 

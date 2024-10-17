@@ -15,7 +15,7 @@ export interface IDropboxFiles {
     clearConnection: () => void
     availableFiles: Ref<IDropboxFile[]>
     loadFileContent: (file: IDropboxFile, callback: (result: { rev: string, content: string }) => any) => void,
-    saveFileContent: (file: IDropboxFile, callback: () => any) => void,
+    saveFileContent: (file: IDropboxFile, callback: (result: any) => any) => void,
     addFile: (file: IDropboxFile, callback: () => any) => void
 }
 
@@ -128,7 +128,6 @@ export const useDropboxFiles = (): IDropboxFiles => {
                 availableFiles.value = response.result.entries
                     .filter((item) => (item.path_lower.endsWith(".flogger") || item.path_lower.endsWith(".flogger.txt")))
                     .map((item) => {
-                        console.log("mapping item", item);
                         const newFile: IDropboxFile = { path: item.path_lower, rev: item[".tag"] }
                         return newFile;
                     });
@@ -206,7 +205,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
             });
     }
 
-    const saveFileContent = async (file: IDropboxFile, callback: () => any) => {
+    const saveFileContent = async (file: IDropboxFile, callback: (result: any) => any) => {
         console.log('saveFileContent file', file)
 
         dbxAuth.checkAndRefreshAccessToken();
@@ -220,7 +219,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
             )
             .then((response) => {
                 console.log(response)
-                callback()
+                callback(response.result)
             })
             .catch((error) => {
                 console.log(
