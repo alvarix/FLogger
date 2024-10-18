@@ -22,21 +22,44 @@ export interface IDropboxFiles {
 export const useDropboxFiles = (): IDropboxFiles => {
 
 
-    const hostname = "localhost";
-    const port = 5173;
+    const hostname = import.meta.env.VITE_VERCEL_URL || import.meta.env.VERCEL_URL;
+    console.log('VERCEL_URL', import.meta.env.VERCEL_URL)
+    console.log('VITE_VERCEL_URL', import.meta.env.VITE_VERCEL_URL)
+    const protocol = (hostname == 'localhost' ? 'http://' : 'https://');
+    const port = (hostname == 'localhost' ? ':5173' : '');
     var CLIENT_ID = "85vbmd9vlyyb5kp" //Flogger data
     //"irjhf3obwytvv53"; //flogger-ccc4
     //"lsu851xgok0qryy"; //Flogger Starscream
     //"k2i486lvdpfjyhj"; //"q5qja4ma5qcl0qc"; //flogger-chad: q5qja4ma5qcl0qc //ORIGINAL EXAMPLE: 42zjexze6mfpf7x
 
+    console.log('fetch', fetch)
+    console.log('globalThis.fetch', globalThis.fetch)
+    // The following variation from mdn docs produced this error:
+    // "Error getting access token from URL: TypeError: 'fetch' called on an object that does not implement interface Window."
+    // if (typeof globalThis.fetch === "undefined") {
+    //     Object.defineProperty(globalThis, "fetch", {
+    //         value: isoFetch,
+    //         enumerable: false,
+    //         configurable: true,
+    //         writable: true,
+    //     });
+    // }
+    // The following (seen on stackoverflow) produced this error:
+    // "Uncaught TypeError: window.fetch.bind is not a function"
+    // (Note that I was using import * as isoFetch from "isomorphic-fetch")
+    // globalThis.fetch = isoFetch;
+    globalThis.fetch = fetch;
+    console.log('globalThis.fetch', globalThis.fetch)
+
     const config = {
-        fetch,
+        fetch: fetch,
         clientId: CLIENT_ID,
     };
 
     const dbxAuth = new DropboxAuth(config);
 
-    const dbxAuthReturnUri = `http://${hostname}:${port}/`;
+    const dbxAuthReturnUri = `${protocol}${hostname}${port}/`;
+    console.log('dbxAuthReturnUri', dbxAuthReturnUri)
 
     // Parses the url and gets the access token if it is in the urls hash
     const getDbxAuthCodeFromUrl = () => {
@@ -141,6 +164,8 @@ export const useDropboxFiles = (): IDropboxFiles => {
 
     const launchConnectFlow = () => {
         console.log("launchConnectFlow");
+        console.log("dbxAuthReturnUri", dbxAuthReturnUri);
+
         dbxAuth
             .getAuthenticationUrl(
                 dbxAuthReturnUri,
