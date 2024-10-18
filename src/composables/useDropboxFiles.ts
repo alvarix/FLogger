@@ -32,6 +32,8 @@ export const useDropboxFiles = (): IDropboxFiles => {
     //"lsu851xgok0qryy"; //Flogger Starscream
     //"k2i486lvdpfjyhj"; //"q5qja4ma5qcl0qc"; //flogger-chad: q5qja4ma5qcl0qc //ORIGINAL EXAMPLE: 42zjexze6mfpf7x
 
+    console.log('fetch', fetch)
+    
     const config = {
         fetch,
         clientId: CLIENT_ID,
