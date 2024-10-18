@@ -1,5 +1,5 @@
 import { ref, Ref } from "vue"
-import * as fetch from "isomorphic-fetch";
+import * as isoFetch from "isomorphic-fetch";
 import { Dropbox, DropboxAuth } from "dropbox";
 // See https://dropbox.github.io/dropbox-sdk-js/Dropbox.html
 
@@ -32,10 +32,10 @@ export const useDropboxFiles = (): IDropboxFiles => {
     //"lsu851xgok0qryy"; //Flogger Starscream
     //"k2i486lvdpfjyhj"; //"q5qja4ma5qcl0qc"; //flogger-chad: q5qja4ma5qcl0qc //ORIGINAL EXAMPLE: 42zjexze6mfpf7x
 
-    console.log('fetch', fetch)
-    
+    console.log('isoFetch', isoFetch)
+
     const config = {
-        fetch,
+        fetch: isoFetch,
         clientId: CLIENT_ID,
     };
 
