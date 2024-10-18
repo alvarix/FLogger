@@ -33,14 +33,6 @@ const {
     addFile
 } = useDropboxFiles()
 
-const filePathToFlogUrl = (path: string): string => {
-    return 'dropbox: ' + path
-}
-
-const flogUrlToFilePath = (url: string): string => {
-    return url.replace(/^dropbox: /, '')
-}
-
 export const useDropboxFlogs = (): IDropboxFlogs => {
 
     const availableFlogs = ref([]);
@@ -50,10 +42,10 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
         (availableFiles, oldValue) => {
             const removed = !oldValue ? [] : oldValue
                 .filter((file) => availableFiles && !availableFiles.includes(file))
-                .map<IDropboxFlog>((file) => ({ url: filePathToFlogUrl(file.path) } as IDropboxFlog))
+                .map<IDropboxFlog>((file) => ({ sourceType: 'dropbox', url: file.path } as IDropboxFlog))
             const added = !availableFiles ? [] : availableFiles
                 .filter((file) => oldValue && !oldValue.includes(file))
-                .map<IDropboxFlog>((file) => ({ url: filePathToFlogUrl(file.path) } as IDropboxFlog))
+                .map<IDropboxFlog>((file) => ({ sourceType: 'dropbox', url: file.path } as IDropboxFlog))
             availableFlogs.value = availableFlogs.value
                 .filter((flog) => !removed.includes(flog))
                 .concat(added)
@@ -64,7 +56,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
     const loadFlogEntries = (flog: IDropboxFlog) => {
         console.log('loadFlogEntries flog', flog)
         loadFileContent(
-            { path: flogUrlToFilePath(flog.url) },
+            { path: flog.url },
             (result) => {
                 flog.loadedEntries = deserializeEntries(result.content)
                 flog.rev = result.rev;
@@ -76,7 +68,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
         console.log('saveFlogEntries flog', flog)
         saveFileContent(
             {
-                path: flogUrlToFilePath(flog.url),
+                path: flog.url,
                 // rev is required, but I'm not 100% sure of usage. 
                 // Might be required like this to ensure writing new version of current version. 
                 // Or, it might allow specing a new rev to version rather than overwrite.
@@ -91,7 +83,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
         console.log('addFlog flog', flog)
         addFile(
             {
-                path: flogUrlToFilePath(flog.url),
+                path: flog.url,
                 // Is rev needed for mode add?
                 // rev: flog.rev, 
                 content: serializeEntries(flog.loadedEntries)
