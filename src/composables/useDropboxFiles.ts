@@ -34,16 +34,19 @@ export const useDropboxFiles = (): IDropboxFiles => {
 
     console.log('isoFetch', isoFetch)
     console.log('globalThis.fetch', globalThis.fetch)
-    if (typeof globalThis.fetch === "undefined") {
-        Object.defineProperty(globalThis, "fetch", {
-          value: isoFetch,
-          enumerable: false,
-          configurable: true,
-          writable: true,
-        });
-      }
-      console.log('globalThis.fetch', globalThis.fetch)
-    
+    // the following variation from mdn docs produced this error:
+    // Error getting access token from URL: TypeError: 'fetch' called on an object that does not implement interface Window.
+    // if (typeof globalThis.fetch === "undefined") {
+    //     Object.defineProperty(globalThis, "fetch", {
+    //         value: isoFetch,
+    //         enumerable: false,
+    //         configurable: true,
+    //         writable: true,
+    //     });
+    // }
+    globalThis.fetch = isoFetch;
+    console.log('globalThis.fetch', globalThis.fetch)
+
     const config = {
         fetch: globalThis.fetch,
         clientId: CLIENT_ID,
