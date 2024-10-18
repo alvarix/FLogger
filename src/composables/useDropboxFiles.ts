@@ -22,7 +22,9 @@ export interface IDropboxFiles {
 export const useDropboxFiles = (): IDropboxFiles => {
 
 
-    const hostname = import.meta.env.VERCEL_URL;
+    const hostname = import.meta.env.VITE_VERCEL_URL || import.meta.env.VERCEL_URL;
+    console.log('VERCEL_URL', import.meta.env.VERCEL_URL)
+    console.log('VITE_VERCEL_URL', import.meta.env.VITE_VERCEL_URL)
     const port = 5173;
     var CLIENT_ID = "85vbmd9vlyyb5kp" //Flogger data
     //"irjhf3obwytvv53"; //flogger-ccc4
@@ -37,6 +39,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
     const dbxAuth = new DropboxAuth(config);
 
     const dbxAuthReturnUri = `http://${hostname}:${port}/`;
+    console.log('dbxAuthReturnUri', dbxAuthReturnUri)
 
     // Parses the url and gets the access token if it is in the urls hash
     const getDbxAuthCodeFromUrl = () => {
@@ -142,7 +145,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
     const launchConnectFlow = () => {
         console.log("launchConnectFlow");
         console.log("dbxAuthReturnUri", dbxAuthReturnUri);
-        
+
         dbxAuth
             .getAuthenticationUrl(
                 dbxAuthReturnUri,
