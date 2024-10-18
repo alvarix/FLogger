@@ -33,9 +33,19 @@ export const useDropboxFiles = (): IDropboxFiles => {
     //"k2i486lvdpfjyhj"; //"q5qja4ma5qcl0qc"; //flogger-chad: q5qja4ma5qcl0qc //ORIGINAL EXAMPLE: 42zjexze6mfpf7x
 
     console.log('isoFetch', isoFetch)
-
+    console.log('globalThis.fetch', globalThis.fetch)
+    if (typeof globalThis.fetch === "undefined") {
+        Object.defineProperty(globalThis, "fetch", {
+          value: isoFetch,
+          enumerable: false,
+          configurable: true,
+          writable: true,
+        });
+      }
+      console.log('globalThis.fetch', globalThis.fetch)
+    
     const config = {
-        fetch: isoFetch,
+        fetch: globalThis.fetch,
         clientId: CLIENT_ID,
     };
 
