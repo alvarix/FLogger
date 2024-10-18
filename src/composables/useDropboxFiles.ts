@@ -38,7 +38,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
 
     const dbxAuth = new DropboxAuth(config);
 
-    const dbxAuthReturnUri = `http://${hostname}:${port}/`;
+    const dbxAuthReturnUri = `${(hostname == 'localhost' ? 'http' : 'https')}://${hostname}:${port}/`;
     console.log('dbxAuthReturnUri', dbxAuthReturnUri)
 
     // Parses the url and gets the access token if it is in the urls hash
