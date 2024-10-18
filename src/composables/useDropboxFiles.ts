@@ -1,5 +1,5 @@
 import { ref, Ref } from "vue"
-import * as isoFetch from "isomorphic-fetch";
+import * as fetch from "isomorphic-fetch";
 import { Dropbox, DropboxAuth } from "dropbox";
 // See https://dropbox.github.io/dropbox-sdk-js/Dropbox.html
 
@@ -32,10 +32,10 @@ export const useDropboxFiles = (): IDropboxFiles => {
     //"lsu851xgok0qryy"; //Flogger Starscream
     //"k2i486lvdpfjyhj"; //"q5qja4ma5qcl0qc"; //flogger-chad: q5qja4ma5qcl0qc //ORIGINAL EXAMPLE: 42zjexze6mfpf7x
 
-    console.log('isoFetch', isoFetch)
+    console.log('fetch', fetch)
     console.log('globalThis.fetch', globalThis.fetch)
-    // the following variation from mdn docs produced this error:
-    // Error getting access token from URL: TypeError: 'fetch' called on an object that does not implement interface Window.
+    // The following variation from mdn docs produced this error:
+    // "Error getting access token from URL: TypeError: 'fetch' called on an object that does not implement interface Window."
     // if (typeof globalThis.fetch === "undefined") {
     //     Object.defineProperty(globalThis, "fetch", {
     //         value: isoFetch,
@@ -44,11 +44,15 @@ export const useDropboxFiles = (): IDropboxFiles => {
     //         writable: true,
     //     });
     // }
-    globalThis.fetch = isoFetch;
+    // The following (seen on stackoverflow) produced this error:
+    // "Uncaught TypeError: window.fetch.bind is not a function"
+    // (Note that I was using import * as isoFetch from "isomorphic-fetch")
+    // globalThis.fetch = isoFetch;
+    globalThis.fetch = fetch;
     console.log('globalThis.fetch', globalThis.fetch)
 
     const config = {
-        fetch: globalThis.fetch,
+        fetch: fetch,
         clientId: CLIENT_ID,
     };
 
