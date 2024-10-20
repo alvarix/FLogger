@@ -1,5 +1,6 @@
 import { ref, Ref } from "vue"
 import * as fetch from "isomorphic-fetch";
+// import fetch from "cross-fetch";
 // import fetch from "node-fetch";
 import { Dropbox, DropboxAuth } from "dropbox";
 // See https://dropbox.github.io/dropbox-sdk-js/Dropbox.html
@@ -61,7 +62,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
     // console.log('globalThis.fetch', globalThis.fetch)
 
     const config = {
-        fetch: fetch,
+        fetch: (...args) => fetch(...args),
         // fetch: (args) => fetch(args),
         clientId: CLIENT_ID,
     };
@@ -120,8 +121,8 @@ export const useDropboxFiles = (): IDropboxFiles => {
             })
             .catch((e) => {
                 console.log("Error getting access token from URL:", e.error || e);
-                console.log("reloadUrl", reloadUrl);
-                window.location.href = reloadUrl;
+                // console.log("reloadUrl", reloadUrl);
+                // window.location.href = reloadUrl;
             });
         // .catch((error) => {
         //   console.error(error.error || error);
