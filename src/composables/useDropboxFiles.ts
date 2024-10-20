@@ -62,7 +62,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
     // console.log('globalThis.fetch', globalThis.fetch)
 
     const config = {
-        fetch: (...args) => fetch(...args),
+        fetch: (...args) => { return fetch(...args) },
         // fetch: (args) => fetch(args),
         clientId: CLIENT_ID,
     };
