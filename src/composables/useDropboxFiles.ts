@@ -1,5 +1,6 @@
 import { ref, Ref } from "vue"
 import * as fetch from "isomorphic-fetch";
+// import fetch from "node-fetch";
 import { Dropbox, DropboxAuth } from "dropbox";
 // See https://dropbox.github.io/dropbox-sdk-js/Dropbox.html
 
@@ -46,13 +47,22 @@ export const useDropboxFiles = (): IDropboxFiles => {
     // }
     // The following (seen on stackoverflow) produced this error:
     // "Uncaught TypeError: window.fetch.bind is not a function"
-    // (Note that I was using import * as isoFetch from "isomorphic-fetch")
+    // globalThis.fetch = fetch;
+    // Same issue when I use import * as isoFetch from "isomorphic-fetch")
     // globalThis.fetch = isoFetch;
-    globalThis.fetch = fetch;
-    console.log('globalThis.fetch', globalThis.fetch)
+    // Object.defineProperty(globalThis, "fetch", fetch);
+
+    // Object.defineProperty(globalThis, "fetch", {
+    //     value: fetch,
+    //     enumerable: false,
+    //     configurable: true,
+    //     writable: true,
+    // });
+    // console.log('globalThis.fetch', globalThis.fetch)
 
     const config = {
         fetch: fetch,
+        // fetch: (args) => fetch(args),
         clientId: CLIENT_ID,
     };
 
