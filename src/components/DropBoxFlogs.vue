@@ -58,7 +58,7 @@ function handleAddFlog(flogData) {
     <div id="files-section">
       <!-- :style="{ display: !loadedFile ? 'block' : 'none' }" -->
       <p>
-        Below are the <em>.flogger.txt</em> files the <span v-if="accountInfo"> in account of <strong>{{ accountInfo.name.display_name }}</strong></span>.
+        Flogs<span v-if="accountInfo"> in account <strong>{{ accountInfo.name.display_name }}</strong></span>:
       </p>
       <ul id="files">
         <li v-for="item in availableFlogs">
