@@ -22,6 +22,7 @@ export interface IDropboxFiles {
 export const useDropboxFiles = (): IDropboxFiles => {
 
 
+    
     const hostname = "localhost";
     const port = 5173;
     var CLIENT_ID = "85vbmd9vlyyb5kp" //Flogger data
@@ -257,7 +258,31 @@ export const useDropboxFiles = (): IDropboxFiles => {
             });
     }
 
+    const accountInfo = ref(null);
+
+    // Fetch account information
+    const fetchAccountInfo = () => {
+      dbxAuth.checkAndRefreshAccessToken().then(() => {
+        const dbx = new Dropbox({ auth: dbxAuth });
+        dbx.usersGetCurrentAccount().then(response => {
+          accountInfo.value = response.result;
+        }).catch(error => {
+          console.log("Error fetching account info:", error);
+        });
+      });
+    };
+  
+    // Call fetchAccountInfo when access token is set
+    if (accessToken) {
+      fetchAccountInfo();
+    }
+  
+ 
+    
+    
+    
     return {
+        accountInfo,
         launchConnectFlow,
         hasConnection,
         clearConnection,

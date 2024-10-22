@@ -2,6 +2,8 @@
 import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
 import { useFlogs } from "@/composables/useFlogs";
 import AddFlog from "@/components/AddFlog.vue";
+import { useDropboxFiles } from "@/composables/useDropboxFiles";
+const { accountInfo } = useDropboxFiles();
 
 const {
   launchConnectFlow,
@@ -52,12 +54,11 @@ function handleAddFlog(flogData) {
       <button @click="clearConnection">forget DropBox connection</button>
       <AddFlog @newFlog="handleAddFlog" />
     </div>
-
+    
     <div id="files-section">
       <!-- :style="{ display: !loadedFile ? 'block' : 'none' }" -->
       <p>
-        Below are the .flogger files available in your of the App/flogger
-        folder.
+        Below are the <em>.flogger.txt</em> files the <span v-if="accountInfo"> in account of <strong>{{ accountInfo.name.display_name }}</strong></span>.
       </p>
       <ul id="files">
         <li v-for="item in availableFlogs">
