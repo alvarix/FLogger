@@ -77,6 +77,7 @@ h3 {
   width: 100%;
   height: auto;
   background-color: cornsilk;
+  field-sizing: content;
 }
 
 @media (prefers-color-scheme: dark) {
