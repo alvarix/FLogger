@@ -4,7 +4,16 @@ import { IEntry } from '../modules/EntryData'
 
 const props = defineProps<{
   entry: IEntry;
+  isEditing: boolean;
+  index: number;
 }>();
+
+
+// Emits an event to the parent
+const emit = defineEmits([
+  'update-entry',
+  'stop-editing'
+]);
 
 // Utility function to format timestamp to MM/DD/YYYY
 function formatDate(timestamp: string | number | Date): string {
@@ -18,6 +27,14 @@ function formatDate(timestamp: string | number | Date): string {
 // Computed property to format the entry date
 const formattedDate = computed(() => formatDate(props.entry.date));
 
+// Function to emit the update when blur occurs
+function save(entry) {
+  emit('update-entry', entry);
+  emit('stop-editing', props.index);
+
+  console.log('save() called - emitting event to parent');
+  console.log('Updated entry:', entry);
+}
 
 </script>
 
@@ -28,9 +45,10 @@ const formattedDate = computed(() => formatDate(props.entry.date));
   <div class="entry">
       <h3>{{ formattedDate }}</h3>
 
-      <div><pre class="entry__pre">{{ entry.entry }}</pre></div> 
-      
-  </div>
+      <div v-if="!isEditing"><pre class="entry__pre">{{ entry.entry }}</pre></div> 
+      <!-- Display a textarea if editing -->
+      <textarea class='entry__textarea' v-else @blur="save" v-model="entry.entry"></textarea>
+    </div>
 </template>
 
 <style scoped>
@@ -54,6 +72,20 @@ h3 {
   font-size: 12px;
   font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
 }
+
+.entry__textarea {
+  width: 100%;
+  height: auto;
+  background-color: cornsilk;
+  field-sizing: content;
+}
+
+@media (prefers-color-scheme: dark) {
+  .entry__textarea {
+    background-color: #999;
+  }
+}
+
 
 
 </style>

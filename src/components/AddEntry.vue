@@ -93,6 +93,14 @@ input[type='submit'],
 	background-color:cornsilk;
 }
 
+@media (prefers-color-scheme: dark) {
+	input[type='submit'],
+	.form-inner,
+	.form-inner * {
+		background-color:#333;
+	}
+}
+
 .form-inner {
     max-width: 600px;
     border-radius: 14px;
