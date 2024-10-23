@@ -61,6 +61,13 @@ export const useDropboxFiles = (): IDropboxFiles => {
     // });
     // console.log('globalThis.fetch', globalThis.fetch)
 
+    // Changing the config line to an arrow function to retain reference to fetch in this file results in error: 
+    // "Uncaught TypeError: As is not a function"
+    // const config = {
+    //     fetch: (...args) => { return fetch(...args) },
+    //     ...
+    // }
+
     const config = {
         fetch: (...args) => { return fetch(...args) },
         // fetch: (args) => fetch(args),
