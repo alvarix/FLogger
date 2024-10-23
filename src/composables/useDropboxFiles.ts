@@ -1,5 +1,7 @@
 import { ref, Ref } from "vue"
 import * as fetch from "isomorphic-fetch";
+// import fetch from "cross-fetch";
+// import fetch from "node-fetch";
 import { Dropbox, DropboxAuth } from "dropbox";
 // See https://dropbox.github.io/dropbox-sdk-js/Dropbox.html
 
@@ -22,21 +24,60 @@ export interface IDropboxFiles {
 export const useDropboxFiles = (): IDropboxFiles => {
 
 
-    const hostname = "localhost";
-    const port = 5173;
+    const hostname = import.meta.env.VITE_VERCEL_URL || import.meta.env.VERCEL_URL;
+    console.log('VERCEL_URL', import.meta.env.VERCEL_URL)
+    console.log('VITE_VERCEL_URL', import.meta.env.VITE_VERCEL_URL)
+    const protocol = (hostname == 'localhost' ? 'http://' : 'https://');
+    const port = (hostname == 'localhost' ? ':5173' : '');
     var CLIENT_ID = "85vbmd9vlyyb5kp" //Flogger data
     //"irjhf3obwytvv53"; //flogger-ccc4
     //"lsu851xgok0qryy"; //Flogger Starscream
     //"k2i486lvdpfjyhj"; //"q5qja4ma5qcl0qc"; //flogger-chad: q5qja4ma5qcl0qc //ORIGINAL EXAMPLE: 42zjexze6mfpf7x
 
+    console.log('fetch', fetch)
+    console.log('globalThis.fetch', globalThis.fetch)
+    // The following variation from mdn docs produced this error:
+    // "Error getting access token from URL: TypeError: 'fetch' called on an object that does not implement interface Window."
+    // if (typeof globalThis.fetch === "undefined") {
+    //     Object.defineProperty(globalThis, "fetch", {
+    //         value: isoFetch,
+    //         enumerable: false,
+    //         configurable: true,
+    //         writable: true,
+    //     });
+    // }
+    // The following (seen on stackoverflow) produced this error:
+    // "Uncaught TypeError: window.fetch.bind is not a function"
+    // globalThis.fetch = fetch;
+    // Same issue when I use import * as isoFetch from "isomorphic-fetch")
+    // globalThis.fetch = isoFetch;
+    // Object.defineProperty(globalThis, "fetch", fetch);
+
+    // Object.defineProperty(globalThis, "fetch", {
+    //     value: fetch,
+    //     enumerable: false,
+    //     configurable: true,
+    //     writable: true,
+    // });
+    // console.log('globalThis.fetch', globalThis.fetch)
+
+    // Changing the config line to an arrow function to retain reference to fetch in this file results in error: 
+    // "Uncaught TypeError: As is not a function"
+    // const config = {
+    //     fetch: (...args) => { return fetch(...args) },
+    //     ...
+    // }
+
     const config = {
-        fetch,
+        fetch: (...args) => { return fetch(...args) },
+        // fetch: (args) => fetch(args),
         clientId: CLIENT_ID,
     };
 
     const dbxAuth = new DropboxAuth(config);
 
-    const dbxAuthReturnUri = `http://${hostname}:${port}/`;
+    const dbxAuthReturnUri = `${protocol}${hostname}${port}/`;
+    console.log('dbxAuthReturnUri', dbxAuthReturnUri)
 
     // Parses the url and gets the access token if it is in the urls hash
     const getDbxAuthCodeFromUrl = () => {
@@ -87,8 +128,8 @@ export const useDropboxFiles = (): IDropboxFiles => {
             })
             .catch((e) => {
                 console.log("Error getting access token from URL:", e.error || e);
-                console.log("reloadUrl", reloadUrl);
-                window.location.href = reloadUrl;
+                // console.log("reloadUrl", reloadUrl);
+                // window.location.href = reloadUrl;
             });
         // .catch((error) => {
         //   console.error(error.error || error);
@@ -140,6 +181,8 @@ export const useDropboxFiles = (): IDropboxFiles => {
 
     const launchConnectFlow = () => {
         console.log("launchConnectFlow");
+        console.log("dbxAuthReturnUri", dbxAuthReturnUri);
+
         dbxAuth
             .getAuthenticationUrl(
                 dbxAuthReturnUri,
