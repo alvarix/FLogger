@@ -123,17 +123,14 @@ export const useDropboxFiles = (): IDropboxFiles => {
                     // @ts-expect-error
                     response.result.access_token
                 );
-                console.log("reloadUrl", reloadUrl);
+                console.log("Reload to remove code from url => ", reloadUrl);
                 window.location.href = reloadUrl;
             })
             .catch((e) => {
                 console.log("Error getting access token from URL:", e.error || e);
-                // console.log("reloadUrl", reloadUrl);
-                // window.location.href = reloadUrl;
+                console.log("Reload to remove code from url => ", reloadUrl);
+                window.location.href = reloadUrl;
             });
-        // .catch((error) => {
-        //   console.error(error.error || error);
-        // });
     }
 
     // 3. Get token
