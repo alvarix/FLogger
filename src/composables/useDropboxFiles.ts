@@ -109,15 +109,16 @@ export const useDropboxFiles = (): IDropboxFiles => {
 
     console.log("accessToken:", accessToken);
 
-    if (hasConnection.value) {
+    var dbx = new Dropbox({
+        auth: dbxAuth,
+    });
+
+    const checkAvailableFiles = () => {
         // 4. Check/refresh token
         console.log("step 4");
         dbxAuth.checkAndRefreshAccessToken();
         // 5. Use token to get files
         console.log("step 5");
-        var dbx = new Dropbox({
-            auth: dbxAuth,
-        });
         dbx
             .filesListFolder({
                 path: "",
@@ -136,6 +137,11 @@ export const useDropboxFiles = (): IDropboxFiles => {
                 console.log("Error listing dropbox folders:", e?.message || e);
                 clearConnection();
             });
+
+    }
+
+    if (hasConnection.value) {
+        checkAvailableFiles();
     }
 
     const launchConnectFlow = () => {
@@ -233,6 +239,10 @@ export const useDropboxFiles = (): IDropboxFiles => {
     const addFile = async (file: IDropboxFile, callback: () => any) => {
         console.log('addFile file', file)
 
+        // function addToAvailable(file) {
+        //     availableFiles.value = availableFiles.value.concat([file])
+        // }
+
         dbxAuth.checkAndRefreshAccessToken();
         await dbx
             .filesUpload(
@@ -245,6 +255,8 @@ export const useDropboxFiles = (): IDropboxFiles => {
             )
             .then((response) => {
                 console.log(response)
+                // addToAvailable(file)
+                checkAvailableFiles()
                 callback()
             })
             .catch((error) => {

@@ -46,15 +46,21 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
             const added = !availableFiles ? [] : availableFiles
                 .filter((file) => oldValue && !oldValue.includes(file))
                 .map<IDropboxFlog>((file) => ({ sourceType: 'dropbox', url: file.path } as IDropboxFlog))
-            availableFlogs.value = availableFlogs.value
-                .filter((flog) => !removed.includes(flog))
+            // console.log('watching availableFiles', removed, added, availableFlogs)
+            const comparableAvailableFlogs = availableFlogs.value.map((flog) => ({ sourceType: flog.sourceType, url: flog.url } as IDropboxFlog))
+            availableFlogs.value = comparableAvailableFlogs
+                .filter((flog, i) => {
+                    const match = removed.filter((removedFlog) => removedFlog.sourceType == flog.sourceType && removedFlog.url == flog.url).length > 0
+                    return !match
+                })
                 .concat(added)
-        },
-        { immediate: true }
+        }
+        // ,
+        // { immediate: true }
     )
 
     const loadFlogEntries = (flog: IDropboxFlog) => {
-        console.log('loadFlogEntries flog', flog)
+        // console.log('loadFlogEntries flog', flog)
         loadFileContent(
             { path: flog.url },
             (result) => {
@@ -65,14 +71,14 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
     }
 
     const saveFlogEntries = (flog: IDropboxFlog) => {
-        console.log('saveFlogEntries flog', flog)
+        // console.log('saveFlogEntries flog', flog)
         saveFileContent(
             {
                 path: flog.url,
                 // rev is required, but I'm not 100% sure of usage. 
                 // Might be required like this to ensure writing new version of current version. 
                 // Or, it might allow specing a new rev to version rather than overwrite.
-                rev: flog.rev, 
+                rev: flog.rev,
                 content: serializeEntries(flog.loadedEntries)
             } as IDropboxFile,
             (result) => { flog.rev = result.rev } // can parameterize so calling app gets notice once save is complete 
@@ -80,7 +86,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
     }
 
     const addFlog = (flog: IDropboxFlog) => {
-        console.log('addFlog flog', flog)
+        // console.log('addFlog flog', flog)
         addFile(
             {
                 path: flog.url,

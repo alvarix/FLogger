@@ -28,30 +28,25 @@ watch(
     matchedFlogs.value = newItems.filter((item) => {
       let filterTerm = newFilename.toLowerCase() || "";
       let matchTerm = item.url.toLowerCase().replace(/.flogger.txt$/g, "");
-      let isMatch = filterTerm != "" && matchTerm.includes(filterTerm) || false;
+      let isMatch =
+        (filterTerm != "" && matchTerm.includes(filterTerm)) || false;
       // To show all flogs in drop-down when search term is empty, change the above line to "filterTerm == "" || ..."
       return isMatch;
     });
   }
 );
 
-const selectFile = (file) => {
-  typedFilename.value = file.path_lower
-}
+const selectFlog = (flog) => {
+  typedFilename.value = flog.url;
+  // Could skip selectedFlog and just emit flog without any checks?
+  let selectedFlog = props.availableFlogs.filter((item) => item === flog);
+  emit("openFlog", selectedFlog.length > 0 && selectedFlog[0]);
+};
 
 const submitAdd = () => {
   newFlog.value.filename = typedFilename.value;
   emit("newFlog", newFlog);
 };
-
-// const change = () => {
-//   console.log("change", availableFlogs);
-//   // matchedFlogs.value = ['hi']
-//   matchedFlogs.value = availableFlogs.filter((flogItem, i) => {
-//     console.log(i, flogItem.filename, typedFilename);
-//     return flogItem.includes(typedFilename);
-//   });
-// };
 </script>
 
 <template>
@@ -81,7 +76,7 @@ const submitAdd = () => {
         <div class="autoc-select">
           <ul id="files">
             <li v-for="item in matchedFlogs">
-              <a href="#" @click.prevent="() => selectFile(item)">{{
+              <a href="#" @click.prevent="() => selectFlog(item)">{{
                 item.path_display ?? item.url
               }}</a>
             </li>
