@@ -50,7 +50,7 @@ function handleAddFlog(flogData) {
     >
       <p>You are connected to DropBox.</p>
       <button @click="clearConnection">forget DropBox connection</button>
-      <AddFlog @newFlog="handleAddFlog" />
+      <AddFlog @newFlog="handleAddFlog" :availableFlogs="availableFlogs"/>
     </div>
 
     <div id="files-section">
