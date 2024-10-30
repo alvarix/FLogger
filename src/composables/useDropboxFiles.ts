@@ -1,6 +1,6 @@
 import { ref, Ref } from "vue"
-import * as fetch from "isomorphic-fetch";
-// import fetch from "cross-fetch";
+// import * as fetch from "isomorphic-fetch";
+import fetch from "cross-fetch";
 // import fetch from "node-fetch";
 import { Dropbox, DropboxAuth } from "dropbox";
 // See https://dropbox.github.io/dropbox-sdk-js/Dropbox.html
