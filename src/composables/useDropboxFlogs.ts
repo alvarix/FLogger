@@ -1,7 +1,8 @@
-import { ref, Ref, watch } from "vue"
+import { ref, Ref, watch, onUpdated, onActivated } from "vue"
 import { IFlog, deserializeEntries, serializeEntries } from "@/modules/Flog"
 import { useDropboxFiles } from "@/composables/useDropboxFiles"
 import { IDropboxFile } from "@/composables/useDropboxFiles";
+
 
 export interface IDropboxFlog extends IFlog {
     rev: string;
@@ -39,24 +40,30 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
 
     watch(
         availableFiles,
-        (availableFiles, oldValue) => {
-            const removed = !oldValue ? [] : oldValue
-                .filter((file) => availableFiles && !availableFiles.includes(file))
-                .map<IDropboxFlog>((file) => ({ sourceType: 'dropbox', url: file.path } as IDropboxFlog))
-            const added = !availableFiles ? [] : availableFiles
-                .filter((file) => oldValue && !oldValue.includes(file))
-                .map<IDropboxFlog>((file) => ({ sourceType: 'dropbox', url: file.path } as IDropboxFlog))
-            // console.log('watching availableFiles', removed, added, availableFlogs)
-            const comparableAvailableFlogs = availableFlogs.value.map((flog) => ({ sourceType: flog.sourceType, url: flog.url } as IDropboxFlog))
-            availableFlogs.value = comparableAvailableFlogs
-                .filter((flog, i) => {
-                    const match = removed.filter((removedFlog) => removedFlog.sourceType == flog.sourceType && removedFlog.url == flog.url).length > 0
-                    return !match
-                })
-                .concat(added)
-        }
-        // ,
-        // { immediate: true }
+        (newValue, oldValue) => {
+            console.log('watch availableFiles (useDropboxFlogs)', availableFlogs.value, availableFiles, newValue, oldValue)
+            // // Rather than merging the old and new values with this...
+            // const removed = !oldValue ? [] : oldValue
+            //     .filter((file) => newValue && !newValue.includes(file))
+            //     .map<IDropboxFlog>((file) => ({ sourceType: 'dropbox', url: file.path } as IDropboxFlog))
+            // const added = !newValue ? [] : newValue
+            //     .filter((file) => oldValue && !oldValue.includes(file))
+            //     .map<IDropboxFlog>((file) => ({ sourceType: 'dropbox', url: file.path } as IDropboxFlog))
+            // // console.log('watching newValue', removed, added, availableFlogs)
+            // const comparableAvailableFlogs = availableFlogs.value.map((flog) => ({ sourceType: flog.sourceType, url: flog.url } as IDropboxFlog))
+            // availableFlogs.value = comparableAvailableFlogs
+            //     .filter((flog, i) => {
+            //         const match = removed.filter((removedFlog) => removedFlog.sourceType == flog.sourceType && removedFlog.url == flog.url).length > 0
+            //         return !match
+            //     })
+            //     .concat(added)
+            // // We will just recreate availableFlogs with this...
+            availableFlogs.value = availableFiles.value.map<IDropboxFlog>(
+                (file) => ({ sourceType: 'dropbox', url: file.path } as IDropboxFlog)
+            )
+            }
+        ,
+        { immediate: true }
     )
 
     const loadFlogEntries = (flog: IDropboxFlog) => {

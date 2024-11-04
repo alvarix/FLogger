@@ -1,4 +1,4 @@
-import { ref, Ref } from "vue"
+import { ref, Ref, watch } from "vue"
 import * as fetch from "isomorphic-fetch";
 import { Dropbox, DropboxAuth } from "dropbox";
 // See https://dropbox.github.io/dropbox-sdk-js/Dropbox.html
@@ -143,6 +143,12 @@ export const useDropboxFiles = (): IDropboxFiles => {
     if (hasConnection.value) {
         checkAvailableFiles();
     }
+    // I'm not sure if this is useful...
+    watch(hasConnection, () => {
+        if (hasConnection.value) {
+            checkAvailableFiles();
+        }
+    })
 
     const launchConnectFlow = () => {
         console.log("launchConnectFlow");
