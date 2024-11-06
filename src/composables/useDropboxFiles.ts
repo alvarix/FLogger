@@ -1,7 +1,5 @@
 import { ref, Ref } from "vue"
-// import * as fetch from "isomorphic-fetch";
 import fetch from "cross-fetch";
-// import fetch from "node-fetch";
 import { Dropbox, DropboxAuth } from "dropbox";
 // See https://dropbox.github.io/dropbox-sdk-js/Dropbox.html
 
@@ -25,7 +23,6 @@ export const useDropboxFiles = (): IDropboxFiles => {
 
 
     const hostname = import.meta.env.VITE_VERCEL_URL || import.meta.env.VERCEL_URL;
-    console.log('VERCEL_URL', import.meta.env.VERCEL_URL)
     console.log('VITE_VERCEL_URL', import.meta.env.VITE_VERCEL_URL)
     const protocol = (hostname == 'localhost' ? 'http://' : 'https://');
     const port = (hostname == 'localhost' ? ':5173' : '');
@@ -33,40 +30,6 @@ export const useDropboxFiles = (): IDropboxFiles => {
     //"irjhf3obwytvv53"; //flogger-ccc4
     //"lsu851xgok0qryy"; //Flogger Starscream
     //"k2i486lvdpfjyhj"; //"q5qja4ma5qcl0qc"; //flogger-chad: q5qja4ma5qcl0qc //ORIGINAL EXAMPLE: 42zjexze6mfpf7x
-
-    console.log('fetch', fetch)
-    console.log('globalThis.fetch', globalThis.fetch)
-    // The following variation from mdn docs produced this error:
-    // "Error getting access token from URL: TypeError: 'fetch' called on an object that does not implement interface Window."
-    // if (typeof globalThis.fetch === "undefined") {
-    //     Object.defineProperty(globalThis, "fetch", {
-    //         value: isoFetch,
-    //         enumerable: false,
-    //         configurable: true,
-    //         writable: true,
-    //     });
-    // }
-    // The following (seen on stackoverflow) produced this error:
-    // "Uncaught TypeError: window.fetch.bind is not a function"
-    // globalThis.fetch = fetch;
-    // Same issue when I use import * as isoFetch from "isomorphic-fetch")
-    // globalThis.fetch = isoFetch;
-    // Object.defineProperty(globalThis, "fetch", fetch);
-
-    // Object.defineProperty(globalThis, "fetch", {
-    //     value: fetch,
-    //     enumerable: false,
-    //     configurable: true,
-    //     writable: true,
-    // });
-    // console.log('globalThis.fetch', globalThis.fetch)
-
-    // Changing the config line to an arrow function to retain reference to fetch in this file results in error: 
-    // "Uncaught TypeError: As is not a function"
-    // const config = {
-    //     fetch: (...args) => { return fetch(...args) },
-    //     ...
-    // }
 
     const config = {
         fetch: (...args) => { return fetch(...args) },
@@ -83,34 +46,30 @@ export const useDropboxFiles = (): IDropboxFiles => {
     const getDbxAuthCodeFromUrl = () => {
         const params = new URL(window.location.href).searchParams;
         const code = params.get("code");
-        // console.log(`getDbxAuthCodeFromUrl: ${code}`);
         return code;
     };
     const removeAuthCodeFromUrl = (urlString) => {
         let url = new URL(urlString);
-        // console.log("url before", url.toString());
         url.searchParams.delete("code");
-        // console.log("url after", url.toString());
         return url.toString();
     };
 
     const dbxAuthCode = ref(getDbxAuthCodeFromUrl());
+
     const hasRedirectedFromAuth = ref(!!dbxAuthCode.value);
 
     const availableFiles = ref([]);
-
 
     const hasConnection = ref(false)
 
 
     if (hasRedirectedFromAuth.value) {
-        console.log(`dbxAuthReturnUri`, dbxAuthReturnUri);
-        console.log(`dbxAuthCode`, dbxAuthCode.value);
 
         const codeVerifier = window.sessionStorage.getItem("codeVerifier");
-        console.log(`codeVerifier:`, codeVerifier);
         dbxAuth.setCodeVerifier(codeVerifier);
+
         const reloadUrl = removeAuthCodeFromUrl(window.location.href);
+
         console.log("step 1");
         dbxAuth
             // 1. Get token
@@ -145,8 +104,6 @@ export const useDropboxFiles = (): IDropboxFiles => {
         accessToken = dbxAuth.getAccessToken();
     }
 
-    console.log("accessToken:", accessToken);
-
     if (hasConnection.value) {
         // 4. Check/refresh token
         console.log("step 4");
@@ -177,8 +134,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
     }
 
     const launchConnectFlow = () => {
-        console.log("launchConnectFlow");
-        console.log("dbxAuthReturnUri", dbxAuthReturnUri);
+        // console.log("launchConnectFlow", "dbxAuthReturnUri", dbxAuthReturnUri);
 
         dbxAuth
             .getAuthenticationUrl(
@@ -217,7 +173,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
     }
 
     const loadFileContent = async (file: IDropboxFile, callback: (result: { rev: string, content: string }) => any) => {
-        console.log('loadFileContent file', file)
+        // console.log('loadFileContent file', file)
 
         dbxAuth.checkAndRefreshAccessToken();
         await dbx
@@ -246,7 +202,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
     }
 
     const saveFileContent = async (file: IDropboxFile, callback: (result: any) => any) => {
-        console.log('saveFileContent file', file)
+        // console.log('saveFileContent file', file)
 
         dbxAuth.checkAndRefreshAccessToken();
         await dbx
@@ -258,7 +214,6 @@ export const useDropboxFiles = (): IDropboxFiles => {
                 }
             )
             .then((response) => {
-                console.log(response)
                 callback(response.result)
             })
             .catch((error) => {
@@ -271,7 +226,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
     }
 
     const addFile = async (file: IDropboxFile, callback: () => any) => {
-        console.log('addFile file', file)
+        // console.log('addFile file', file)
 
         dbxAuth.checkAndRefreshAccessToken();
         await dbx
@@ -284,7 +239,6 @@ export const useDropboxFiles = (): IDropboxFiles => {
                 }
             )
             .then((response) => {
-                console.log(response)
                 callback()
             })
             .catch((error) => {
