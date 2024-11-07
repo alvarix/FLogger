@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, nextTick } from "vue";
 import { IEntry } from '../modules/EntryData'
 
 const props = defineProps<{
@@ -28,11 +28,21 @@ function formatDate(timestamp: string | number | Date): string {
 const formattedDate = computed(() => formatDate(props.entry.date));
 
 let isEditingClick = ref(false);
+const entryTextarea = ref(null);
 
 function edit(entry) {
-  // emit('edit-entry', entry);
   isEditingClick.value = true;
+  // textarea isnt in dom yet, so next click needed
+  nextTick(() => {
+    if (entryTextarea.value) {
+      entryTextarea.value.focus();
+      // Set cursor position to the start of the text
+      entryTextarea.value.selectionStart = 0;
+      entryTextarea.value.selectionEnd = 0;
+    }
+  });
 }
+
 // Function to emit the update when blur occurs
 function save(entry) {
   emit('update-entry', entry);
@@ -51,7 +61,7 @@ function save(entry) {
 
       <div v-if="!isEditing && !isEditingClick" @click="edit" class="entry__body"><pre class="entry__pre">{{ entry.entry }}</pre></div> 
       <!-- Display a textarea if editing -->
-      <textarea class='entry__textarea' v-else @blur="save" v-model="entry.entry"></textarea>
+      <textarea ref="entryTextarea" class='entry__textarea' v-else @blur="save" v-model="entry.entry"></textarea>
     </div>
 </template>
 
