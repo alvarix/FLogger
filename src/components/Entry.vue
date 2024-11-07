@@ -27,13 +27,17 @@ function formatDate(timestamp: string | number | Date): string {
 // Computed property to format the entry date
 const formattedDate = computed(() => formatDate(props.entry.date));
 
+let isEditingClick = ref(false);
+
+function edit(entry) {
+  // emit('edit-entry', entry);
+  isEditingClick.value = true;
+}
 // Function to emit the update when blur occurs
 function save(entry) {
   emit('update-entry', entry);
   emit('stop-editing', props.index);
-
-  console.log('save() called - emitting event to parent');
-  console.log('Updated entry:', entry);
+  isEditingClick.value = false;
 }
 
 </script>
@@ -45,7 +49,7 @@ function save(entry) {
   <div class="entry">
       <h3>{{ formattedDate }}</h3>
 
-      <div v-if="!isEditing"><pre class="entry__pre">{{ entry.entry }}</pre></div> 
+      <div v-if="!isEditing && !isEditingClick" @click="edit" class="entry__body"><pre class="entry__pre">{{ entry.entry }}</pre></div> 
       <!-- Display a textarea if editing -->
       <textarea class='entry__textarea' v-else @blur="save" v-model="entry.entry"></textarea>
     </div>
@@ -54,7 +58,6 @@ function save(entry) {
 <style scoped>
 h3 {
   font-weight: 700;
-  margin-bottom: 20px;
   font-size: 14px;
 }
 
@@ -78,6 +81,14 @@ h3 {
   height: auto;
   background-color: cornsilk;
   field-sizing: content;
+}
+
+.entry__body {
+  padding: 20px 0px;
+}
+
+.entry__body:hover {
+  background-color: cornsilk;
 }
 
 @media (prefers-color-scheme: dark) {
