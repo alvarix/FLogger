@@ -35,7 +35,7 @@ function edit(entry) {
   // textarea isnt in dom yet, so next click needed
   nextTick(() => {
     if (entryTextarea.value) {
-      entryTextarea.value.focus();
+      entryTextarea.value.focus({ preventScroll: true });
       // Set cursor position to the start of the text
       entryTextarea.value.selectionStart = 0;
       entryTextarea.value.selectionEnd = 0;
@@ -80,6 +80,7 @@ h3 {
   border: 1px solid black;
 }
 
+.entry__textarea,
 .entry__pre {
   white-space: pre-wrap;
   font-size: 12px;
@@ -93,6 +94,7 @@ h3 {
   field-sizing: content;
 }
 
+.entry__textarea,
 .entry__body {
   padding: 20px 0px;
 }
