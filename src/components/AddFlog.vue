@@ -6,11 +6,45 @@ import { ref, watch, onMounted, nextTick } from "vue";
 const emit = defineEmits(["newFlog"]);
 const newFlog = ref({ filename: "" }); // Initialize newFlog as a reactive variable
 
-let showInput = ref(false);
+let typedFilename = ref("");
+
+let showInput = ref(true);
 
 let hasError = ref(false);
 
+const props = defineProps({
+  availableFlogs: {
+    type: Array,
+    required: true,
+  },
+});
+
+const matchedFlogs = ref([]);
+// To show all flogs in drop-down when search term is empty, set this ref to [...props.availableFlogs]
+
+watch(
+  [() => props.availableFlogs, typedFilename],
+  ([newItems, newFilename = ""]) => {
+    matchedFlogs.value = newItems.filter((item) => {
+      let filterTerm = newFilename.toLowerCase() || "";
+      let matchTerm = item.url.toLowerCase().replace(/.flogger.txt$/g, "");
+      let isMatch =
+        (filterTerm != "" && matchTerm.includes(filterTerm)) || false;
+      // To show all flogs in drop-down when search term is empty, change the above line to "filterTerm == "" || ..."
+      return isMatch;
+    });
+  }
+);
+
+const selectFlog = (flog) => {
+  typedFilename.value = flog.url;
+  // Could skip selectedFlog and just emit flog without any checks?
+  let selectedFlog = props.availableFlogs.filter((item) => item === flog);
+  emit("openFlog", selectedFlog.length > 0 && selectedFlog[0]);
+};
+
 const submitAdd = () => {
+  newFlog.value.filename = typedFilename.value;
   emit("newFlog", newFlog);
 };
 </script>
@@ -29,22 +63,31 @@ const submitAdd = () => {
   </div>
   <form v-else id="add-flog" @submit.prevent="submitAdd">
     <div class="form-inner">
-      <div>
+      <div class="filename-controls">
         <input
           :class="['filename', { error: hasError }]"
           id="filename"
           type="text"
-          :placeholder="newFlog.filename"
-          v-model="newFlog.filename"
-          required
+          placeholder="search or create new flog"
+          v-model="typedFilename"
         />
+        <!-- required
+          @change="change" -->
+        <div class="autoc-select">
+          <ul id="files">
+            <li v-for="item in matchedFlogs">
+              <a href="#" @click.prevent="() => selectFlog(item)">{{
+                item.path_display ?? item.url
+              }}</a>
+            </li>
+          </ul>
+        </div>
         <em class="date-validation hidden" :class="{ error: hasError }"
           >Please enter valid file name</em
         >
       </div>
     </div>
     <div>
-      <input type="submit" value="Add Flog" /> 
       <input
         type="button"
         value="Cancel"
@@ -79,6 +122,10 @@ input[type="button"] {
   background-color: cornsilk;
 }
 
+.filename-controls {
+  position: relative;
+}
+
 .form-inner {
   max-width: 600px;
   border-radius: 14px;
@@ -93,6 +140,11 @@ input.filename {
   color: cornflowerblue;
   padding: 5px;
   width: 100%;
+  /* height: 2rem; */
+}
+
+.autoc-select {
+  position: absolute;
 }
 
 .date-validation.error {

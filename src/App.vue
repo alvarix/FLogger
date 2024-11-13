@@ -3,19 +3,17 @@
     <h1>FLogger!</h1>
   </div>
   <div v-if="openFlogs.length == 0">
-      <AddEntry @newEntry="addNewEntry" :timestamp="timestamp" />
+    <AddEntry @newEntry="addNewEntry" :timestamp="timestamp" />
     <Suspense>
       <DropBoxFlogs />
     </Suspense>
-    <br />
-    <hr />
     <br />
     <hr />
   </div>
   <OpenFlogs />
   <br />
   <hr />
-  <EntryList :entries="loadedEntries" />
+  <EntryList :entries="loadedEntries || []" />
 </template>
 
 <script setup>
@@ -33,9 +31,8 @@ const { loadedEntries, loadEntries, loadEntry } = useLoadedEntries();
 const timestamp = ref(new Date().toLocaleDateString());
 
 function addNewEntry(entryData) {
-  console.log('Not implemented yet')
+  console.log("Not implemented yet");
 }
-
 </script>
 
 <style scoped>
@@ -44,6 +41,7 @@ h2 {
 }
 
 * {
-  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas,
+    "DejaVu Sans Mono", monospace;
 }
 </style>

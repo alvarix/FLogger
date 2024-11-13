@@ -18,6 +18,7 @@ const { openFlog } = useFlogs();
 // const props = defineProps({});
 
 const selectFile = (file) => {
+  console.log("selectFile", file);
   loadFlogEntries(file);
   openFlog(file);
 };
@@ -52,7 +53,7 @@ function handleAddFlog(flogData) {
     >
       <p>You are connected to DropBox.</p>
       <button @click="clearConnection">forget DropBox connection</button>
-      <AddFlog @newFlog="handleAddFlog" />
+      <AddFlog @newFlog="handleAddFlog" @openFlog="selectFile" :availableFlogs="availableFlogs"/>
     </div>
     
     <div id="files-section">

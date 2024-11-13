@@ -1,5 +1,5 @@
-import { ref, Ref } from "vue"
-import * as fetch from "isomorphic-fetch";
+import { ref, Ref, watch } from "vue"
+import fetch from "cross-fetch";
 import { Dropbox, DropboxAuth } from "dropbox";
 // See https://dropbox.github.io/dropbox-sdk-js/Dropbox.html
 
@@ -22,55 +22,54 @@ export interface IDropboxFiles {
 export const useDropboxFiles = (): IDropboxFiles => {
 
 
-    
-    const hostname = "localhost";
-    const port = 5173;
+    const hostname = import.meta.env.VITE_VERCEL_URL || import.meta.env.VERCEL_URL;
+    console.log('VITE_VERCEL_URL', import.meta.env.VITE_VERCEL_URL)
+    const protocol = (hostname == 'localhost' ? 'http://' : 'https://');
+    const port = (hostname == 'localhost' ? ':5173' : '');
     var CLIENT_ID = "85vbmd9vlyyb5kp" //Flogger data
     //"irjhf3obwytvv53"; //flogger-ccc4
     //"lsu851xgok0qryy"; //Flogger Starscream
     //"k2i486lvdpfjyhj"; //"q5qja4ma5qcl0qc"; //flogger-chad: q5qja4ma5qcl0qc //ORIGINAL EXAMPLE: 42zjexze6mfpf7x
 
     const config = {
-        fetch,
+        fetch: (...args) => { return fetch(...args) },
+        // fetch: (args) => fetch(args),
         clientId: CLIENT_ID,
     };
 
     const dbxAuth = new DropboxAuth(config);
 
-    const dbxAuthReturnUri = `http://${hostname}:${port}/`;
+    const dbxAuthReturnUri = `${protocol}${hostname}${port}/`;
+    console.log('dbxAuthReturnUri', dbxAuthReturnUri)
 
     // Parses the url and gets the access token if it is in the urls hash
     const getDbxAuthCodeFromUrl = () => {
         const params = new URL(window.location.href).searchParams;
         const code = params.get("code");
-        // console.log(`getDbxAuthCodeFromUrl: ${code}`);
         return code;
     };
     const removeAuthCodeFromUrl = (urlString) => {
         let url = new URL(urlString);
-        // console.log("url before", url.toString());
         url.searchParams.delete("code");
-        // console.log("url after", url.toString());
         return url.toString();
     };
 
     const dbxAuthCode = ref(getDbxAuthCodeFromUrl());
+
     const hasRedirectedFromAuth = ref(!!dbxAuthCode.value);
 
     const availableFiles = ref([]);
-
 
     const hasConnection = ref(false)
 
 
     if (hasRedirectedFromAuth.value) {
-        console.log(`dbxAuthReturnUri`, dbxAuthReturnUri);
-        console.log(`dbxAuthCode`, dbxAuthCode.value);
 
         const codeVerifier = window.sessionStorage.getItem("codeVerifier");
-        console.log(`codeVerifier:`, codeVerifier);
         dbxAuth.setCodeVerifier(codeVerifier);
+
         const reloadUrl = removeAuthCodeFromUrl(window.location.href);
+
         console.log("step 1");
         dbxAuth
             // 1. Get token
@@ -83,17 +82,14 @@ export const useDropboxFiles = (): IDropboxFiles => {
                     // @ts-expect-error
                     response.result.access_token
                 );
-                console.log("reloadUrl", reloadUrl);
+                console.log("Reload to remove code from url => ", reloadUrl);
                 window.location.href = reloadUrl;
             })
             .catch((e) => {
                 console.log("Error getting access token from URL:", e.error || e);
-                console.log("reloadUrl", reloadUrl);
+                console.log("Reload to remove code from url => ", reloadUrl);
                 window.location.href = reloadUrl;
             });
-        // .catch((error) => {
-        //   console.error(error.error || error);
-        // });
     }
 
     // 3. Get token
@@ -110,15 +106,16 @@ export const useDropboxFiles = (): IDropboxFiles => {
 
     console.log("accessToken:", accessToken);
 
-    if (hasConnection.value) {
+    var dbx = new Dropbox({
+        auth: dbxAuth,
+    });
+
+    const checkAvailableFiles = () => {
         // 4. Check/refresh token
         console.log("step 4");
         dbxAuth.checkAndRefreshAccessToken();
         // 5. Use token to get files
         console.log("step 5");
-        var dbx = new Dropbox({
-            auth: dbxAuth,
-        });
         dbx
             .filesListFolder({
                 path: "",
@@ -137,10 +134,22 @@ export const useDropboxFiles = (): IDropboxFiles => {
                 console.log("Error listing dropbox folders:", e?.message || e);
                 clearConnection();
             });
+
     }
 
+    if (hasConnection.value) {
+        checkAvailableFiles();
+    }
+    // I'm not sure if this is useful...
+    watch(hasConnection, () => {
+        if (hasConnection.value) {
+            checkAvailableFiles();
+        }
+    })
+
     const launchConnectFlow = () => {
-        console.log("launchConnectFlow");
+        // console.log("launchConnectFlow", "dbxAuthReturnUri", dbxAuthReturnUri);
+
         dbxAuth
             .getAuthenticationUrl(
                 dbxAuthReturnUri,
@@ -178,7 +187,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
     }
 
     const loadFileContent = async (file: IDropboxFile, callback: (result: { rev: string, content: string }) => any) => {
-        console.log('loadFileContent file', file)
+        // console.log('loadFileContent file', file)
 
         dbxAuth.checkAndRefreshAccessToken();
         await dbx
@@ -207,7 +216,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
     }
 
     const saveFileContent = async (file: IDropboxFile, callback: (result: any) => any) => {
-        console.log('saveFileContent file', file)
+        // console.log('saveFileContent file', file)
 
         dbxAuth.checkAndRefreshAccessToken();
         await dbx
@@ -219,7 +228,6 @@ export const useDropboxFiles = (): IDropboxFiles => {
                 }
             )
             .then((response) => {
-                console.log(response)
                 callback(response.result)
             })
             .catch((error) => {
@@ -232,7 +240,11 @@ export const useDropboxFiles = (): IDropboxFiles => {
     }
 
     const addFile = async (file: IDropboxFile, callback: () => any) => {
-        console.log('addFile file', file)
+        // console.log('addFile file', file)
+
+        // function addToAvailable(file) {
+        //     availableFiles.value = availableFiles.value.concat([file])
+        // }
 
         dbxAuth.checkAndRefreshAccessToken();
         await dbx
@@ -246,6 +258,8 @@ export const useDropboxFiles = (): IDropboxFiles => {
             )
             .then((response) => {
                 console.log(response)
+                // addToAvailable(file)
+                checkAvailableFiles()
                 callback()
             })
             .catch((error) => {
