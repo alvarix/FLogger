@@ -3,7 +3,7 @@ import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
 import { useFlogs } from "@/composables/useFlogs";
 import AddFlog from "@/components/AddFlog.vue";
 import { useDropboxFiles } from "@/composables/useDropboxFiles";
-const { accountInfo } = useDropboxFiles();
+// const { accountInfo } = useDropboxFiles();
 
 const {
   launchConnectFlow,
@@ -58,9 +58,6 @@ function handleAddFlog(flogData) {
     
     <div id="files-section">
       <!-- :style="{ display: !loadedFile ? 'block' : 'none' }" -->
-      <p>
-        Flogs<span v-if="accountInfo"> in account <strong>{{ accountInfo.name.display_name }}</strong></span>:
-      </p>
       <ul id="files">
         <li v-for="item in availableFlogs">
           <a href="#" @click.prevent="() => selectFile(item)">{{
