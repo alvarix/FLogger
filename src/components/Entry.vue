@@ -5,7 +5,6 @@ import { IEntry } from '../modules/EntryData'
 const props = defineProps<{
   entry: IEntry;
   isEditing: boolean;
-  index: number;
 }>();
 
 
