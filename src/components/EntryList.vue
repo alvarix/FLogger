@@ -5,7 +5,7 @@ import { IEntry } from '@/modules/EntryData'
 import { useFlogs } from "@/composables/useFlogs";
 
 const props = defineProps<{
-  entries: Array<IEntry>;
+  entries?: Array<IEntry>;
 }>();
 
 
