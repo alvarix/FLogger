@@ -1,10 +1,18 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, nextTick } from "vue";
 import { IEntry } from '../modules/EntryData'
 
 const props = defineProps<{
   entry: IEntry;
+  isEditing: boolean;
 }>();
+
+
+// Emits an event to the parent
+const emit = defineEmits([
+  'update-entry',
+  'stop-editing'
+]);
 
 // Utility function to format timestamp to MM/DD/YYYY
 function formatDate(timestamp: string | number | Date): string {
@@ -18,6 +26,28 @@ function formatDate(timestamp: string | number | Date): string {
 // Computed property to format the entry date
 const formattedDate = computed(() => formatDate(props.entry.date));
 
+let isEditingClick = ref(false);
+const entryTextarea = ref(null);
+
+function edit(entry) {
+  isEditingClick.value = true;
+  // textarea isnt in dom yet, so next click needed
+  nextTick(() => {
+    if (entryTextarea.value) {
+      entryTextarea.value.focus({ preventScroll: true });
+      // Set cursor position to the start of the text
+      entryTextarea.value.selectionStart = 0;
+      entryTextarea.value.selectionEnd = 0;
+    }
+  });
+}
+
+// Function to emit the update when blur occurs
+function save(entry) {
+  emit('update-entry', entry);
+  emit('stop-editing', props.index);
+  isEditingClick.value = false;
+}
 
 </script>
 
@@ -28,15 +58,15 @@ const formattedDate = computed(() => formatDate(props.entry.date));
   <div class="entry">
       <h3>{{ formattedDate }}</h3>
 
-      <div><pre class="entry__pre">{{ entry.entry }}</pre></div> 
-      
-  </div>
+      <div v-if="!isEditing && !isEditingClick" @click="edit" class="entry__body"><pre class="entry__pre">{{ entry.entry }}</pre></div> 
+      <!-- Display a textarea if editing -->
+      <textarea ref="entryTextarea" class='entry__textarea' v-else @blur="save" v-model="entry.entry"></textarea>
+    </div>
 </template>
 
 <style scoped>
 h3 {
   font-weight: 700;
-  margin-bottom: 20px;
   font-size: 14px;
 }
 
@@ -49,11 +79,35 @@ h3 {
   border: 1px solid black;
 }
 
+.entry__textarea,
 .entry__pre {
   white-space: pre-wrap;
   font-size: 12px;
   font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
 }
+
+.entry__textarea {
+  width: 100%;
+  height: auto;
+  background-color: cornsilk;
+  field-sizing: content;
+}
+
+.entry__textarea,
+.entry__body {
+  padding: 20px 0px;
+}
+
+.entry__body:hover {
+  background-color: cornsilk;
+}
+
+@media (prefers-color-scheme: dark) {
+  .entry__textarea {
+    background-color: #999;
+  }
+}
+
 
 
 </style>
