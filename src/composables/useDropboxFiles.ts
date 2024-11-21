@@ -63,7 +63,9 @@ export const useDropboxFiles = (): IDropboxFiles => {
 
     const hasConnection = ref(false)
 
-    const settingsFile = ref<{}>();
+    // // Support for .flogger.config settings file. 
+    // // Commenting out for now.
+    // const settingsFile = ref<{}>();
 
 
     if (hasRedirectedFromAuth.value) {
@@ -118,16 +120,6 @@ export const useDropboxFiles = (): IDropboxFiles => {
         auth: dbxAuth,
     });
 
-    const initializeSettings = () => {
-        console.log('Initializing settings file')
-        addFile({
-            path: '.flogger.config',
-            content: '{}'
-        }, (response) => {
-            console.log('Done initializing settings file', response)
-            settingsFile.value = response.result
-        })
-    }
 
     const checkAvailableFiles = () => {
         // 4. Check/refresh token
@@ -142,22 +134,54 @@ export const useDropboxFiles = (): IDropboxFiles => {
             // 6. Set availableFiles to display
             .then((response) => {
                 console.log("step 6");
+                let readMeFile: IDropboxFile;
                 availableFiles.value = response.result.entries
                     .filter((item) => (item.path_lower.endsWith(".flogger") || item.path_lower.endsWith(".flogger.txt")))
                     .map((item) => {
                         const newFile: IDropboxFile = { path: item.path_lower, rev: item[".tag"] }
+                        if (newFile.path == '/readme.flogger.txt') readMeFile = newFile;
                         return newFile;
                     });
-                settingsFile.value = response.result.entries
-                    .reduce((previousValue, currentValue, currentIndex, array) => {
-                        if (currentValue.path_lower == '/.flogger.config') return currentValue;
-                        return previousValue;
-                    }, undefined)
-                console.log('settingsFile.value', settingsFile.value)
-                if (!settingsFile.value) {
-                    // Save default settingsFile
-                    initializeSettings()
+
+                // Support for README.flogger.txt
+                if (!readMeFile) {
+                    console.log('Initializing README file')
+                    addFile({
+                        path: 'README.flogger.txt',
+                        content: `
+11/21/2024
+Welcome to Flogger
+░▒▓████████▓▒░▒▓█▓▒░      ░▒▓██████▓▒░ ░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓████████▓▒░▒▓███████▓▒░  
+░▒▓█▓▒░      ░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ 
+░▒▓█▓▒░      ░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ 
+░▒▓██████▓▒░ ░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒▒▓███▓▒░▒▓█▓▒▒▓███▓▒░▒▓██████▓▒░ ░▒▓███████▓▒░  
+░▒▓█▓▒░      ░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ 
+░▒▓█▓▒░      ░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ 
+░▒▓█▓▒░      ░▒▓████████▓▒░▒▓██████▓▒░ ░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓████████▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+`
+                    }, (response) => {
+                        console.log('Done initializing README file', response)
+                    })
                 }
+
+                // // Support for .flogger.config settings file. 
+                // // Commenting out for now.
+                // settingsFile.value = response.result.entries
+                //     .reduce((previousValue, currentValue, currentIndex, array) => {
+                //         if (currentValue.path_lower == '/.flogger.config') return currentValue;
+                //         return previousValue;
+                //     }, undefined)
+                // if (!settingsFile.value) {
+                //     // Save default settingsFile
+                //     console.log('Initializing settings file')
+                //     addFile({
+                //         path: '.flogger.config',
+                //         content: '{}'
+                //     }, (response) => {
+                //         console.log('Done initializing settings file', response)
+                //         settingsFile.value = response.result
+                //     })
+                // }
             })
             .catch((e) => {
                 console.log("Error listing dropbox folders:", e?.message || e);
