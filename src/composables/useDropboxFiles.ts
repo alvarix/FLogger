@@ -59,9 +59,11 @@ export const useDropboxFiles = (): IDropboxFiles => {
 
     const hasRedirectedFromAuth = ref(!!dbxAuthCode.value);
 
-    const availableFiles = ref([]);
+    const availableFiles = ref<IDropboxFile[]>([]);
 
     const hasConnection = ref(false)
+
+    const settingsFile = ref<{}>();
 
 
     if (hasRedirectedFromAuth.value) {
@@ -116,6 +118,17 @@ export const useDropboxFiles = (): IDropboxFiles => {
         auth: dbxAuth,
     });
 
+    const initializeSettings = () => {
+        console.log('Initializing settings file')
+        addFile({
+            path: '.flogger.config',
+            content: '{}'
+        }, (response) => {
+            console.log('Done initializing settings file', response)
+            settingsFile.value = response.result
+        })
+    }
+
     const checkAvailableFiles = () => {
         // 4. Check/refresh token
         console.log("step 4");
@@ -135,6 +148,16 @@ export const useDropboxFiles = (): IDropboxFiles => {
                         const newFile: IDropboxFile = { path: item.path_lower, rev: item[".tag"] }
                         return newFile;
                     });
+                settingsFile.value = response.result.entries
+                    .reduce((previousValue, currentValue, currentIndex, array) => {
+                        if (currentValue.path_lower == '/.flogger.config') return currentValue;
+                        return previousValue;
+                    }, undefined)
+                console.log('settingsFile.value', settingsFile.value)
+                if (!settingsFile.value) {
+                    // Save default settingsFile
+                    initializeSettings()
+                }
             })
             .catch((e) => {
                 console.log("Error listing dropbox folders:", e?.message || e);
@@ -143,14 +166,16 @@ export const useDropboxFiles = (): IDropboxFiles => {
 
     }
 
-    if (hasConnection.value) {
-        checkAvailableFiles();
-    }
+    // if (hasConnection.value) {
+    //     checkAvailableFiles();
+    // }
     // I'm not sure if this is useful...
     watch(hasConnection, () => {
         if (hasConnection.value) {
             checkAvailableFiles();
         }
+    }, {
+        immediate: true
     })
 
     const connectionPopupWindow = ref<any>()
@@ -249,7 +274,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
             });
     }
 
-    const addFile = async (file: IDropboxFile, callback: () => any) => {
+    const addFile = async (file: IDropboxFile, callback: (result?: any) => any) => {
         // console.log('addFile file', file)
 
         // function addToAvailable(file) {
@@ -270,7 +295,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
                 console.log(response)
                 // addToAvailable(file)
                 checkAvailableFiles()
-                callback()
+                callback(response.result)
             })
             .catch((error) => {
                 console.log(
