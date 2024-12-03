@@ -1,6 +1,27 @@
 <template>
   <div>
-    <h1>FLogger!</h1>
+    <h1>
+
+      <pre>
+
+
+
+
+███████╗██╗      ██████╗  ██████╗  ██████╗ ███████╗██████╗ 
+██╔════╝██║     ██╔═══██╗██╔════╝ ██╔════╝ ██╔════╝██╔══██╗
+█████╗  ██║     ██║   ██║██║  ███╗██║  ███╗█████╗  ██████╔╝
+██╔══╝  ██║     ██║   ██║██║   ██║██║   ██║██╔══╝  ██╔══██╗
+██║     ███████╗╚██████╔╝╚██████╔╝╚██████╔╝███████╗██║  ██║
+╚═╝     ╚══════╝ ╚═════╝  ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝
+                                                           
+
+
+
+        </pre>
+        
+                                                                                            
+    </h1>
+    
   </div>
   <div v-if="openFlogs.length == 0">
     <AddEntry @newEntry="addNewEntry" :timestamp="timestamp" />
@@ -35,7 +56,11 @@ function addNewEntry(entryData) {
 }
 </script>
 
-<style scoped>
+<style scoped lang="stylus"> 
+h1  
+  font-size 8px
+  font-family monospace
+
 h2 {
   font-size: 2em;
 }
