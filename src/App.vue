@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import EntryList from "@/components/EntryList.vue";
 import AddEntry from "@/components/AddEntry.vue";
 import DropBoxFlogs from "@/components/DropBoxFlogs.vue";
@@ -43,11 +43,24 @@ function addNewEntry(entryData) {
 <style lang="stylus"> 
 h1 pre 
   font-size 8px
-  font-family monospace
 
-  h2
-    font-size 2em
-    font-size 2.8em
+body:has(#files-section) // what happens if #files-section is empty?
+  h1
+    margin 10px 0
+    padding 10px 0
+    pre
+      font-size 4px
+  .dbx__btn 
+    font-size 14px
+    padding 5px 8px
+    position absolute
+    top 55px
+    right 20px
+
+
+h2
+  font-size 2em
+  font-size 2.8em
 
 *
     font-family ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas,

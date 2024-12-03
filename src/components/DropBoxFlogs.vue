@@ -52,14 +52,14 @@ function handleAddFlog(flogData) {
       Connect to your Dropbox account to begin:
     </p>
 
-      <button @click="launchConnectFlow">connect to DropBox</button>
+      <button class="dbx__btn" @click="launchConnectFlow">connect to DropBox</button>
     </div>
 
     <div
       id="authed-section"
       :style="{ display: hasConnection ? 'block' : 'none' }"
     >
-      <button @click="clearConnection">forget DropBox connection</button>
+      <button  class="dbx__btn" @click="clearConnection">forget DropBox connection</button>
       <AddFlog @newFlog="handleAddFlog" @openFlog="selectFile" :availableFlogs="availableFlogs"/>
     </div>
     
@@ -75,7 +75,10 @@ function handleAddFlog(flogData) {
   </section>
 </template>
 
-<style scoped>
+<style scoped lang="stylus">
+button 
+  margin-bottom 20px
+
 #add-entry *:not(.date-validation) {
   display: block;
 }
