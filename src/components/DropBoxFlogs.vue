@@ -33,17 +33,25 @@ function handleAddFlog(flogData) {
 </script>
 
 <template>
-  <!-- Example description and UI -->
   <section class="container main">
-    <h3>Dropbox Flogs</h3>
-    <p>
-      To load files from your DropBox account, you need to connect to DropBox
-      and authorize Flogger.
-    </p>
+
+    <!-- 
+    dev note:
+    Should this intro text live elsewhere?
+    -->
     <div
       id="pre-auth-section"
       :style="{ display: hasConnection ? 'none' : 'block' }"
     >
+    <p>
+      Welcome to Flogger!<br/>
+      A project by Alvar and Chad.<br/>
+      See the <a href='https://github.com/alvarix/FLogger/' target='_blank'>Github</a> page for more info.
+    </p>
+    <p>
+      Connect to your Dropbox account to begin:
+    </p>
+
       <button @click="launchConnectFlow">connect to DropBox</button>
     </div>
 
@@ -51,13 +59,11 @@ function handleAddFlog(flogData) {
       id="authed-section"
       :style="{ display: hasConnection ? 'block' : 'none' }"
     >
-      <p>You are connected to DropBox.</p>
       <button @click="clearConnection">forget DropBox connection</button>
       <AddFlog @newFlog="handleAddFlog" @openFlog="selectFile" :availableFlogs="availableFlogs"/>
     </div>
     
     <div id="files-section">
-      <!-- :style="{ display: !loadedFile ? 'block' : 'none' }" -->
       <ul id="files">
         <li v-for="item in availableFlogs">
           <a href="#" @click.prevent="() => selectFile(item)">{{
