@@ -3,7 +3,6 @@ import { IFlog, deserializeEntries, serializeEntries } from "@/modules/Flog"
 import { useDropboxFiles } from "@/composables/useDropboxFiles"
 import { IDropboxFile } from "@/composables/useDropboxFiles";
 
-
 export interface IDropboxFlog extends IFlog {
     rev: string;
 }
@@ -26,6 +25,52 @@ export interface IDropboxFlogs {
     addFlog: (flog: IDropboxFlog) => void;
 }
 
+// const initialReadmeFile = fs.readFileSync('./repo_template/README.flogger.txt').toString("utf-8");
+// const response1 = await fetch('./repo_template/README.flogger.txt');
+// const response1Text = await response.text();
+// console.log(response1Text)
+
+const folderContents = ref([])
+
+// Using a list of repoFiles (paths and contents using interface IDropboxFile) 
+// as default files to save to a user's Dropbox app folder.
+const repoFiles = ref<IDropboxFile[]>([]);
+
+// In clientside code, we must get the list of paths from the env vars, 
+// but then do clientside fetches to get file contents. 
+// The files must be in the public static folder, or serviced via an application route.
+
+// Get the list of paths from the import.meta env vars
+const repoFilesGlob = import.meta.glob("../../public/repo_template/**/*"); // maybe should use "../../public/repo_template/**/*.flogger.txt"
+for (const propName in repoFilesGlob) {
+    if (repoFilesGlob.hasOwnProperty(propName)) {
+        const globPathValue = propName
+        repoFiles.value.push(
+            { path: globPathValue.replace("../../public/repo_template/", "") } //IDropboxFlog
+        );
+    }
+}
+// console.log("repoFiles.value", repoFiles.value);
+
+// Clientside fetches to get file contents for each path
+repoFiles.value.forEach(repoFile => {
+    console.log(repoFile.path)
+    fetch(`/${repoFile.path}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text(); // Assuming the server returns JSON
+        })
+        .then(data => {
+            console.log('data', data)
+            folderContents.value.push(data);
+        })
+        .catch(error => {
+            console.error('Error loading folder contents:', error);
+        });
+})
+
 const {
     launchConnectFlow,
     connectionPopupWindow, 
@@ -35,7 +80,7 @@ const {
     loadFileContent,
     saveFileContent,
     addFile
-} = useDropboxFiles()
+} = useDropboxFiles(repoFiles.value)
 
 export const useDropboxFlogs = (): IDropboxFlogs => {
 
@@ -64,7 +109,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
             availableFlogs.value = availableFiles.value.map<IDropboxFlog>(
                 (file) => ({ sourceType: 'dropbox', url: file.path } as IDropboxFlog)
             )
-            }
+        }
         ,
         { immediate: true }
     )

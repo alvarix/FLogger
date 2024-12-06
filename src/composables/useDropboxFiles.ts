@@ -20,7 +20,7 @@ export interface IDropboxFiles {
     addFile: (file: IDropboxFile, callback: () => any) => void
 }
 
-export const useDropboxFiles = (): IDropboxFiles => {
+export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFiles => {
 
 
     const hostname = import.meta.env.VITE_VERCEL_URL || import.meta.env.VERCEL_URL;
@@ -134,35 +134,58 @@ export const useDropboxFiles = (): IDropboxFiles => {
             // 6. Set availableFiles to display
             .then((response) => {
                 console.log("step 6");
-                let readMeFile: IDropboxFile;
+                // // Support for README.flogger.txt
+                // let readMeFile: IDropboxFile;
+                // Support for repo template/default files
+                let templateFilesFound = new Map<string, boolean>()
                 availableFiles.value = response.result.entries
                     .filter((item) => (item.path_lower.endsWith(".flogger") || item.path_lower.endsWith(".flogger.txt")))
                     .map((item) => {
                         const newFile: IDropboxFile = { path: item.path_lower, rev: item[".tag"] }
-                        if (newFile.path == '/readme.flogger.txt') readMeFile = newFile;
+                        // // Support for README.flogger.txt
+                        // if (newFile.path == '/readme.flogger.txt') readMeFile = newFile;
+                        // Support for repo template/default files
+                        templateFilesFound.set(newFile.path, true);
                         return newFile;
                     });
 
-                // Support for README.flogger.txt
-                if (!readMeFile) {
-                    console.log('Initializing README file')
-                    addFile({
-                        path: 'README.flogger.txt',
-                        content: `
-11/21/2024
-Welcome to Flogger
-░▒▓████████▓▒░▒▓█▓▒░      ░▒▓██████▓▒░ ░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓████████▓▒░▒▓███████▓▒░  
-░▒▓█▓▒░      ░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ 
-░▒▓█▓▒░      ░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ 
-░▒▓██████▓▒░ ░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒▒▓███▓▒░▒▓█▓▒▒▓███▓▒░▒▓██████▓▒░ ░▒▓███████▓▒░  
-░▒▓█▓▒░      ░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ 
-░▒▓█▓▒░      ░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ 
-░▒▓█▓▒░      ░▒▓████████▓▒░▒▓██████▓▒░ ░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓████████▓▒░▒▓█▓▒░░▒▓█▓▒░ 
-`
-                    }, (response) => {
-                        console.log('Done initializing README file', response)
-                    })
-                }
+//                 // Support for README.flogger.txt
+//                 if (!readMeFile) {
+//                     console.log('Initializing README file')
+//                     addFile({
+//                         path: 'README.flogger.txt',
+//                         content: `
+// 11/21/2024
+// Welcome to Flogger
+// ░▒▓████████▓▒░▒▓█▓▒░      ░▒▓██████▓▒░ ░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓████████▓▒░▒▓███████▓▒░  
+// ░▒▓█▓▒░      ░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ 
+// ░▒▓█▓▒░      ░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ 
+// ░▒▓██████▓▒░ ░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒▒▓███▓▒░▒▓█▓▒▒▓███▓▒░▒▓██████▓▒░ ░▒▓███████▓▒░  
+// ░▒▓█▓▒░      ░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ 
+// ░▒▓█▓▒░      ░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ 
+// ░▒▓█▓▒░      ░▒▓████████▓▒░▒▓██████▓▒░ ░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓████████▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+// `
+//                     }, (response) => {
+//                         console.log('Done initializing README file', response)
+//                     })
+//                 }
+
+                // Support for repo template/default files
+                console.log('repoTemplateFiles', repoTemplateFiles)
+                console.log('templateFilesFound', templateFilesFound)
+                repoTemplateFiles.forEach(file => {
+                    const pathLower = file.path.toLowerCase();
+                    console.log(`templateFilesFound.get('/'+${pathLower})`, templateFilesFound.get('/'+pathLower))
+                    if (!templateFilesFound.get('/'+pathLower)) {
+                        console.log(`Initializing '/'+${file.path}`)
+                        addFile({
+                            path: file.path,
+                            content: file.content
+                        }, (response) => {
+                            console.log(`Done initializing ${file.path}`, response)
+                        })
+                    }
+                })
 
                 // // Support for .flogger.config settings file. 
                 // // Commenting out for now.
