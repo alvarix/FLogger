@@ -11,6 +11,7 @@ export interface IDropboxFile {
 
 export interface IDropboxFiles {
     launchConnectFlow: () => void
+    connectionPopupWindow: any
     hasConnection: Ref<boolean>
     clearConnection: () => void
     availableFiles: Ref<IDropboxFile[]>
@@ -84,12 +85,14 @@ export const useDropboxFiles = (): IDropboxFiles => {
                     // @ts-expect-error
                     response.result.access_token
                 );
+                // window.opener.connectionPopupWindow.value = false;
                 window.opener.location.reload();
                 window.close();
             })
             .catch((e) => {
                 console.log("Error getting access token from URL:", e.error || e);
                 // dbxauth-popup: Reload opener instead of current, and close current.
+                // window.opener.connectionPopupWindow.value = false;
                 window.opener.reload();
                 window.close();
             });
@@ -150,6 +153,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
         }
     })
 
+    const connectionPopupWindow = ref<any>()
     const launchConnectFlow = () => {
         // console.log("launchConnectFlow", "dbxAuthReturnUri", dbxAuthReturnUri);
 
@@ -170,10 +174,9 @@ export const useDropboxFiles = (): IDropboxFiles => {
                 //@ts-expect-error
                 console.log("dbxAuth.codeVerifier", dbxAuth.codeVerifier);
                 // dbxauth-popup: Replace open popup rather than redirecting to Db in this window
-                const windowFeatures = "popup=true,menubar=false,width=700height=700,innerWidth=700,innerHeight=700";
+                const windowFeatures = "popup=true,menubar=false,width=700height=700,innerWidth=700,innerHeight=700,left=100,top=100";
                 //@ts-expect-error
-                window.open(authUrl, 'dbauth', windowFeatures
-                )
+                connectionPopupWindow.value = window.open(authUrl, 'dbauth', windowFeatures)
             })
             .catch((error) => {
                 console.log(`Error getting auth URL:`, error?.message || error);
@@ -184,6 +187,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
 
     const clearConnection = () => {
         console.log("clearConnection");
+        connectionPopupWindow.value = undefined;
         window.sessionStorage.removeItem("accessToken");
         window.sessionStorage.removeItem("codeVerifier");
         dbxAuthCode.value = undefined;
@@ -303,6 +307,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
     return {
         accountInfo,
         launchConnectFlow,
+        connectionPopupWindow,
         hasConnection,
         clearConnection,
         availableFiles,
