@@ -41,7 +41,7 @@ function handleAddFlog(flogData) {
 </script>
 
 <template>
-  <button id="show-modal" @click="showModal = true">Show Modal</button>
+  <!-- <button id="show-modal" @click="showModal = true">Show Modal</button> -->
   <Teleport to="body">
     <!-- use the modal component, pass in the prop -->
     <modal :show="showModal" @close="showModal = false">
