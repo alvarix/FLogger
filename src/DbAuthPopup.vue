@@ -14,7 +14,7 @@
 </template>
 
 <script setup>
-import DropBoxAuth from "./DropBoxAuth.vue";
+import DropBoxAuth from "@/components/DropBoxAuth.vue";
 </script>
 
 <style scoped>

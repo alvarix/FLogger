@@ -1,5 +1,5 @@
 <script setup>
-import { useDropboxFlogs } from "../src/composables/useDropboxFlogs";
+import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
 
 // Calling useDropboxFlogs to handle the auth flow,
 // but don't need to use any vars or functions from it,
