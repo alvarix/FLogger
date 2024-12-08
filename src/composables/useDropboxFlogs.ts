@@ -12,6 +12,8 @@ export interface IDropboxFlogs {
     // pass through from useDropboxFiles
     launchConnectFlow: () => void;
     // pass through from useDropboxFiles
+    connectionPopupWindow: boolean;
+    // pass through from useDropboxFiles
     hasConnection: Ref<boolean>;
     // pass through from useDropboxFiles
     clearConnection: () => void;
@@ -26,6 +28,7 @@ export interface IDropboxFlogs {
 
 const {
     launchConnectFlow,
+    connectionPopupWindow, 
     hasConnection,
     clearConnection: clearFileConnection,
     availableFiles,
@@ -112,6 +115,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
 
     return {
         launchConnectFlow,
+        connectionPopupWindow,
         hasConnection,
         clearConnection,
         availableFlogs,
