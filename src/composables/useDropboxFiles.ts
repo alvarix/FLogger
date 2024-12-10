@@ -134,50 +134,36 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
             // 6. Set availableFiles to display
             .then((response) => {
                 console.log("step 6");
-                // // Support for README.flogger.txt
-                // let readMeFile: IDropboxFile;
+
                 // Support for repo template/default files
-                let templateFilesFound = new Map<string, boolean>()
+                // * Var to easily check if a template file exists in the filesListFolder response
+                let filePathsFound = new Map<string, boolean>()
+
+                // Set availableFiles from filesListFolder response 
+                // And set the keys in filePathsFound
                 availableFiles.value = response.result.entries
                     .filter((item) => (item.path_lower.endsWith(".flogger") || item.path_lower.endsWith(".flogger.txt")))
                     .map((item) => {
                         const newFile: IDropboxFile = { path: item.path_lower, rev: item[".tag"] }
-                        // // Support for README.flogger.txt
-                        // if (newFile.path == '/readme.flogger.txt') readMeFile = newFile;
                         // Support for repo template/default files
-                        templateFilesFound.set(newFile.path, true);
+                        // * Var to easily check if a template file exists in the filesListFolder response
+                        filePathsFound.set(newFile.path, true);
                         return newFile;
                     });
 
-//                 // Support for README.flogger.txt
-//                 if (!readMeFile) {
-//                     console.log('Initializing README file')
-//                     addFile({
-//                         path: 'README.flogger.txt',
-//                         content: `
-// 11/21/2024
-// Welcome to Flogger
-// ░▒▓████████▓▒░▒▓█▓▒░      ░▒▓██████▓▒░ ░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓████████▓▒░▒▓███████▓▒░  
-// ░▒▓█▓▒░      ░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ 
-// ░▒▓█▓▒░      ░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ 
-// ░▒▓██████▓▒░ ░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒▒▓███▓▒░▒▓█▓▒▒▓███▓▒░▒▓██████▓▒░ ░▒▓███████▓▒░  
-// ░▒▓█▓▒░      ░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ 
-// ░▒▓█▓▒░      ░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ 
-// ░▒▓█▓▒░      ░▒▓████████▓▒░▒▓██████▓▒░ ░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓████████▓▒░▒▓█▓▒░░▒▓█▓▒░ 
-// `
-//                     }, (response) => {
-//                         console.log('Done initializing README file', response)
-//                     })
-//                 }
-
-                // Support for repo template/default files
-                console.log('repoTemplateFiles', repoTemplateFiles)
-                console.log('templateFilesFound', templateFilesFound)
+                // Each repoTemplateFiles should have a key in filePathsFound with value true.
+                // Otherwise need to create the file in Dropbox.
+                // console.log('repoTemplateFiles', repoTemplateFiles)
+                // console.log('filePathsFound', filePathsFound)
                 repoTemplateFiles.forEach(file => {
                     const pathLower = file.path.toLowerCase();
-                    console.log(`templateFilesFound.get('/'+${pathLower})`, templateFilesFound.get('/'+pathLower))
-                    if (!templateFilesFound.get('/'+pathLower)) {
-                        console.log(`Initializing '/'+${file.path}`)
+                    if (pathLower.includes('/')) {
+                        console.log('Repo template subfolders are not supported yet')
+                        return
+                    }
+                    console.log(`filePathsFound.get('/'+${pathLower})`, filePathsFound.get('/' + pathLower))
+                    if (!filePathsFound.get('/' + pathLower)) {
+                        console.log(`Initializing '/'+${file.path}`, file)
                         addFile({
                             path: file.path,
                             content: file.content
@@ -186,25 +172,6 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                         })
                     }
                 })
-
-                // // Support for .flogger.config settings file. 
-                // // Commenting out for now.
-                // settingsFile.value = response.result.entries
-                //     .reduce((previousValue, currentValue, currentIndex, array) => {
-                //         if (currentValue.path_lower == '/.flogger.config') return currentValue;
-                //         return previousValue;
-                //     }, undefined)
-                // if (!settingsFile.value) {
-                //     // Save default settingsFile
-                //     console.log('Initializing settings file')
-                //     addFile({
-                //         path: '.flogger.config',
-                //         content: '{}'
-                //     }, (response) => {
-                //         console.log('Done initializing settings file', response)
-                //         settingsFile.value = response.result
-                //     })
-                // }
             })
             .catch((e) => {
                 console.log("Error listing dropbox folders:", e?.message || e);

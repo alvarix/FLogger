@@ -42,6 +42,26 @@ const repoFiles = ref<IDropboxFile[]>([]);
 
 // Get the list of paths from the import.meta env vars
 const repoFilesGlob = import.meta.glob("../../public/repo_template/**/*"); // maybe should use "../../public/repo_template/**/*.flogger.txt"
+// 
+// Git repo files are at            
+//             [Git repo root]/public/repo_template/**/*
+// And so import.meta.glob returns paths relative to this file that look like this...     
+//             ../../public/repo_template/**/*
+//                                        ^^^^
+// 
+// Dropbox files are saved at       
+//             [User's Dropbox app folder]/**/*
+//                                         ^^^^
+// 
+// So we remove the '../../public/repo_template/' part to get the list of files with Dropbox paths
+//                   ---------------------------
+// 
+// But the frontend gets the files from the static URLs at...
+//             [URL domain]/repo_template/**/*
+//                                        ^^^^
+// 
+// So when the frontend does fetch calls, it will add the '/repo_template/' part back.
+// 
 for (const propName in repoFilesGlob) {
     if (repoFilesGlob.hasOwnProperty(propName)) {
         const globPathValue = propName
@@ -53,9 +73,12 @@ for (const propName in repoFilesGlob) {
 // console.log("repoFiles.value", repoFiles.value);
 
 // Clientside fetches to get file contents for each path
-repoFiles.value.forEach(repoFile => {
+let repoFilesWithContents:IDropboxFile[] = []
+repoFiles.value.forEach(async repoFile => {
     console.log(repoFile.path)
-    fetch(`/${repoFile.path}`)
+    // As mentioned before...
+    // ...when the frontend does fetch calls, it will add the '/repo_template/' part back.
+    await fetch(`/repo_template/${repoFile.path}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -64,12 +87,18 @@ repoFiles.value.forEach(repoFile => {
         })
         .then(data => {
             console.log('data', data)
-            folderContents.value.push(data);
+            // folderContents.value.push(data);
+            repoFilesWithContents.push({
+                path: repoFile.path,
+                content: data
+            })
         })
         .catch(error => {
             console.error('Error loading folder contents:', error);
         });
 })
+repoFiles.value = repoFilesWithContents
+console.log('repoFiles.value', repoFiles.value)
 
 const {
     launchConnectFlow,
