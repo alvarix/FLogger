@@ -19,7 +19,7 @@ export interface IDropboxFiles {
     addFile: (file: IDropboxFile, callback: () => any) => void
 }
 
-export const useDropboxFiles = (): IDropboxFiles => {
+export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFiles => {
 
 
     const hostname = import.meta.env.VITE_VERCEL_URL || import.meta.env.VERCEL_URL;
@@ -58,9 +58,13 @@ export const useDropboxFiles = (): IDropboxFiles => {
 
     const hasRedirectedFromAuth = ref(!!dbxAuthCode.value);
 
-    const availableFiles = ref([]);
+    const availableFiles = ref<IDropboxFile[]>([]);
 
     const hasConnection = ref(false)
+
+    // // Support for .flogger.config settings file. 
+    // // Commenting out for now.
+    // const settingsFile = ref<{}>();
 
 
     if (hasRedirectedFromAuth.value) {
@@ -110,6 +114,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
         auth: dbxAuth,
     });
 
+
     const checkAvailableFiles = () => {
         // 4. Check/refresh token
         console.log("step 4");
@@ -123,12 +128,44 @@ export const useDropboxFiles = (): IDropboxFiles => {
             // 6. Set availableFiles to display
             .then((response) => {
                 console.log("step 6");
+
+                // Support for repo template/default files
+                // * Var to easily check if a template file exists in the filesListFolder response
+                let filePathsFound = new Map<string, boolean>()
+
+                // Set availableFiles from filesListFolder response 
+                // And set the keys in filePathsFound
                 availableFiles.value = response.result.entries
                     .filter((item) => (item.path_lower.endsWith(".flogger") || item.path_lower.endsWith(".flogger.txt")))
                     .map((item) => {
                         const newFile: IDropboxFile = { path: item.path_lower, rev: item[".tag"] }
+                        // Support for repo template/default files
+                        // * Var to easily check if a template file exists in the filesListFolder response
+                        filePathsFound.set(newFile.path, true);
                         return newFile;
                     });
+
+                // Each repoTemplateFiles should have a key in filePathsFound with value true.
+                // Otherwise need to create the file in Dropbox.
+                // console.log('repoTemplateFiles', repoTemplateFiles)
+                // console.log('filePathsFound', filePathsFound)
+                repoTemplateFiles.forEach(file => {
+                    const pathLower = file.path.toLowerCase();
+                    if (pathLower.includes('/')) {
+                        console.log('Repo template subfolders are not supported yet')
+                        return
+                    }
+                    console.log(`filePathsFound.get('/'+${pathLower})`, filePathsFound.get('/' + pathLower))
+                    if (!filePathsFound.get('/' + pathLower)) {
+                        console.log(`Initializing '/'+${file.path}`, file)
+                        addFile({
+                            path: file.path,
+                            content: file.content
+                        }, (response) => {
+                            console.log(`Done initializing ${file.path}`, response)
+                        })
+                    }
+                })
             })
             .catch((e) => {
                 console.log("Error listing dropbox folders:", e?.message || e);
@@ -137,14 +174,16 @@ export const useDropboxFiles = (): IDropboxFiles => {
 
     }
 
-    if (hasConnection.value) {
-        checkAvailableFiles();
-    }
+    // if (hasConnection.value) {
+    //     checkAvailableFiles();
+    // }
     // I'm not sure if this is useful...
     watch(hasConnection, () => {
         if (hasConnection.value) {
             checkAvailableFiles();
         }
+    }, {
+        immediate: true
     })
 
     const launchConnectFlow = () => {
@@ -239,7 +278,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
             });
     }
 
-    const addFile = async (file: IDropboxFile, callback: () => any) => {
+    const addFile = async (file: IDropboxFile, callback: (result?: any) => any) => {
         // console.log('addFile file', file)
 
         // function addToAvailable(file) {
@@ -260,7 +299,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
                 console.log(response)
                 // addToAvailable(file)
                 checkAvailableFiles()
-                callback()
+                callback(response.result)
             })
             .catch((error) => {
                 console.log(
@@ -275,25 +314,25 @@ export const useDropboxFiles = (): IDropboxFiles => {
 
     // Fetch account information
     const fetchAccountInfo = () => {
-      dbxAuth.checkAndRefreshAccessToken().then(() => {
-        const dbx = new Dropbox({ auth: dbxAuth });
-        dbx.usersGetCurrentAccount().then(response => {
-          accountInfo.value = response.result;
-        }).catch(error => {
-          console.log("Error fetching account info:", error);
+        dbxAuth.checkAndRefreshAccessToken().then(() => {
+            const dbx = new Dropbox({ auth: dbxAuth });
+            dbx.usersGetCurrentAccount().then(response => {
+                accountInfo.value = response.result;
+            }).catch(error => {
+                console.log("Error fetching account info:", error);
+            });
         });
-      });
     };
-  
+
     // Call fetchAccountInfo when access token is set
     if (accessToken) {
-      fetchAccountInfo();
+        fetchAccountInfo();
     }
-  
- 
-    
-    
-    
+
+
+
+
+
     return {
         accountInfo,
         launchConnectFlow,
