@@ -1,12 +1,14 @@
 import { ref, Ref, watch } from "vue"
 import fetch from "cross-fetch";
-import { Dropbox, DropboxAuth } from "dropbox";
+import { Dropbox, DropboxAuth, Timestamp as DropboxTimestamp } from "dropbox";
 // See https://dropbox.github.io/dropbox-sdk-js/Dropbox.html
 
 export interface IDropboxFile {
     path: string;
     content?: string;
     rev?: string;
+    tag?: string;   //This is the Db API context type tag, not user-controlled file tag data
+    modified?: DropboxTimestamp
 }
 
 export interface IDropboxFiles {
@@ -148,7 +150,16 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                 availableFiles.value = response.result.entries
                     .filter((item) => (item.path_lower.endsWith(".flogger") || item.path_lower.endsWith(".flogger.txt")))
                     .map((item) => {
-                        const newFile: IDropboxFile = { path: item.path_lower, rev: item[".tag"] }
+                        console.log('dropbox item', item)
+                        const newFile: IDropboxFile = {
+                            path: item.path_lower,
+                            // @ts-expect-error - Unsure how to get item typed correctly
+                            rev: item.rev,
+                            tag: item[".tag"],
+                            // @ts-expect-error - Unsure how to get item typed correctly
+                            modified: item.server_modified
+                        }
+                        console.log('newFile', newFile)
 
                         // Support for repo template/default files
                         // * Var to easily check if a template file exists in the filesListFolder response
