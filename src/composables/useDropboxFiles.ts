@@ -133,6 +133,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
         dbx
             .filesListFolder({
                 path: "",
+                recursive: true
             })
             // 6. Set availableFiles to display
             .then((response) => {
@@ -148,6 +149,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                     .filter((item) => (item.path_lower.endsWith(".flogger") || item.path_lower.endsWith(".flogger.txt")))
                     .map((item) => {
                         const newFile: IDropboxFile = { path: item.path_lower, rev: item[".tag"] }
+
                         // Support for repo template/default files
                         // * Var to easily check if a template file exists in the filesListFolder response
                         filePathsFound.set(newFile.path, true);
@@ -160,10 +162,6 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                 // console.log('filePathsFound', filePathsFound)
                 repoTemplateFiles.forEach(file => {
                     const pathLower = file.path.toLowerCase();
-                    if (pathLower.includes('/')) {
-                        console.log('Repo template subfolders are not supported yet')
-                        return
-                    }
                     console.log(`filePathsFound.get('/'+${pathLower})`, filePathsFound.get('/' + pathLower))
                     if (!filePathsFound.get('/' + pathLower)) {
                         console.log(`Initializing '/'+${file.path}`, file)
