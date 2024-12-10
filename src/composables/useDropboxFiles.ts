@@ -22,7 +22,9 @@ export interface IDropboxFiles {
 export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFiles => {
 
 
+    // @ts-expect-error - Unsure why env isn't in the type definition for import.meta
     const hostname = import.meta.env.VITE_VERCEL_URL || import.meta.env.VERCEL_URL;
+    // @ts-expect-error - Unsure why env isn't in the type definition for import.meta
     console.log('VITE_VERCEL_URL', import.meta.env.VITE_VERCEL_URL)
     const protocol = (hostname == 'localhost' ? 'http://' : 'https://');
     const port = (hostname == 'localhost' ? ':5173' : '');
@@ -32,6 +34,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
     //"k2i486lvdpfjyhj"; //"q5qja4ma5qcl0qc"; //flogger-chad: q5qja4ma5qcl0qc //ORIGINAL EXAMPLE: 42zjexze6mfpf7x
 
     const config = {
+        // @ts-expect-error - Unsure how to cast or spec ...args for use as the fetch params
         fetch: (...args) => { return fetch(...args) },
         // fetch: (args) => fetch(args),
         clientId: CLIENT_ID,
@@ -314,6 +317,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
 
     // Fetch account information
     const fetchAccountInfo = () => {
+        // @ts-expect-error - Unsure why checkAndRefreshAccessToken is typed to return void but expecting a promise works.
         dbxAuth.checkAndRefreshAccessToken().then(() => {
             const dbx = new Dropbox({ auth: dbxAuth });
             dbx.usersGetCurrentAccount().then(response => {
