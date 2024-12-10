@@ -41,6 +41,7 @@ const repoFiles = ref<IDropboxFile[]>([]);
 // The files must be in the public static folder, or serviced via an application route.
 
 // Get the list of paths from the import.meta env vars
+// @ts-expect-error - Unsure why glob isn't in the type definition for import.meta 
 const repoFilesGlob = import.meta.glob("../../public/repo_template/**/*"); // maybe should use "../../public/repo_template/**/*.flogger.txt"
 // 
 // Git repo files are at            
