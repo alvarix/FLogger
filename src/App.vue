@@ -10,16 +10,29 @@
 ╚═╝     ╚══════╝ ╚═════╝  ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝
       </pre>
     </h1>
+  <div :class="{ 'connected' : hasConnection }">
+    <div>
+      <h1 id="logo">
+        <pre>
+███████╗██╗      ██████╗  ██████╗  ██████╗ ███████╗██████╗ 
+██╔════╝██║     ██╔═══██╗██╔════╝ ██╔════╝ ██╔════╝██╔══██╗
+█████╗  ██║     ██║   ██║██║  ███╗██║  ███╗█████╗  ██████╔╝
+██╔══╝  ██║     ██║   ██║██║   ██║██║   ██║██╔══╝  ██╔══██╗
+██║     ███████╗╚██████╔╝╚██████╔╝╚██████╔╝███████╗██║  ██║
+╚═╝     ╚══════╝ ╚═════╝  ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝
+        </pre>
+      </h1>
+    </div>
+    <div v-if="openFlogs.length == 0">
+      <Suspense>
+        <DropBoxFlogs />
+      </Suspense>
+    </div>
+    <OpenFlogs />
+    <br />
+    <EntryList :entries="loadedEntries || []" />
   </div>
-  <div v-if="openFlogs.length == 0">
-    <Suspense>
-      <DropBoxFlogs />
-    </Suspense>
-  </div>
-  <OpenFlogs />
-  <br />
-  <EntryList :entries="loadedEntries || []" />
-</template>
+  </template>
 
 <script setup>
 import { ref, computed } from "vue";
@@ -27,10 +40,12 @@ import EntryList from "@/components/EntryList.vue";
 import AddEntry from "@/components/AddEntry.vue";
 import DropBoxFlogs from "@/components/DropBoxFlogs.vue";
 import OpenFlogs from "@/components/OpenFlogs.vue";
+import { useDropboxFlogs } from "@/composables/useDropboxFlogs.ts";
 import { useFlogs } from "@/composables/useFlogs";
 import { useLoadedEntries } from "@/composables/useLoadedEntries.ts";
 
 const { openFlogs } = useFlogs();
+const { hasConnection } = useDropboxFlogs();
 const { loadedEntries, loadEntries, loadEntry } = useLoadedEntries();
 
 const timestamp = ref(new Date().toLocaleDateString());
@@ -41,22 +56,31 @@ function addNewEntry(entryData) {
 </script>
 
 <style lang="stylus"> 
+/* HP style
 h1 pre 
   font-size 8px
 
-body:has(#files-section) // what happens if #files-section is empty?
-  h1
-    margin 10px 0
-    padding 10px 0
-    pre
-      font-size 4px
-  .dbx__btn 
-    font-size 14px
-    padding 5px 8px
-    position absolute
-    top 55px
-    right 20px
+button
+    cursor pointer
+    font-size 1.2rem
+    padding 10px 15px
 
+@media (prefers-color-scheme: light)
+    button
+*/
+// body:has(#authed-section) // what happens if #files-section is empty?
+#logo
+  margin 10px 0
+  padding 10px 0
+  pre
+    font-size 4px
+    
+.dbx__btn 
+  font-size 14px
+  padding 5px 8px
+  position absolute
+  top 55px
+  right 20px
 
 h2
   font-size 2em
@@ -99,7 +123,7 @@ body
     color CanvasText
     color-scheme light dark
 
-h1, h2, h3, h4
+h2, h3, h4
     line-height 1.1
     padding 1em 0
 
@@ -117,13 +141,7 @@ h4
     margin 0 auto
     padding 2rem
 
-button
-    cursor pointer
-    font-size 1.2rem
-    padding 10px 15px
 
-@media (prefers-color-scheme: light)
-    button
 
 /* Tailwind */
 .hidden

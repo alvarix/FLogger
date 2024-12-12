@@ -49,7 +49,7 @@ function handleAddFlog(flogData) {
       See the <a href='https://github.com/alvarix/FLogger/' target='_blank'>Github</a> page for more info.
     </p>
     <p>
-      Connect to your Dropbox account to begin:
+      Connect to your Dropbox account to begin.
     </p>
 
       <button class="dbx__btn" @click="launchConnectFlow">connect to DropBox</button>
@@ -59,7 +59,7 @@ function handleAddFlog(flogData) {
       id="authed-section"
       :style="{ display: hasConnection ? 'block' : 'none' }"
     >
-      <button  class="dbx__btn" @click="clearConnection">forget DropBox connection</button>
+      <button  class="dbx__btn" @click="clearConnection">Disconnect</button>
       <AddFlog @newFlog="handleAddFlog" @openFlog="selectFile" :availableFlogs="availableFlogs"/>
     </div>
     
