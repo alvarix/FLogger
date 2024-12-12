@@ -5,9 +5,8 @@
 // with redirectUri returning the user to this page.
  -->
 <template>
-  <div>
-    <h1>Flogger Dropbox Auth Pop-up!</h1>
-  </div>
+  <div id="spinner">
+    <PacmanLoader :loading="loading" :color="color" :size="size"></PacmanLoader>  </div>
   <Suspense>
     <DropBoxAuth />
   </Suspense>
@@ -15,11 +14,13 @@
 
 <script setup>
 import DropBoxAuth from "@/components/DropBoxAuth.vue";
+import PacmanLoader from 'vue-spinner/src/PacmanLoader.vue'
 </script>
 
 <style scoped>
-h2 {
-  font-size: 2em;
+.spinner {
+  text-align: center;
+  width: 100%;
 }
 
 * {
