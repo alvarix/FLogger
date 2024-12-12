@@ -44,7 +44,7 @@ function handleAddFlog(flogData) {
   <!-- <button id="show-modal" @click="showModal = true">Show Modal</button> -->
   <Teleport to="body">
     <!-- use the modal component, pass in the prop -->
-    <modal :show="showModal" @close="showModal = false">
+    <Modal :show="showModal" @close="showModal = false">
       <template #header>
         <h3>Dropbox authorization in progress</h3>
       </template>
@@ -58,7 +58,7 @@ function handleAddFlog(flogData) {
         ><p></p>
         <button class="modal-default-button" @click="showModal = false">cancel</button>
       </template>
-    </modal>
+    </Modal>
   </Teleport>
   <!-- Example description and UI -->
   <section class="container main">
