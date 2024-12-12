@@ -1,12 +1,14 @@
 import { ref, Ref, watch } from "vue"
 import fetch from "cross-fetch";
-import { Dropbox, DropboxAuth } from "dropbox";
+import { Dropbox, DropboxAuth, Timestamp as DropboxTimestamp } from "dropbox";
 // See https://dropbox.github.io/dropbox-sdk-js/Dropbox.html
 
 export interface IDropboxFile {
     path: string;
     content?: string;
     rev?: string;
+    tag?: string;   //This is the Db API context type tag, not user-controlled file tag data
+    modified?: DropboxTimestamp
 }
 
 export interface IDropboxFiles {
@@ -19,10 +21,12 @@ export interface IDropboxFiles {
     addFile: (file: IDropboxFile, callback: () => any) => void
 }
 
-export const useDropboxFiles = (): IDropboxFiles => {
+export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFiles => {
 
 
+    // @ts-expect-error - Unsure why env isn't in the type definition for import.meta
     const hostname = import.meta.env.VITE_VERCEL_URL || import.meta.env.VERCEL_URL;
+    // @ts-expect-error - Unsure why env isn't in the type definition for import.meta
     console.log('VITE_VERCEL_URL', import.meta.env.VITE_VERCEL_URL)
     const protocol = (hostname == 'localhost' ? 'http://' : 'https://');
     const port = (hostname == 'localhost' ? ':5173' : '');
@@ -32,6 +36,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
     //"k2i486lvdpfjyhj"; //"q5qja4ma5qcl0qc"; //flogger-chad: q5qja4ma5qcl0qc //ORIGINAL EXAMPLE: 42zjexze6mfpf7x
 
     const config = {
+        // @ts-expect-error - Unsure how to cast or spec ...args for use as the fetch params
         fetch: (...args) => { return fetch(...args) },
         // fetch: (args) => fetch(args),
         clientId: CLIENT_ID,
@@ -58,9 +63,13 @@ export const useDropboxFiles = (): IDropboxFiles => {
 
     const hasRedirectedFromAuth = ref(!!dbxAuthCode.value);
 
-    const availableFiles = ref([]);
+    const availableFiles = ref<IDropboxFile[]>([]);
 
     const hasConnection = ref(false)
+
+    // // Support for .flogger.config settings file. 
+    // // Commenting out for now.
+    // const settingsFile = ref<{}>();
 
 
     if (hasRedirectedFromAuth.value) {
@@ -110,6 +119,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
         auth: dbxAuth,
     });
 
+
     const checkAvailableFiles = () => {
         // 4. Check/refresh token
         console.log("step 4");
@@ -119,16 +129,55 @@ export const useDropboxFiles = (): IDropboxFiles => {
         dbx
             .filesListFolder({
                 path: "",
+                recursive: true
             })
             // 6. Set availableFiles to display
             .then((response) => {
                 console.log("step 6");
+
+                // Support for repo template/default files
+                // * Var to easily check if a template file exists in the filesListFolder response
+                let filePathsFound = new Map<string, boolean>()
+
+                // Set availableFiles from filesListFolder response 
+                // And set the keys in filePathsFound
                 availableFiles.value = response.result.entries
                     .filter((item) => (item.path_lower.endsWith(".flogger") || item.path_lower.endsWith(".flogger.txt")))
                     .map((item) => {
-                        const newFile: IDropboxFile = { path: item.path_lower, rev: item[".tag"] }
+                        console.log('dropbox item', item)
+                        const newFile: IDropboxFile = {
+                            path: item.path_lower,
+                            // @ts-expect-error - Unsure how to get item typed correctly
+                            rev: item.rev,
+                            tag: item[".tag"],
+                            // @ts-expect-error - Unsure how to get item typed correctly
+                            modified: item.server_modified
+                        }
+                        console.log('newFile', newFile)
+
+                        // Support for repo template/default files
+                        // * Var to easily check if a template file exists in the filesListFolder response
+                        filePathsFound.set(newFile.path, true);
                         return newFile;
                     });
+
+                // Each repoTemplateFiles should have a key in filePathsFound with value true.
+                // Otherwise need to create the file in Dropbox.
+                // console.log('repoTemplateFiles', repoTemplateFiles)
+                // console.log('filePathsFound', filePathsFound)
+                repoTemplateFiles.forEach(file => {
+                    const pathLower = file.path.toLowerCase();
+                    console.log(`filePathsFound.get('/'+${pathLower})`, filePathsFound.get('/' + pathLower))
+                    if (!filePathsFound.get('/' + pathLower)) {
+                        console.log(`Initializing '/'+${file.path}`, file)
+                        addFile({
+                            path: file.path,
+                            content: file.content
+                        }, (response) => {
+                            console.log(`Done initializing ${file.path}`, response)
+                        })
+                    }
+                })
             })
             .catch((e) => {
                 console.log("Error listing dropbox folders:", e?.message || e);
@@ -137,14 +186,16 @@ export const useDropboxFiles = (): IDropboxFiles => {
 
     }
 
-    if (hasConnection.value) {
-        checkAvailableFiles();
-    }
+    // if (hasConnection.value) {
+    //     checkAvailableFiles();
+    // }
     // I'm not sure if this is useful...
     watch(hasConnection, () => {
         if (hasConnection.value) {
             checkAvailableFiles();
         }
+    }, {
+        immediate: true
     })
 
     const launchConnectFlow = () => {
@@ -239,7 +290,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
             });
     }
 
-    const addFile = async (file: IDropboxFile, callback: () => any) => {
+    const addFile = async (file: IDropboxFile, callback: (result?: any) => any) => {
         // console.log('addFile file', file)
 
         // function addToAvailable(file) {
@@ -260,7 +311,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
                 console.log(response)
                 // addToAvailable(file)
                 checkAvailableFiles()
-                callback()
+                callback(response.result)
             })
             .catch((error) => {
                 console.log(
@@ -275,25 +326,26 @@ export const useDropboxFiles = (): IDropboxFiles => {
 
     // Fetch account information
     const fetchAccountInfo = () => {
-      dbxAuth.checkAndRefreshAccessToken().then(() => {
-        const dbx = new Dropbox({ auth: dbxAuth });
-        dbx.usersGetCurrentAccount().then(response => {
-          accountInfo.value = response.result;
-        }).catch(error => {
-          console.log("Error fetching account info:", error);
+        // @ts-expect-error - Unsure why checkAndRefreshAccessToken is typed to return void but expecting a promise works.
+        dbxAuth.checkAndRefreshAccessToken().then(() => {
+            const dbx = new Dropbox({ auth: dbxAuth });
+            dbx.usersGetCurrentAccount().then(response => {
+                accountInfo.value = response.result;
+            }).catch(error => {
+                console.log("Error fetching account info:", error);
+            });
         });
-      });
     };
-  
+
     // Call fetchAccountInfo when access token is set
     if (accessToken) {
-      fetchAccountInfo();
+        fetchAccountInfo();
     }
-  
- 
-    
-    
-    
+
+
+
+
+
     return {
         accountInfo,
         launchConnectFlow,
