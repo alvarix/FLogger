@@ -4,15 +4,23 @@ import { useFlogs } from "@/composables/useFlogs";
 import AddFlog from "@/components/AddFlog.vue";
 import { useDropboxFiles } from "@/composables/useDropboxFiles";
 // const { accountInfo } = useDropboxFiles();
+import { ref, watch } from "vue";
+import Modal from "@/components/Modal.vue";
 
 const {
   launchConnectFlow,
+  connectionPopupWindow,
   hasConnection,
   clearConnection,
   availableFlogs,
   loadFlogEntries,
-  addFlog
+  addFlog,
 } = useDropboxFlogs();
+
+const showModal = ref(false);
+watch(connectionPopupWindow, () => {
+  showModal.value = connectionPopupWindow ? true : false;
+});
 
 const { openFlog } = useFlogs();
 // const props = defineProps({});
@@ -33,6 +41,25 @@ function handleAddFlog(flogData) {
 </script>
 
 <template>
+  <!-- <button id="show-modal" @click="showModal = true">Show Modal</button> -->
+  <Teleport to="body">
+    <!-- use the modal component, pass in the prop -->
+    <Modal :show="showModal" @close="showModal = false">
+      <template #header>
+        <h3>Dropbox authorization in progress</h3>
+      </template>
+      <template #body>
+        <p>
+          Complete the Dropbox authorization in the
+          <a @click="connectionPopupWindow?.focus()">pop-up window</a>.
+        </p>
+      </template>
+      <template #footer
+        ><p></p>
+        <button class="modal-default-button" @click="showModal = false">cancel</button>
+      </template>
+    </Modal>
+  </Teleport>
   <!-- Example description and UI -->
   <section class="container main">
     <h3>Dropbox Flogs</h3>
@@ -53,9 +80,13 @@ function handleAddFlog(flogData) {
     >
       <p>You are connected to DropBox.</p>
       <button @click="clearConnection">forget DropBox connection</button>
-      <AddFlog @newFlog="handleAddFlog" @openFlog="selectFile" :availableFlogs="availableFlogs"/>
+      <AddFlog
+        @newFlog="handleAddFlog"
+        @openFlog="selectFile"
+        :availableFlogs="availableFlogs"
+      />
     </div>
-    
+
     <div id="files-section">
       <!-- :style="{ display: !loadedFile ? 'block' : 'none' }" -->
       <ul id="files">
