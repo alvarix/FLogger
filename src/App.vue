@@ -62,15 +62,12 @@ button
   margin 10px 0
   padding 10px 0
   pre
-    font-size 4px
+    font-size 12px
+    transition 500ms all ease-in-out
     
-.dbx__btn 
-  font-size 14px
-  padding 5px 8px
-  position absolute
-  top 55px
-  right 20px
-
+.connected #logo pre
+      font-size 5px
+    
 h2
   font-size 2em
   font-size 2.8em

@@ -73,11 +73,11 @@ function handleAddFlog(flogData) {
     >
     <p>
       Welcome to Flogger!<br/>
-      A project by Alvar and Chad.<br/>
+      A project by <a href="https://alvarsirlin.com" target="_blank">Alvar</a> and <a href="https://chad.crume.org/" target="_blank">Chad</a>.<br/>
       See the <a href='https://github.com/alvarix/FLogger/' target='_blank'>Github</a> page for more info.
     </p>
     <p>
-      Connect to your Dropbox account to begin.
+      Connect to your DropBox account to begin.
     </p>
 
       <button class="dbx__btn" @click="launchConnectFlow">connect to DropBox</button>
@@ -89,7 +89,6 @@ function handleAddFlog(flogData) {
     >
       <button  class="dbx__btn" @click="clearConnection">Disconnect</button>
       <AddFlog @newFlog="handleAddFlog" @openFlog="selectFile" :availableFlogs="availableFlogs"/>
-
     </div>
 
     <div id="files-section">
@@ -105,8 +104,18 @@ function handleAddFlog(flogData) {
 </template>
 
 <style scoped lang="stylus">
-button 
-  margin-bottom 20px
+.dbx__btn 
+  padding 15px 20px
+  font-size 14px
+  margin-top 30px
+  cursor pointer
+
+.connected .dbx__btn 
+  padding 5px 8px
+  position absolute
+  top 55px
+  right 20px
+  margin-top 0
 
 #add-entry *:not(.date-validation) {
   display: block;
@@ -122,7 +131,7 @@ input.error {
 }
 
 #add-entry label {
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 ul {
