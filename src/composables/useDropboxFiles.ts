@@ -11,6 +11,7 @@ export interface IDropboxFile {
 
 export interface IDropboxFiles {
     launchConnectFlow: () => void
+    connectionPopupWindow: any
     hasConnection: Ref<boolean>
     clearConnection: () => void
     availableFiles: Ref<IDropboxFile[]>
@@ -39,7 +40,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
 
     const dbxAuth = new DropboxAuth(config);
 
-    const dbxAuthReturnUri = `${protocol}${hostname}${port}/`;
+    const dbxAuthReturnUri = `${protocol}${hostname}${port}/dbauthpopup/`;
     console.log('dbxAuthReturnUri', dbxAuthReturnUri)
 
     // Parses the url and gets the access token if it is in the urls hash
@@ -68,7 +69,8 @@ export const useDropboxFiles = (): IDropboxFiles => {
         const codeVerifier = window.sessionStorage.getItem("codeVerifier");
         dbxAuth.setCodeVerifier(codeVerifier);
 
-        const reloadUrl = removeAuthCodeFromUrl(window.location.href);
+        // dbxauth-popup: Not needed because code is in URL of popup, which gets closed. Opener window is simply reloaded.
+        // const reloadUrl = removeAuthCodeFromUrl(window.location.href);
 
         console.log("step 1");
         dbxAuth
@@ -77,18 +79,22 @@ export const useDropboxFiles = (): IDropboxFiles => {
             // 2. Save token and reload
             .then((response) => {
                 console.log("step 2");
-                window.sessionStorage.setItem(
+                // dbxauth-popup: Set accessToken in sessionStorage of opener instead of current window, reload opener instead of current, and close current.
+                window.opener.sessionStorage.setItem(
                     "accessToken",
                     // @ts-expect-error
                     response.result.access_token
                 );
-                console.log("Reload to remove code from url => ", reloadUrl);
-                window.location.href = reloadUrl;
+                // window.opener.connectionPopupWindow.value = false;
+                window.opener.location.reload();
+                window.close();
             })
             .catch((e) => {
                 console.log("Error getting access token from URL:", e.error || e);
-                console.log("Reload to remove code from url => ", reloadUrl);
-                window.location.href = reloadUrl;
+                // dbxauth-popup: Reload opener instead of current, and close current.
+                // window.opener.connectionPopupWindow.value = false;
+                window.opener.reload();
+                window.close();
             });
     }
 
@@ -147,6 +153,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
         }
     })
 
+    const connectionPopupWindow = ref<any>()
     const launchConnectFlow = () => {
         // console.log("launchConnectFlow", "dbxAuthReturnUri", dbxAuthReturnUri);
 
@@ -166,8 +173,10 @@ export const useDropboxFiles = (): IDropboxFiles => {
                 window.sessionStorage.setItem("codeVerifier", dbxAuth.codeVerifier);
                 //@ts-expect-error
                 console.log("dbxAuth.codeVerifier", dbxAuth.codeVerifier);
+                // dbxauth-popup: Replace open popup rather than redirecting to Db in this window
+                const windowFeatures = "popup=true,menubar=false,width=700height=700,innerWidth=700,innerHeight=700,left=100,top=100";
                 //@ts-expect-error
-                window.location.href = authUrl;
+                connectionPopupWindow.value = window.open(authUrl, 'dbauthPopupWindow', windowFeatures)
             })
             .catch((error) => {
                 console.log(`Error getting auth URL:`, error?.message || error);
@@ -178,6 +187,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
 
     const clearConnection = () => {
         console.log("clearConnection");
+        connectionPopupWindow.value = undefined;
         window.sessionStorage.removeItem("accessToken");
         window.sessionStorage.removeItem("codeVerifier");
         dbxAuthCode.value = undefined;
@@ -275,28 +285,29 @@ export const useDropboxFiles = (): IDropboxFiles => {
 
     // Fetch account information
     const fetchAccountInfo = () => {
-      dbxAuth.checkAndRefreshAccessToken().then(() => {
-        const dbx = new Dropbox({ auth: dbxAuth });
-        dbx.usersGetCurrentAccount().then(response => {
-          accountInfo.value = response.result;
-        }).catch(error => {
-          console.log("Error fetching account info:", error);
+        dbxAuth.checkAndRefreshAccessToken().then(() => {
+            const dbx = new Dropbox({ auth: dbxAuth });
+            dbx.usersGetCurrentAccount().then(response => {
+                accountInfo.value = response.result;
+            }).catch(error => {
+                console.log("Error fetching account info:", error);
+            });
         });
-      });
     };
-  
+
     // Call fetchAccountInfo when access token is set
     if (accessToken) {
-      fetchAccountInfo();
+        fetchAccountInfo();
     }
-  
- 
-    
-    
-    
+
+
+
+
+
     return {
         accountInfo,
         launchConnectFlow,
+        connectionPopupWindow,
         hasConnection,
         clearConnection,
         availableFiles,

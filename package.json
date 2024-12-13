@@ -14,7 +14,8 @@
     "dropbox": "^10.34.0",
     "pinia": "^2.1.4",
     "qs": "^6.12.1",
-    "vue": "^3.2.47"
+    "vue": "^3.2.47",
+    "vue-spinner": "^1.0.4"
   },
   "devDependencies": {
     "@types/isomorphic-fetch": "^0.0.39",
