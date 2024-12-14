@@ -62,33 +62,36 @@ function handleAddFlog(flogData) {
   </Teleport>
   <!-- Example description and UI -->
   <section class="container main">
-    <h3>Dropbox Flogs</h3>
-    <p>
-      To load files from your DropBox account, you need to connect to DropBox
-      and authorize Flogger.
-    </p>
+
+    <!-- 
+    dev note:
+    Should this intro text live elsewhere?
+    -->
     <div
       id="pre-auth-section"
       :style="{ display: hasConnection ? 'none' : 'block' }"
     >
-      <button @click="launchConnectFlow">connect to DropBox</button>
+    <p>
+      Welcome to Flogger!<br/>
+      A project by <a href="https://alvarsirlin.com" target="_blank">Alvar</a> and <a href="https://chad.crume.org/" target="_blank">Chad</a>.<br/>
+      See the <a href='https://github.com/alvarix/FLogger/' target='_blank'>Github</a> page for more info.
+    </p>
+    <p>
+      Connect to your DropBox account to begin.
+    </p>
+
+      <button class="dbx__btn" @click="launchConnectFlow">connect to DropBox</button>
     </div>
 
     <div
       id="authed-section"
       :style="{ display: hasConnection ? 'block' : 'none' }"
     >
-      <p>You are connected to DropBox.</p>
-      <button @click="clearConnection">forget DropBox connection</button>
-      <AddFlog
-        @newFlog="handleAddFlog"
-        @openFlog="selectFile"
-        :availableFlogs="availableFlogs"
-      />
+      <button  class="dbx__btn" @click="clearConnection">Disconnect</button>
+      <AddFlog @newFlog="handleAddFlog" @openFlog="selectFile" :availableFlogs="availableFlogs"/>
     </div>
 
     <div id="files-section">
-      <!-- :style="{ display: !loadedFile ? 'block' : 'none' }" -->
       <ul id="files">
         <li v-for="item in availableFlogs">
           <a href="#" @click.prevent="() => selectFile(item)">{{
@@ -100,7 +103,20 @@ function handleAddFlog(flogData) {
   </section>
 </template>
 
-<style scoped>
+<style scoped lang="stylus">
+.dbx__btn 
+  padding 15px 20px
+  font-size 14px
+  margin-top 30px
+  cursor pointer
+
+.connected .dbx__btn 
+  padding 5px 8px
+  position absolute
+  top 55px
+  right 20px
+  margin-top 0
+
 #add-entry *:not(.date-validation) {
   display: block;
 }
@@ -115,7 +131,7 @@ input.error {
 }
 
 #add-entry label {
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 ul {

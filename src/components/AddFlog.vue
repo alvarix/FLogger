@@ -101,7 +101,11 @@ const submitAdd = () => {
   </form>
 </template>
 
-<style scoped>
+<style scoped lang="stylus">
+
+.autoc-select ul 
+  padding 0
+
 input.error {
   border: 1px solid red;
 }
@@ -109,7 +113,6 @@ input.error {
 input[type="submit"],
 input[type="button"] {
   display: inline-block;
-  background-color: cornsilk;
   border: 1px solid #ccc;
   border-radius: 10px;
   padding: 6px 10px;
