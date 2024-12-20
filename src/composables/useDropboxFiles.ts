@@ -152,7 +152,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                     .map((item) => {
                         console.log('dropbox item', item)
                         const newFile: IDropboxFile = {
-                            path: item.path_lower,
+                            path: item.path_display,
                             // @ts-expect-error - Unsure how to get item typed correctly
                             rev: item.rev,
                             tag: item[".tag"],
