@@ -36,7 +36,9 @@ export function deserializeEntries(entryData: string): IEntry[] {
         // allowing for pretext before first date.
         // The regex matching a date with nothing preceding, 
         // or a date with 2 \n preceding.
-        .split(/(?<!.)([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4})\n|\n\n([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4})\n/)
+        .split(/(?<!.)([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4}|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2})\n|\n\n([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4}|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2})\n/)
+        // Alvar's version to merge in with pretext...
+        // .split(/^\n?\n?([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4}|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2})\n|\n\n([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4}|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2})\n/)
         // Filter out blank array entries (non-date and non-entry),
         // and filter out any pretext in position 0
         .filter((item, index) => item && item != '\n'
