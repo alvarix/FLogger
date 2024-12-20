@@ -47,6 +47,20 @@ const submitAdd = () => {
   newFlog.value.filename = typedFilename.value;
   emit("newFlog", newFlog);
 };
+
+// Add new ref to control dropdown visibility
+const showDropdown = ref(true);
+
+// Add new methods to handle hiding dropdown
+const hideDropdown = () => {
+  showDropdown.value = false;
+};
+
+const handleKeydown = (e) => {
+  if (e.key === 'Escape') {
+    showDropdown.value = false;
+  }
+};
 </script>
 
 <template>
@@ -61,19 +75,23 @@ const submitAdd = () => {
       add new flog
     </button>
   </div>
-  <form v-else id="add-flog" @submit.prevent="submitAdd">
+  <form v-else id="add-flog" @submit.prevent="submitAdd" @mouseleave="hideDropdown" @keydown="handleKeydown">
     <div class="form-inner">
       <div class="filename-controls">
         <input
+          autofocus
+          autocomplete="off"
           :class="['filename', { error: hasError }]"
           id="filename"
           type="text"
           placeholder="search or create new flog"
           v-model="typedFilename"
+          @focus="showDropdown = true"
+          @input="showDropdown = true"
         />
         <!-- required
           @change="change" -->
-        <div class="autoc-select">
+        <div class="autoc-select" v-show="showDropdown">
           <ul id="files">
             <li v-for="item in matchedFlogs">
               <a href="#" @click.prevent="() => selectFlog(item)">{{
@@ -87,6 +105,7 @@ const submitAdd = () => {
         >
       </div>
     </div>
+<!--
     <div>
       <input
         type="button"
@@ -98,18 +117,32 @@ const submitAdd = () => {
         "
       />
     </div>
+  -->
   </form>
 </template>
 
-<style scoped>
-input.error {
+<style scoped lang="stylus">
+
+.autoc-select ul 
+  list-style none
+  box-shadow 0 2px 4px rgba(0, 0, 0, 0.1)
+  background-color var(--accent-light)
+  margin 0
+  padding 0
+  a 
+    padding 10px 15px    
+    display block
+    &:hover 
+      background-color var(--accent)
+    
+
+input.error 
   border: 1px solid red;
-}
+
 
 input[type="submit"],
 input[type="button"] {
   display: inline-block;
-  background-color: cornsilk;
   border: 1px solid #ccc;
   border-radius: 10px;
   padding: 6px 10px;
@@ -117,10 +150,11 @@ input[type="button"] {
   cursor: pointer;
 }
 
-.form-inner,
-.form-inner * {
-  background-color: cornsilk;
-}
+.form-inner
+  background-color: var(--accent);
+  input
+    background-color: var(--accent);
+
 
 .filename-controls {
   position: relative;
