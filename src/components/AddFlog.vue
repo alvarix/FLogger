@@ -87,6 +87,7 @@ const submitAdd = () => {
         >
       </div>
     </div>
+<!--
     <div>
       <input
         type="button"
@@ -98,17 +99,21 @@ const submitAdd = () => {
         "
       />
     </div>
+  -->
   </form>
 </template>
 
 <style scoped lang="stylus">
 
 .autoc-select ul 
-  padding 0
+    box-shadow 0 2px 4px rgba(0, 0, 0, 0.1)
+    padding  20px
+    list-style none
+    background-color var(--accent-light)
 
-input.error {
+input.error 
   border: 1px solid red;
-}
+
 
 input[type="submit"],
 input[type="button"] {
@@ -120,10 +125,11 @@ input[type="button"] {
   cursor: pointer;
 }
 
-.form-inner,
-.form-inner * {
-  background-color: cornsilk;
-}
+.form-inner
+  background-color: var(--accent);
+  input
+    background-color: var(--accent);
+
 
 .filename-controls {
   position: relative;
