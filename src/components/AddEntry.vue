@@ -50,6 +50,8 @@ watch(() => props.copiedEntry, (newVal) => {
 
 	nextTick(() => autoResizeTextarea('entry')); // Adjust the textarea size after the DOM update
 
+	alert('Your entry was copied into the editor');
+
     if (addEntryForm) {
       addEntryForm.scrollIntoView({ behavior: 'smooth' }); // Smooth scroll to the form
     }
