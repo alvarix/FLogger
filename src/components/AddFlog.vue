@@ -79,7 +79,8 @@ const handleKeydown = (e) => {
     <div class="form-inner">
       <div class="filename-controls">
         <input
-           autocomplete="off"
+          autofocus
+          autocomplete="off"
           :class="['filename', { error: hasError }]"
           id="filename"
           type="text"
