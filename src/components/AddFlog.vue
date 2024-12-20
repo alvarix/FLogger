@@ -47,6 +47,20 @@ const submitAdd = () => {
   newFlog.value.filename = typedFilename.value;
   emit("newFlog", newFlog);
 };
+
+// Add new ref to control dropdown visibility
+const showDropdown = ref(true);
+
+// Add new methods to handle hiding dropdown
+const hideDropdown = () => {
+  showDropdown.value = false;
+};
+
+const handleKeydown = (e) => {
+  if (e.key === 'Escape') {
+    showDropdown.value = false;
+  }
+};
 </script>
 
 <template>
@@ -61,7 +75,7 @@ const submitAdd = () => {
       add new flog
     </button>
   </div>
-  <form v-else id="add-flog" @submit.prevent="submitAdd">
+  <form v-else id="add-flog" @submit.prevent="submitAdd" @mouseleave="hideDropdown" @keydown="handleKeydown">
     <div class="form-inner">
       <div class="filename-controls">
         <input
@@ -71,10 +85,12 @@ const submitAdd = () => {
           type="text"
           placeholder="search or create new flog"
           v-model="typedFilename"
+          @focus="showDropdown = true"
+          @input="showDropdown = true"
         />
         <!-- required
           @change="change" -->
-        <div class="autoc-select">
+        <div class="autoc-select" v-show="showDropdown">
           <ul id="files">
             <li v-for="item in matchedFlogs">
               <a href="#" @click.prevent="() => selectFlog(item)">{{
