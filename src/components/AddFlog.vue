@@ -65,6 +65,7 @@ const submitAdd = () => {
     <div class="form-inner">
       <div class="filename-controls">
         <input
+           autocomplete="off"
           :class="['filename', { error: hasError }]"
           id="filename"
           type="text"
@@ -106,10 +107,17 @@ const submitAdd = () => {
 <style scoped lang="stylus">
 
 .autoc-select ul 
-    box-shadow 0 2px 4px rgba(0, 0, 0, 0.1)
-    padding  20px
-    list-style none
-    background-color var(--accent-light)
+  list-style none
+  box-shadow 0 2px 4px rgba(0, 0, 0, 0.1)
+  background-color var(--accent-light)
+  margin 0
+  padding 0
+  a 
+    padding 10px 15px    
+    display block
+    &:hover 
+      background-color var(--accent)
+    
 
 input.error 
   border: 1px solid red;
