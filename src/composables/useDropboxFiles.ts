@@ -132,7 +132,7 @@ export const useDropboxFiles = (): IDropboxFiles => {
                 availableFiles.value = response.result.entries
                     .filter((item) => (item.path_lower.endsWith(".flogger") || item.path_lower.endsWith(".flogger.txt")))
                     .map((item) => {
-                        const newFile: IDropboxFile = { path: item.path_lower, rev: item[".tag"] }
+                        const newFile: IDropboxFile = { path: item.path_display, rev: item[".tag"] }
                         return newFile;
                     });
             })
