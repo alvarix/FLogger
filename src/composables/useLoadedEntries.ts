@@ -28,8 +28,8 @@ export function useLoadedEntries() {
   }
   function deserializeEntries(entryData: string): IEntry[] {
     const entriesList: (IEntry | undefined)[] = entryData
-      // split text file at date delimiters
-      .split(/^\n?\n?([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4})\n|\n\n([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4})\n/)
+      // split text file at date delimiters - MM/DD/YYYY or MM/DD/YY format
+      .split(/^\n?\n?([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4}|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2})\n|\n\n([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4}|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2})\n/)
       // filter out blank array entries (non-date and non-entry)
       .filter(item => item && item != '\n')
       // convert array of [date,entry,date,entry,...] into [{date, entry},{date, entry},...]
