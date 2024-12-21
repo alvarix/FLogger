@@ -150,32 +150,27 @@ input[type="button"] {
   cursor: pointer;
 }
 
-.form-inner
+  
+  
+.filename-controls 
+    position: relative;
+  
+  
+.filename 
   background-color: var(--accent);
-  input
-    background-color: var(--accent);
-
-
-.filename-controls {
-  position: relative;
-}
-
-.form-inner {
-  max-width: 600px;
-  border-radius: 14px;
-  padding: 20px;
-  border: 1px solid #ccc;
-}
-
-input.filename {
+  max-width: 600px
+  padding 20px
+  border-radius: 14px
   font-weight: bold;
+  border-color: lightsteelblue 
+  border-style solid
   font-size: 14px;
-  border: none;
-  color: cornflowerblue;
-  padding: 5px;
   width: 100%;
-  /* height: 2rem; */
-}
+  outline-color: var(--accent-bold)
+  &:focus 
+    Xbox-shadow: 0 0 10px rgba(0, 0, 0, 0.5)
+    Xborder-color transparent
+    
 
 .autoc-select {
   position: absolute;
