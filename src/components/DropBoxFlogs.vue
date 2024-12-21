@@ -12,6 +12,7 @@ const {
   hasConnection,
   clearConnection,
   availableFlogs,
+  availableRepoFlogs,
   loadFlogEntries,
   addFlog,
 } = useDropboxFlogs();
@@ -55,13 +56,14 @@ function handleAddFlog(flogData) {
       </template>
       <template #footer
         ><p></p>
-        <button class="modal-default-button" @click="showModal = false">cancel</button>
+        <button class="modal-default-button" @click="showModal = false">
+          cancel
+        </button>
       </template>
     </Modal>
   </Teleport>
   <!-- Example description and UI -->
   <section class="container main">
-
     <!-- 
     dev note:
     Should this intro text live elsewhere?
@@ -70,46 +72,65 @@ function handleAddFlog(flogData) {
       id="pre-auth-section"
       :style="{ display: hasConnection ? 'none' : 'block' }"
     >
-    <p>
-      Welcome to Flogger!<br/>
-      A project by <a href="https://alvarsirlin.com" target="_blank">Alvar</a> and <a href="https://chad.crume.org/" target="_blank">Chad</a>.<br/>
-      See the <a href='https://github.com/alvarix/FLogger/' target='_blank'>Github</a> page for more info.
-    </p>
-    <p>
-      Connect to your DropBox account to begin.
-    </p>
+      <p>
+        Welcome to Flogger!<br />
+        A project by
+        <a href="https://alvarsirlin.com" target="_blank">Alvar</a> and
+        <a href="https://chad.crume.org/" target="_blank">Chad</a>.<br />
+        See the
+        <a href="https://github.com/alvarix/FLogger/" target="_blank">Github</a>
+        page for more info.
+      </p>
+      <p>Connect to your DropBox account to begin.</p>
 
-      <button class="dbx__btn" @click="launchConnectFlow">connect to DropBox</button>
+      <button class="dbx__btn" @click="launchConnectFlow">
+        connect to DropBox
+      </button>
     </div>
 
     <div
       id="authed-section"
       :style="{ display: hasConnection ? 'block' : 'none' }"
     >
-      <button  class="dbx__btn" @click="clearConnection">Disconnect</button>
-      <AddFlog @newFlog="handleAddFlog" @openFlog="selectFile" :availableFlogs="availableFlogs"/>
-    </div>
+      <button class="dbx__btn" @click="clearConnection">Disconnect</button>
+      <AddFlog
+        @newFlog="handleAddFlog"
+        @openFlog="selectFile"
+        :availableFlogs="availableFlogs"
+      />
 
-    <div id="files-section">
-      <ul id="files">
-        <li v-for="item in availableFlogs">
-          <a href="#" @click.prevent="() => selectFile(item)">{{
-            item.path_display ?? item.url
-          }}</a>
-        </li>
-      </ul>
+      <div id="files-section">
+        <h3>Your files</h3>
+        <ul id="files">
+          <li v-for="item in availableFlogs">
+            <a href="#" @click.prevent="() => selectFile(item)">{{
+              item.path_display ?? item.url
+            }}</a>
+          </li>
+        </ul>
+      </div>
+      <div id="repo-files-section">
+        <h3>App files</h3>
+        <ul id="files">
+          <li v-for="item in availableRepoFlogs">
+            <a href="#" @click.prevent="() => selectFile(item)">{{
+              item.path_display ?? item.url
+            }}</a>
+          </li>
+        </ul>
+      </div>
     </div>
   </section>
 </template>
 
 <style scoped lang="stylus">
-.dbx__btn 
+.dbx__btn
   padding 15px 20px
   font-size 14px
   margin-top 30px
   cursor pointer
 
-.connected .dbx__btn 
+.connected .dbx__btn
   padding 5px 8px
   position absolute
   top 55px

@@ -18,7 +18,6 @@ export const useFlogs = () => {
         newFlog: IFlog,
     ) => {
         if (!openFlogs.value.includes(newFlog)) {
-            const temp = openFlogs.value
             openFlogs.value.unshift(newFlog)
         }
     }

@@ -8,7 +8,8 @@ export interface IDropboxFile {
     content?: string;
     rev?: string;
     tag?: string;   //This is the Db API context type tag, not user-controlled file tag data
-    modified?: DropboxTimestamp
+    modified?: DropboxTimestamp;
+    readOnly?: boolean;
 }
 
 export interface IDropboxFiles {
@@ -17,13 +18,13 @@ export interface IDropboxFiles {
     hasConnection: Ref<boolean>
     clearConnection: () => void
     availableFiles: Ref<IDropboxFile[]>
+    availableRepoFiles: Ref<IDropboxFile[]>
     loadFileContent: (file: IDropboxFile, callback: (result: { rev: string, content: string }) => any) => void,
     saveFileContent: (file: IDropboxFile, callback: (result: any) => any) => void,
     addFile: (file: IDropboxFile, callback: () => any) => void
 }
 
 export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFiles => {
-
 
     // @ts-expect-error - Unsure why env isn't in the type definition for import.meta
     const hostname = import.meta.env.VITE_VERCEL_URL || import.meta.env.VERCEL_URL;
@@ -65,6 +66,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
     const hasRedirectedFromAuth = ref(!!dbxAuthCode.value);
 
     const availableFiles = ref<IDropboxFile[]>([]);
+    const availableRepoFiles = ref<IDropboxFile[]>([]);
 
     const hasConnection = ref(false)
 
@@ -142,15 +144,22 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                 console.log("step 6");
 
                 // Support for repo template/default files
+                // Create a map of the paths in repoTemplateFiles to efficiently check against files in user's dropbox
+                // Use lowercase to avoid mixed case possibilities, because 
+                // Dropbox supports cased filenames but enforces case insensative uniqueness
+                const repoTemplateFilesMap = new Map<string, boolean>()
+                repoTemplateFiles.forEach(item => repoTemplateFilesMap.set('/' + item.path.toLowerCase(), true))
+
+                // Support for repo template/default files
                 // * Var to easily check if a template file exists in the filesListFolder response
-                let filePathsFound = new Map<string, boolean>()
+                let repoFilePathsFound = new Map<string, boolean>()
 
                 // Set availableFiles from filesListFolder response 
-                // And set the keys in filePathsFound
+                // Filtering out files that match the repoTemplateFiles
                 availableFiles.value = response.result.entries
                     .filter((item) => (item.path_lower.endsWith(".flogger") || item.path_lower.endsWith(".flogger.txt")))
+                    .filter(item => !repoTemplateFilesMap.get(item.path_lower))
                     .map((item) => {
-                        console.log('dropbox item', item)
                         const newFile: IDropboxFile = {
                             path: item.path_display,
                             // @ts-expect-error - Unsure how to get item typed correctly
@@ -159,23 +168,41 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                             // @ts-expect-error - Unsure how to get item typed correctly
                             modified: item.server_modified
                         }
-                        console.log('newFile', newFile)
-
-                        // Support for repo template/default files
-                        // * Var to easily check if a template file exists in the filesListFolder response
-                        filePathsFound.set(newFile.path, true);
                         return newFile;
                     });
 
-                // Each repoTemplateFiles should have a key in filePathsFound with value true.
+                // Support for repo template/default files
+                // Set availableRepoFiles from filesListFolder response 
+                // Filtering out files that DON'T match the repoTemplateFiles
+                // And set the keys in repoFilePathsFound
+                availableRepoFiles.value = response.result.entries
+                    .filter((item) => (item.path_lower.endsWith(".flogger") || item.path_lower.endsWith(".flogger.txt")))
+                    .filter(item => repoTemplateFilesMap.get(item.path_lower))
+                    .map((item) => {
+                        const newFile: IDropboxFile = {
+                            path: item.path_display,
+                            // @ts-expect-error - Unsure how to get item typed correctly
+                            rev: item.rev,
+                            tag: item[".tag"],
+                            // @ts-expect-error - Unsure how to get item typed correctly
+                            modified: item.server_modified,
+                            readOnly: true,
+                        }
+                        // * Var to easily check if a template file exists in the filesListFolder response
+                        // Use lowercase to avoid mixed case possibilities, because 
+                        // Dropbox supports cased filenames but enforces case insensative uniqueness
+                        repoFilePathsFound.set(item.path_lower, true);
+                        return newFile;
+                    });
+
+                // Each repoTemplateFiles should have a key in repoFilePathsFound with value true.
                 // Otherwise need to create the file in Dropbox.
                 // console.log('repoTemplateFiles', repoTemplateFiles)
-                // console.log('filePathsFound', filePathsFound)
+                // console.log('repoFilePathsFound', repoFilePathsFound)
                 repoTemplateFiles.forEach(file => {
                     const pathLower = file.path.toLowerCase();
-                    console.log(`filePathsFound.get('/'+${pathLower})`, filePathsFound.get('/' + pathLower))
-                    if (!filePathsFound.get('/' + pathLower)) {
-                        console.log(`Initializing '/'+${file.path}`, file)
+                    if (!repoFilePathsFound.get('/' + pathLower)) {
+                        console.log(`Initializing ${file.path}`, file)
                         addFile({
                             path: file.path,
                             content: file.content
@@ -245,6 +272,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
         accessToken = undefined;
         hasConnection.value = false
         availableFiles.value = [];
+        availableRepoFiles.value = [];
     }
 
     const loadFileContent = async (file: IDropboxFile, callback: (result: { rev: string, content: string }) => any) => {
@@ -363,6 +391,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
         hasConnection,
         clearConnection,
         availableFiles,
+        availableRepoFiles,
         loadFileContent,
         saveFileContent,
         addFile,

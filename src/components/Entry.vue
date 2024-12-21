@@ -5,6 +5,7 @@ import { IEntry } from '../modules/EntryData'
 const props = defineProps<{
   entry: IEntry;
   isEditing: boolean;
+  readOnly?: boolean;
 }>();
 
 
@@ -57,10 +58,9 @@ function save(entry) {
 <template>
   <div class="entry">
       <h3>{{ formattedDate }}</h3>
-
       <div v-if="!isEditing && !isEditingClick" @click="edit" class="entry__body"><pre class="entry__pre">{{ entry.entry }}</pre></div> 
       <!-- Display a textarea if editing -->
-      <textarea ref="entryTextarea" class='entry__textarea' v-else @blur="save" v-model="entry.entry"></textarea>
+      <textarea ref="entryTextarea" class='entry__textarea' v-else @blur="save" v-model="entry.entry" :readOnly="readOnly"></textarea>
     </div>
 </template>
 

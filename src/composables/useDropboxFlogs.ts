@@ -18,6 +18,8 @@ export interface IDropboxFlogs {
     clearConnection: () => void;
     // map availableFiles from from useDropboxFiles to flogs
     availableFlogs: Ref<IDropboxFlog[]>;
+    // map availableRepoFiles from from useDropboxFiles to flogs
+    availableRepoFlogs: Ref<IDropboxFlog[]>;
     // makes use of loadFileContent from useDropboxFiles
     loadFlogEntries: (flog: IDropboxFlog) => void;
     // makes use of ... from useDropboxFiles
@@ -107,6 +109,7 @@ const {
     hasConnection,
     clearConnection: clearFileConnection,
     availableFiles,
+    availableRepoFiles,
     loadFileContent,
     saveFileContent,
     addFile
@@ -115,6 +118,7 @@ const {
 export const useDropboxFlogs = (): IDropboxFlogs => {
 
     const availableFlogs = ref([]);
+    const availableRepoFlogs = ref([]);
 
     watch(
         availableFiles,
@@ -138,6 +142,18 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
             // // We will just recreate availableFlogs with this...
             availableFlogs.value = availableFiles.value.map<IDropboxFlog>(
                 (file) => ({ sourceType: 'dropbox', url: file.path } as IDropboxFlog)
+            )
+        }
+        ,
+        { immediate: true }
+    )
+
+    watch(
+        availableRepoFiles,
+        (newValue, oldValue) => {
+            console.log('watch availableRepoFiles (useDropboxFlogs)', availableRepoFlogs.value, availableRepoFiles, newValue, oldValue)
+            availableRepoFlogs.value = availableRepoFiles.value.map<IDropboxFlog>(
+                (file) => ({ sourceType: 'dropbox', url: file.path, readOnly: file.readOnly } as IDropboxFlog)
             )
         }
         ,
@@ -186,6 +202,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
     const clearConnection = () => {
         clearFileConnection()
         availableFlogs.value = []
+        availableRepoFlogs.value = []
     }
 
     return {
@@ -194,6 +211,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
         hasConnection,
         clearConnection,
         availableFlogs,
+        availableRepoFlogs,
         loadFlogEntries,
         saveFlogEntries,
         addFlog,
