@@ -126,14 +126,14 @@ const handleKeydown = (e) => {
 .autoc-select ul 
   list-style none
   box-shadow 0 2px 4px rgba(0, 0, 0, 0.1)
-  background-color var(--accent-light)
+  background-color var(--input-color)
   margin 0
   padding 0
   a 
     padding 10px 15px    
     display block
     &:hover 
-      background-color var(--accent)
+      background-color var(--input-color)
     
 
 input.error 
@@ -157,7 +157,7 @@ input[type="button"] {
   
   
 .filename 
-  background-color: var(--accent);
+  background-color: var(--input-color);
   max-width: 600px
   padding 20px
   border-radius: 14px
@@ -166,7 +166,7 @@ input[type="button"] {
   border-style solid
   font-size: 14px;
   width: 100%;
-  outline-color: var(--accent-bold)
+  outline-color: var(--input-color)
   &:focus 
     Xbox-shadow: 0 0 10px rgba(0, 0, 0, 0.5)
     Xborder-color transparent

@@ -86,32 +86,23 @@ watch(() => props.copiedEntry, (newVal) => {
 }
 
 input.error {
-	border:1px solid red;
+	border:1px solid var(--red-color);
 }
 
 input[type='submit'],
 .form-inner,
 .form-inner * {
-	background-color:cornsilk;
+	background-color:var(--input-color);
 }
 
-@media (prefers-color-scheme: dark) {
-	input[type='submit'],
-	.form-inner,
-	.form-inner * {
-		background-color:#333;
-	}
-}
+
 
 .form-inner {
     max-width: 600px;
     border-radius: 14px;
     padding: 20px;
 }
-.form-inner,
-input[type='submit'] {
-	border: 1px solid #ccc;
-}
+
 
 input.date {
 	font-weight: bold;
@@ -129,7 +120,7 @@ textarea {
 
 .date-validation.error {
 	display:block;
-	color:red;
+	color:var(--red-color);
 }
 
 input[type=submit] {

@@ -71,25 +71,21 @@ h3 {
 }
 
 
-.entry {
+.entry textarea,
+.entry input {
   text-align: left;
   max-width: 600px;
   border-radius: 14px;
   padding: 20px;
   border: 1px solid black;
-}
-
-.entry__textarea,
-.entry__pre {
   white-space: pre-wrap;
   font-size: 12px;
-  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
 }
 
 .entry__textarea {
   width: 100%;
   height: auto;
-  background-color: cornsilk;
+  background-color: var(--entry-bg-color);
   field-sizing: content;
 }
 
@@ -99,12 +95,12 @@ h3 {
 }
 
 .entry__body:hover {
-  background-color: cornsilk;
+  background-color: var(--input-color);
 }
 
 @media (prefers-color-scheme: dark) {
   .entry__textarea {
-    background-color: #999;
+    Xbackground-color: #999;
   }
 }
 
