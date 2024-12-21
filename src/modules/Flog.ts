@@ -5,6 +5,7 @@ export interface IFlog {
     url: string,
     permissions?: string,
     loadedEntries: IEntry[],
+    readOnly?: boolean,
 }
 
 export function serializeEntries(entriesList: IEntry[]): string {

@@ -3,7 +3,6 @@ import { IFlog, deserializeEntries, serializeEntries } from "@/modules/Flog"
 import { useDropboxFiles } from "@/composables/useDropboxFiles"
 import { IDropboxFile } from "@/composables/useDropboxFiles";
 
-
 export interface IDropboxFlog extends IFlog {
     rev: string;
 }
@@ -19,6 +18,8 @@ export interface IDropboxFlogs {
     clearConnection: () => void;
     // map availableFiles from from useDropboxFiles to flogs
     availableFlogs: Ref<IDropboxFlog[]>;
+    // map availableRepoFiles from from useDropboxFiles to flogs
+    availableRepoFlogs: Ref<IDropboxFlog[]>;
     // makes use of loadFileContent from useDropboxFiles
     loadFlogEntries: (flog: IDropboxFlog) => void;
     // makes use of ... from useDropboxFiles
@@ -26,20 +27,98 @@ export interface IDropboxFlogs {
     addFlog: (flog: IDropboxFlog) => void;
 }
 
+// const initialReadmeFile = fs.readFileSync('./repo_template/README.flogger.txt').toString("utf-8");
+// const response1 = await fetch('./repo_template/README.flogger.txt');
+// const response1Text = await response.text();
+// console.log(response1Text)
+
+const folderContents = ref([])
+
+// Using a list of repoFiles (paths and contents using interface IDropboxFile) 
+// as default files to save to a user's Dropbox app folder.
+const repoFiles = ref<IDropboxFile[]>([]);
+
+// In clientside code, we must get the list of paths from the env vars, 
+// but then do clientside fetches to get file contents. 
+// The files must be in the public static folder, or serviced via an application route.
+
+// Get the list of paths from the import.meta env vars
+// @ts-expect-error - Unsure why glob isn't in the type definition for import.meta 
+const repoFilesGlob = import.meta.glob("../../public/repo_template/**/*"); // maybe should use "../../public/repo_template/**/*.flogger.txt"
+// 
+// Git repo files are at            
+//             [Git repo root]/public/repo_template/**/*
+// And so import.meta.glob returns paths relative to this file that look like this...     
+//             ../../public/repo_template/**/*
+//                                        ^^^^
+// 
+// Dropbox files are saved at       
+//             [User's Dropbox app folder]/**/*
+//                                         ^^^^
+// 
+// So we remove the '../../public/repo_template/' part to get the list of files with Dropbox paths
+//                   ---------------------------
+// 
+// But the frontend gets the files from the static URLs at...
+//             [URL domain]/repo_template/**/*
+//                                        ^^^^
+// 
+// So when the frontend does fetch calls, it will add the '/repo_template/' part back.
+// 
+for (const propName in repoFilesGlob) {
+    if (repoFilesGlob.hasOwnProperty(propName)) {
+        const globPathValue = propName
+        repoFiles.value.push(
+            { path: globPathValue.replace("../../public/repo_template/", "") } //IDropboxFlog
+        );
+    }
+}
+// console.log("repoFiles.value", repoFiles.value);
+
+// Clientside fetches to get file contents for each path
+let repoFilesWithContents:IDropboxFile[] = []
+repoFiles.value.forEach(async repoFile => {
+    console.log(repoFile.path)
+    // As mentioned before...
+    // ...when the frontend does fetch calls, it will add the '/repo_template/' part back.
+    await fetch(`/repo_template/${repoFile.path}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text(); // Assuming the server returns JSON
+        })
+        .then(data => {
+            console.log('data', data)
+            // folderContents.value.push(data);
+            repoFilesWithContents.push({
+                path: repoFile.path,
+                content: data
+            })
+        })
+        .catch(error => {
+            console.error('Error loading folder contents:', error);
+        });
+})
+repoFiles.value = repoFilesWithContents
+console.log('repoFiles.value', repoFiles.value)
+
 const {
     launchConnectFlow,
     connectionPopupWindow, 
     hasConnection,
     clearConnection: clearFileConnection,
     availableFiles,
+    availableRepoFiles,
     loadFileContent,
     saveFileContent,
     addFile
-} = useDropboxFiles()
+} = useDropboxFiles(repoFiles.value)
 
 export const useDropboxFlogs = (): IDropboxFlogs => {
 
     const availableFlogs = ref([]);
+    const availableRepoFlogs = ref([]);
 
     watch(
         availableFiles,
@@ -64,7 +143,19 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
             availableFlogs.value = availableFiles.value.map<IDropboxFlog>(
                 (file) => ({ sourceType: 'dropbox', url: file.path } as IDropboxFlog)
             )
-            }
+        }
+        ,
+        { immediate: true }
+    )
+
+    watch(
+        availableRepoFiles,
+        (newValue, oldValue) => {
+            console.log('watch availableRepoFiles (useDropboxFlogs)', availableRepoFlogs.value, availableRepoFiles, newValue, oldValue)
+            availableRepoFlogs.value = availableRepoFiles.value.map<IDropboxFlog>(
+                (file) => ({ sourceType: 'dropbox', url: file.path, readOnly: file.readOnly } as IDropboxFlog)
+            )
+        }
         ,
         { immediate: true }
     )
@@ -111,6 +202,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
     const clearConnection = () => {
         clearFileConnection()
         availableFlogs.value = []
+        availableRepoFlogs.value = []
     }
 
     return {
@@ -119,6 +211,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
         hasConnection,
         clearConnection,
         availableFlogs,
+        availableRepoFlogs,
         loadFlogEntries,
         saveFlogEntries,
         addFlog,

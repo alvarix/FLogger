@@ -5,13 +5,13 @@ import EntryData from "@/modules/EntryData.ts";
 import AddEntry from "@/components/AddEntry.vue";
 import EntryList from "@/components/EntryList.vue";
 
-const { 
-  openFlogs, 
-  closeFlog, 
-  addEntryToFlog, 
+const {
+  openFlogs,
+  closeFlog,
+  addEntryToFlog,
   deleteEntryFromFlog,
   editEntryFromFlog,
-  saveFlogToSource 
+  saveFlogToSource,
 } = useFlogs();
 // const props = defineProps({});
 
@@ -30,29 +30,30 @@ const handleCopyEntry = (entry) => {
   copiedEntry.value = entry;
 };
 
-
 // Handle entry deletion with confirmation
 const handleDeleteEntry = (flog, entry) => {
-  const confirmDelete = window.confirm('Are you sure you want to delete this entry?');
-  
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this entry?"
+  );
+
   // If the user confirms deletion, proceed with removing the entry
   if (confirmDelete) {
     deleteEntryFromFlog(flog, entry); // Delete the entry
-    console.log('Entry deleted successfully');
+    console.log("Entry deleted successfully");
   } else {
-    console.log('Entry deletion canceled');
+    console.log("Entry deletion canceled");
   }
 };
 
 // Function to handle the update event from the grandchild and update flog
 const handleUpdateEntry = (flog, updatedEntry) => {
-  console.log('handleUpdateEntry() in grandparent called');
-  console.log('Received updated entry:', updatedEntry);
+  console.log("handleUpdateEntry() in grandparent called");
+  console.log("Received updated entry:", updatedEntry);
 
   if (flog) {
     editEntryFromFlog(flog, updatedEntry);
   } else {
-    console.error('flog is not defined or initialized');
+    console.error("flog is not defined or initialized");
   }
 };
 
@@ -70,12 +71,14 @@ const getTimestamp = () => ref(new Date().toLocaleDateString());
         :copiedEntry="copiedEntry"
         :timestamp="getTimestamp()"
       />
-      <EntryList :entries="flog.loadedEntries" 
-      :isEditing = "isEditing"
-      @edit-entry="editEntryFromFlog" 
-      @copy-entry="handleCopyEntry" 
-      @delete-entry="(entry) => handleDeleteEntry(flog, entry)" 
-      @update-entry="(entry) => handleUpdateEntry(flog, entry)" 
+      <EntryList
+        :entries="flog.loadedEntries"
+        :isEditing="isEditing"
+        :readOnly="flog.readOnly"
+        @edit-entry="editEntryFromFlog"
+        @copy-entry="handleCopyEntry"
+        @delete-entry="(entry) => handleDeleteEntry(flog, entry)"
+        @update-entry="(entry) => handleUpdateEntry(flog, entry)"
       />
     </div>
   </section>

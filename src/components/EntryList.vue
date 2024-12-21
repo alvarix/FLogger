@@ -1,30 +1,32 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import Entry from "@/components/Entry.vue";
-import { IEntry } from '@/modules/EntryData'
+import { IEntry } from "@/modules/EntryData";
 import { useFlogs } from "@/composables/useFlogs";
 
 const props = defineProps<{
   entries?: Array<IEntry>;
+  readOnly?: boolean;
 }>();
 
-
 const emit = defineEmits([
-  'copy-entry',
-  'delete-entry', 
-  'edit-entry',
-  'update-entry'
+  "copy-entry",
+  "delete-entry",
+  "edit-entry",
+  "update-entry",
 ]);
 
-function changeEntry(actionName,entry) {
+function changeEntry(actionName, entry) {
   emit(`${actionName}-entry`, entry);
 }
 
 // Function to catch update from child and emit to grandparent
 function updateEntry(updatedEntry: IEntry) {
-  console.log('updateEntry() called');
-  console.log('Forwarding updated entry to grandparent:', updatedEntry);
-  emit('update-entry', updatedEntry);
+  if (!props.readOnly) {
+    console.log("updateEntry() called");
+    console.log("Forwarding updated entry to grandparent:", updatedEntry);
+    emit("update-entry", updatedEntry);
+  }
 }
 
 // Track the currently editing entry ID
@@ -35,7 +37,7 @@ const isEditingEntry = (index) => {
   return editingEntryId.value === index;
 };
 
-const editButtonText = ref('Edit');
+const editButtonText = ref("Edit");
 
 // Function to set the editing mode for a specific entry
 const setEditing = (index) => {
@@ -46,38 +48,46 @@ const setEditing = (index) => {
 // Handle stop-editing event from the child component
 const stopEditingEntry = (index) => {
   if (editingEntryId.value === index) {
-    editingEntryId.value = null;  // Stop editing the entry
+    editingEntryId.value = null; // Stop editing the entry
   }
 };
 
 // not used
 // Toggle function that changes the button text and class
 const toggleButton = () => {
-  if (editButtonText.value === 'Edit') {
-    editButtonText.value = 'Save';
+  if (editButtonText.value === "Edit") {
+    editButtonText.value = "Save";
     //editButtonClass.value = 'button-clicked';
   } else {
-    editButtonText.value = 'Edit';
+    editButtonText.value = "Edit";
     //editButtonClass.value = 'button-normal';
   }
 };
-
 </script>
 
 <template>
-  
   <ul class="entry-list">
     <li v-for="(entry, index) in entries" :key="index">
-      <Entry 
-        :entry="entry" 
-        :isEditing="isEditingEntry(index)" 
-        @stop-editing="stopEditingEntry(index)" 
+      <Entry
+        :entry="entry"
+        :readOnly="readOnly"
+        :isEditing="isEditingEntry(index)"
+        @stop-editing="stopEditingEntry(index)"
         @update-entry="updateEntry"
-
-        />
-      <button class='entry__btn' @click="changeEntry('copy',entry)">Copy</button>
-      <button class='entry__btn' @click="setEditing(index)">{{ editButtonText }}</button>
-      <button class='entry__btn entry__btn--warn' @click="changeEntry('delete',entry)">Delete</button>
+      />
+      <button class="entry__btn" @click="changeEntry('copy', entry)">
+        Copy
+      </button>
+      <button v-if="!readOnly" class="entry__btn" @click="setEditing(index)">
+        {{ editButtonText }}
+      </button>
+      <button
+        v-if="!readOnly"
+        class="entry__btn entry__btn--warn"
+        @click="changeEntry('delete', entry)"
+      >
+        Delete
+      </button>
     </li>
   </ul>
 </template>
@@ -103,11 +113,10 @@ button {
 }
 
 .entry__btn:hover {
-  color: #000
+  color: #000;
 }
 
 .entry__btn--warn:hover {
-  color:red;
+  color: red;
 }
-
 </style>
