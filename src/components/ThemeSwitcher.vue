@@ -4,17 +4,18 @@
     <button class="small" @click="toggleTheme">
       {{ isDark ? '🌙 Dark' : '☀️ Light' }}
     </button>
+    <!--
     <button 
       v-if="!isSystemTheme"
       class="small"
       @click="resetToSystem"
     >
       Reset to System
-    </button>
-    <span v-if="isSystemTheme" class="system-indicator">
-     <!--(Following System) -->
+    </button>-->
+   <!--<span v-if="isSystemTheme" class="system-indicator">
+     (Following System) 
       
-    </span>
+    </span>-->
   </div>
 </template>
 
