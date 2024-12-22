@@ -75,7 +75,7 @@ watch(() => props.copiedEntry, (newVal) => {
 				<textarea autofocus id="entry" name="" cols="30" rows="2" v-model='form.entry' required></textarea>
 			</div>
 		</div>
-		<div><input type="submit" value="Add Entry"></div>
+		<div><button class="big" type="submit">Add Entry</button></div>
 		
 	</form>
 </template>

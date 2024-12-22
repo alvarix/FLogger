@@ -75,9 +75,9 @@ const toggleButton = () => {
         @update-entry="updateEntry"
 
         />
-      <button class='entry__btn' @click="changeEntry('copy',entry)">Copy</button>
-      <button class='entry__btn' @click="setEditing(index)">{{ editButtonText }}</button>
-      <button class='entry__btn entry__btn--warn' @click="changeEntry('delete',entry)">Delete</button>
+      <button class='small entry__btn' @click="changeEntry('copy',entry)">Copy</button>
+      <button class='small entry__btn' @click="setEditing(index)">{{ editButtonText }}</button>
+      <button class='small entry__btn entry__btn--warn' @click="changeEntry('delete',entry)">Delete</button>
     </li>
   </ul>
 </template>
@@ -89,18 +89,7 @@ const toggleButton = () => {
   margin-top: 10px;
 }
 
-button {
-  cursor: pointer;
-}
 
-.entry__btn {
-  font-size: 10px;
-  padding: 2px 4px;
-  margin: 3px 5px 0 0;
-  color: #999;
-  font-weight: bold;
-  text-transform: uppercase;
-}
 
 .entry__btn:hover {
   color: #000

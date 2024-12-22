@@ -137,7 +137,5 @@ input.error {
 ul {
   border-radius: 14px;
   list-style: disc;
-  padding: 0.5em;
-  margin: 0.5em;
 }
 </style>

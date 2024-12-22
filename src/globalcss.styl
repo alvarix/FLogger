@@ -32,12 +32,24 @@ button
     color var(--color)
     border none
     padding 10px 15px
+    margin-top 10px
     border-radius 10px
     cursor pointer
     box-shadow 0 2px 4px rgba(0, 0, 0, 0.1)
+    font-weight 600
     &:hover 
         box-shadow 0 2px 4px rgba(0, 0, 0, 0.5)
         color var(--link-color)
+
+button.big 
+    padding 15px 30px
+    border-radius 16px
+
+button.small 
+    padding 5px 10px
+    font-size 10px
+    text-transform uppercase
+    margin 10px 5px 0 0
 
 input:not(submit), textarea 
     background-color var(--input-color)
@@ -102,9 +114,16 @@ h4
     max-width 1280px
     margin 0 auto
     padding 2rem
+    @media (max-width: 768px)
+        padding 1rem
+        margin 0
 
+    @media (max-width: 499px)
+        padding .25rem
 
-
+ul 
+    margin 0
+    padding 0
 /* Tailwind */
 .hidden
     display none
