@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { useTheme } from './useTheme'
+import { useTheme } from '../composables/useTheme'
 
 const { isDark, isSystemTheme, toggleTheme, resetToSystem } = useTheme()
 </script>
