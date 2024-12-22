@@ -59,54 +59,50 @@ function save(entry) {
   <div class="entry">
       <h3>{{ formattedDate }}</h3>
       <div v-if="!isEditing && !isEditingClick" @click="edit" class="entry__body"><pre class="entry__pre">{{ entry.entry }}</pre></div> 
+      
       <!-- Display a textarea if editing -->
       <textarea ref="entryTextarea" class='entry__textarea' v-else @blur="save" v-model="entry.entry" :readOnly="readOnly"></textarea>
     </div>
 </template>
 
-<style scoped>
+<style scoped lang="stylus">
 h3 {
   font-weight: 700;
   font-size: 14px;
+  margin: 40px 0 0 20px;
 }
 
 
-.entry {
+.entry__body {
+  background-color: var(--misc-color);
+}
+
+.entry__pre
+  white-space: pre-wrap;
+
+.entry__body, 
+.entry textarea,
+.entry input {
   text-align: left;
   max-width: 600px;
   border-radius: 14px;
   padding: 20px;
-  border: 1px solid black;
-}
-
-.entry__textarea,
-.entry__pre {
-  white-space: pre-wrap;
   font-size: 12px;
-  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+  height: auto;
+  field-sizing: content;
+  padding: 10px 20px ;
+  
 }
 
 .entry__textarea {
-  width: 100%;
-  height: auto;
-  background-color: cornsilk;
-  field-sizing: content;
-}
-
-.entry__textarea,
-.entry__body {
-  padding: 20px 0px;
+  background-color: var(--input-color);
 }
 
 .entry__body:hover {
-  background-color: cornsilk;
+  background-color: var(--input-color);
 }
 
-@media (prefers-color-scheme: dark) {
-  .entry__textarea {
-    background-color: #999;
-  }
-}
+
 
 
 
