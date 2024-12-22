@@ -1,5 +1,6 @@
 <template>
   <div :class="{ 'connected' : hasConnection }">
+    <ThemeSwitcher />
     <div>
       <h1 id="logo">
         <pre>
@@ -32,6 +33,7 @@ import OpenFlogs from "@/components/OpenFlogs.vue";
 import { useDropboxFlogs } from "@/composables/useDropboxFlogs.ts";
 import { useFlogs } from "@/composables/useFlogs";
 import { useLoadedEntries } from "@/composables/useLoadedEntries.ts";
+import ThemeSwitcher from '@/components/ThemeSwitcher.vue'
 
 const { openFlogs } = useFlogs();
 const { hasConnection } = useDropboxFlogs();

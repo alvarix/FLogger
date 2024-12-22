@@ -87,7 +87,7 @@ function handleAddFlog(flogData) {
       id="authed-section"
       :style="{ display: hasConnection ? 'block' : 'none' }"
     >
-      <button  class="dbx__btn" @click="clearConnection">Disconnect</button>
+      <button  class="dbx__btn small" @click="clearConnection">Disconnect</button>
       <AddFlog @newFlog="handleAddFlog" @openFlog="selectFile" :availableFlogs="availableFlogs"/>
     </div>
 
@@ -104,14 +104,8 @@ function handleAddFlog(flogData) {
 </template>
 
 <style scoped lang="stylus">
-.dbx__btn 
-  padding 15px 20px
-  font-size 14px
-  margin-top 30px
-  cursor pointer
 
 .connected .dbx__btn 
-  padding 5px 8px
   position absolute
   top 55px
   right 20px
