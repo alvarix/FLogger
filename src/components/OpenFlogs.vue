@@ -63,8 +63,11 @@ const getTimestamp = () => ref(new Date().toLocaleDateString());
   <!-- Example description and UI -->
   <section class="container main">
     <div v-for="flog in openFlogs" :key="flog.id">
-      <h4>{{ flog.url }}</h4>
-      <button @click.prevent="() => closeFlog(flog)">close flog</button>
+      <h4 class="flog-title">{{ flog.url }}
+
+        <button class="small close-flog" @click.prevent="() => closeFlog(flog)">close flog</button>
+      </h4>
+
       <AddEntry
         @newEntry="(entryData) => addNewEntry(entryData, flog)"
         :copiedEntry="copiedEntry"
@@ -82,6 +85,14 @@ const getTimestamp = () => ref(new Date().toLocaleDateString());
 </template>
 
 <style scoped>
+
+.close-flog {
+  margin-left: 10px;
+}
+
+h4 {
+  padding: 0;
+}
 #add-entry *:not(.date-validation) {
   display: block;
 }
@@ -99,10 +110,5 @@ input.error {
   margin-top: 20px;
 }
 
-ul {
-  border-radius: 14px;
-  list-style: disc;
-  padding: 0.5em;
-  margin: 0.5em;
-}
+
 </style>
