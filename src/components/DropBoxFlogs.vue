@@ -137,5 +137,10 @@ input.error {
 ul {
   border-radius: 14px;
   list-style: disc;
+  margin 20px 0 0 20px
+}
+
+li {
+  margin 5px 0
 }
 </style>
