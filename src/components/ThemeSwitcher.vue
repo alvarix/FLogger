@@ -4,18 +4,13 @@
     <button class="small" @click="toggleTheme">
       {{ isDark ? '🌙 Dark' : '☀️ Light' }}
     </button>
-    <!--
-    <button 
-      v-if="!isSystemTheme"
-      class="small"
-      @click="resetToSystem"
-    >
+    <button v-if="!isSystemTheme" class="small" @click="resetToSystem">
       Reset to System
-    </button>-->
-   <!--<span v-if="isSystemTheme" class="system-indicator">
+    </button>
+    <span v-if="isSystemTheme" class="system-indicator">
      (Following System) 
       
-    </span>-->
+    </span>
   </div>
 </template>
 
@@ -40,4 +35,7 @@ const { isDark, isSystemTheme, toggleTheme, resetToSystem } = useTheme()
   font-size: 0.8em;
   opacity: 0.7;
 }
+
+button.small 
+  margin-top 0
 </style>
