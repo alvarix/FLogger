@@ -6,9 +6,11 @@ export function useTheme() {
   const isSystemTheme = ref(true)
   const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
-  const updateThemeFromSystem = (event: MediaQueryListEvent | MediaQueryList) => {
+  const updateThemeFromSystem = (event?: MediaQueryListEvent | MediaQueryList) => {
+    const systemPrefersDark = event?.matches ?? mediaQuery.matches;
     if (isSystemTheme.value) {
-      isDark.value = event.matches
+      isDark.value = systemPrefersDark;
+      document.documentElement.style.colorScheme = systemPrefersDark ? 'dark' : 'light';
     }
   }
 
