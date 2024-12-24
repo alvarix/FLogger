@@ -10,7 +10,6 @@ import Intro from "@/components/Intro.vue";
 const {
   connectionPopupWindow,
   hasConnection,
-  clearConnection,
   availableFlogs,
   availableRepoFlogs,
   loadFlogEntries,

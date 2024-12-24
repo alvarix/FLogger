@@ -13,7 +13,7 @@ const { accountOwner } = useDropboxFiles();
 const { openFlogs } = useFlogs();
 const { hasConnection } = useDropboxFlogs();
 const { loadedEntries } = useLoadedEntries();
-
+const { clearConnection } = useDropboxFlogs();
 
 </script>
 
