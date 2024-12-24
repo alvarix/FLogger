@@ -1,16 +1,13 @@
 <script setup>
 import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
-import { useDropboxFiles } from "@/composables/useDropboxFiles";
 import { useFlogs } from "@/composables/useFlogs";
 import AddFlog from "@/components/AddFlog.vue";
 // const { accountInfo } = useDropboxFiles();
 import { ref, watch } from "vue";
 import Modal from "@/components/Modal.vue";
-
-const { accountOwner } = useDropboxFiles();
+import Intro from "@/components/Intro.vue";
 
 const {
-  launchConnectFlow,
   connectionPopupWindow,
   hasConnection,
   clearConnection,
@@ -83,9 +80,6 @@ function handleAddFlog(flogData) {
       id="authed-section"
       :style="{ display: hasConnection ? 'block' : 'none' }"
     >
-      <button class="dbx__btn small" @click="clearConnection">
-        Disconnect {{ accountOwner }}
-      </button>
       <AddFlog
         @newFlog="handleAddFlog"
         @openFlog="selectFile"
@@ -116,13 +110,6 @@ function handleAddFlog(flogData) {
 </template>
 
 <style scoped lang="stylus">
-
-.connected .dbx__btn
-  position absolute
-  top 55px
-  right 20px
-  margin-top 0
-
 #add-entry *:not(.date-validation) {
   display: block;
 }
