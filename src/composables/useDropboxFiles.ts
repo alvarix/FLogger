@@ -22,6 +22,7 @@ export interface IDropboxFiles {
     loadFileContent: (file: IDropboxFile, callback: (result: { rev: string, content: string }) => any) => void,
     saveFileContent: (file: IDropboxFile, callback: (result: any) => any) => void,
     addFile: (file: IDropboxFile, callback: () => any) => void
+    accountOwner: Ref<string | null> 
 }
 
 export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFiles => {
@@ -360,6 +361,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
             });
     }
 
+    const accountOwner = ref<string | null>(null);
     const accountInfo = ref(null);
 
     // Fetch account information
@@ -369,6 +371,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
             const dbx = new Dropbox({ auth: dbxAuth });
             dbx.usersGetCurrentAccount().then(response => {
                 accountInfo.value = response.result;
+                accountOwner.value = response.result.email;
             }).catch(error => {
                 console.log("Error fetching account info:", error);
             });
@@ -386,6 +389,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
 
     return {
         accountInfo,
+        accountOwner,
         launchConnectFlow,
         connectionPopupWindow,
         hasConnection,
