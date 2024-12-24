@@ -26,7 +26,7 @@ const { loadedEntries } = useLoadedEntries();
       :style="{ display: hasConnection ? 'block' : 'none' }"
     >
       <button class="dbx__btn small" @click="clearConnection">
-        Disconnect {{ accountOwner }}
+        <img src="/Dropbox_Icon.svg" width="16" height="16"> Disconnect {{ accountOwner }}
       </button>
     </div>
     
@@ -60,4 +60,7 @@ const { loadedEntries } = useLoadedEntries();
     top 55px
     right 20px
     margin-top 0
+    display flex
+    align-items center
+    gap 5px
 </style>
