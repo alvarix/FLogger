@@ -1,10 +1,13 @@
 <script setup>
 import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
+import { useDropboxFiles } from "@/composables/useDropboxFiles";
 import { useFlogs } from "@/composables/useFlogs";
 import AddFlog from "@/components/AddFlog.vue";
 // const { accountInfo } = useDropboxFiles();
 import { ref, watch } from "vue";
 import Modal from "@/components/Modal.vue";
+
+const { accountOwner } = useDropboxFiles();
 
 const {
   launchConnectFlow,
@@ -93,7 +96,7 @@ function handleAddFlog(flogData) {
       :style="{ display: hasConnection ? 'block' : 'none' }"
     >
       <button class="dbx__btn small" @click="clearConnection">
-        Disconnect
+        Disconnect {{ accountOwner }}
       </button>
       <AddFlog
         @newFlog="handleAddFlog"
@@ -101,7 +104,7 @@ function handleAddFlog(flogData) {
         :availableFlogs="availableFlogs"
       />
       <div id="files-section">
-        <h3>Your files</h3>
+        <h3>Flogs</h3>
         <ul id="files">
           <li v-for="item in availableFlogs">
             <a href="#" @click.prevent="() => selectFile(item)">{{
@@ -111,7 +114,7 @@ function handleAddFlog(flogData) {
         </ul>
       </div>
       <div id="repo-files-section">
-        <h3>App files</h3>
+        <h3>Flogger</h3>
         <ul id="files">
           <li v-for="item in availableRepoFlogs">
             <a href="#" @click.prevent="() => selectFile(item)">{{
