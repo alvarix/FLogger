@@ -155,18 +155,23 @@ input[type="button"] {
 .filename-controls 
     position: relative;
   
-  
+
+
 .filename 
   background-color: var(--input-color);
-  max-width: 600px
   padding 20px
   border-radius: 14px
   font-weight: bold;
   border-color: lightsteelblue 
   border-style solid
   font-size: 14px;
-  width: 100%;
   outline-color: var(--input-color)
+  width: 100%;
+  box-sizing: border-box;
+
+  @media screen and (min-width: 600px)
+    max-width: 600px
+
   &:focus 
     Xbox-shadow: 0 0 10px rgba(0, 0, 0, 0.5)
     Xborder-color transparent
