@@ -5,12 +5,11 @@ import AddFlog from "@/components/AddFlog.vue";
 // const { accountInfo } = useDropboxFiles();
 import { ref, watch } from "vue";
 import Modal from "@/components/Modal.vue";
+import Intro from "@/components/Intro.vue";
 
 const {
-  launchConnectFlow,
   connectionPopupWindow,
   hasConnection,
-  clearConnection,
   availableFlogs,
   availableRepoFlogs,
   loadFlogEntries,
@@ -72,36 +71,21 @@ function handleAddFlog(flogData) {
       id="pre-auth-section"
       :style="{ display: hasConnection ? 'none' : 'block' }"
     >
-      <p>
-        Welcome to Flogger!<br />
-        A project by
-        <a href="https://alvarsirlin.com" target="_blank">Alvar</a> and
-        <a href="https://chad.crume.org/" target="_blank">Chad</a>.<br />
-        See the
-        <a href="https://github.com/alvarix/FLogger/" target="_blank">Github</a>
-        page for more info.
-      </p>
-      <p>Connect to your DropBox account to begin.</p>
-
-      <button class="dbx__btn" @click="launchConnectFlow">
-        connect to DropBox
-      </button>
+      <Intro />
+  
     </div>
 
     <div
       id="authed-section"
       :style="{ display: hasConnection ? 'block' : 'none' }"
     >
-      <button class="dbx__btn small" @click="clearConnection">
-        Disconnect
-      </button>
       <AddFlog
         @newFlog="handleAddFlog"
         @openFlog="selectFile"
         :availableFlogs="availableFlogs"
       />
       <div id="files-section">
-        <h3>Your files</h3>
+        <h3>Flogs</h3>
         <ul id="files">
           <li v-for="item in availableFlogs">
             <a href="#" @click.prevent="() => selectFile(item)">{{
@@ -111,7 +95,7 @@ function handleAddFlog(flogData) {
         </ul>
       </div>
       <div id="repo-files-section">
-        <h3>App files</h3>
+        <h3>Flogger</h3>
         <ul id="files">
           <li v-for="item in availableRepoFlogs">
             <a href="#" @click.prevent="() => selectFile(item)">{{
@@ -125,13 +109,6 @@ function handleAddFlog(flogData) {
 </template>
 
 <style scoped lang="stylus">
-
-.connected .dbx__btn
-  position absolute
-  top 55px
-  right 20px
-  margin-top 0
-
 #add-entry *:not(.date-validation) {
   display: block;
 }
