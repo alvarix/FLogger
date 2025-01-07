@@ -31,42 +31,50 @@ export function serializeEntries(entriesList: IEntry[]): string {
 // 
 export function deserializeEntries(rawEntryContent: string): IEntry[] {
     function isValidDate(dateString) {
-        const date = new Date(dateString);
-        return !isNaN(date.getTime());
-    }
-    let filteredEntries, pretext;
-    try {
-        let splitItems, filteredItems, itemsMappedToEntries, firstEntryIndex;
-        splitItems = rawEntryContent.split(
-            /(?<!.)([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4}|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2})\n|\n\n([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4}|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2})\n/
+        // const date = new Date(dateString);
+        // return !isNaN(date.getTime());
+        return /([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4}|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2})/.test(
+          dateString
         );
-        filteredItems = splitItems.filter(item => !!item)
-
+      }
+      let filteredEntries, pretext;
+      let splitItems, filteredItems, itemsMappedToEntries;
+      try {
+        // The following few steps convert array of
+        //    [date,entry,date,entry,...]
+        // into an array of objects with date and entry properties:
+        //    [{date, entry},{date, entry},...]
+      
+        splitItems = rawEntryContent.split(
+          /(?<!.)([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4}|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2})\n|\n\n([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4}|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2})\n/
+        );
+        filteredItems = splitItems.filter((item) => !!item);
         itemsMappedToEntries = filteredItems.map((item, index, arr) => {
-            if (isValidDate(item) && arr[index + 1]) {
-                firstEntryIndex = firstEntryIndex || index;
-                return { date: new Date(arr[index]), entry: arr[index + 1] };
-            }
+          if (isValidDate(item) && arr[index + 1]) {
+            return { date: new Date(arr[index]), entry: arr[index + 1] };
+          }
         });
         filteredEntries = itemsMappedToEntries.filter((item) => !!item);
-
-        // pretext is not returned by this deserializeEntries function (... yet?)
-        // But this is how it can be parsed out here after splitting by date:
-        pretext = splitItems.reduce((prev, current, index) => {
-            if (index < firstEntryIndex) {
-                return (prev || "") + (current || "") + "\n";
-            } else {
-                return prev;
-            }
-        }, "");
-        console.log("pretext", pretext);
-
-    } catch (e) {
+      
+        // "pretext" found before the first date is not returned by this deserializeEntries function (... yet?)
+        // But this is how it can be parsed out here, after already splitting by date:
+        let firstEntryFound = false;
+        pretext = splitItems.reduce((prev, item, index, arr) => {
+          if (!firstEntryFound && isValidDate(item)) {
+            firstEntryFound = true;
+          }
+          if (firstEntryFound) {
+            return prev;
+          } else {
+            return (prev || "") + (item || "") + "\n";
+          }
+        }, undefined);
+      } catch (e) {
         console.log("Error parsing flogger file content", e);
         console.log("rawEntryContent", rawEntryContent);
-        return []
-    }
-
+        // return [];
+      }
+      
     return filteredEntries as IEntry[];
 
 }
