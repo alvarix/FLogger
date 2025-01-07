@@ -78,7 +78,8 @@ for (const propName in repoFilesGlob) {
 // Clientside fetches to get file contents for each path
 let repoFilesWithContents:IDropboxFile[] = []
 repoFiles.value.forEach(async repoFile => {
-    console.log(repoFile.path)
+    // console.log(repoFile.path)
+    
     // As mentioned before...
     // ...when the frontend does fetch calls, it will add the '/repo_template/' part back.
     await fetch(`/repo_template/${repoFile.path}`)
@@ -89,7 +90,7 @@ repoFiles.value.forEach(async repoFile => {
             return response.text(); // Assuming the server returns JSON
         })
         .then(data => {
-            console.log('data', data)
+            // console.log('data', data)
             // folderContents.value.push(data);
             repoFilesWithContents.push({
                 path: repoFile.path,
@@ -101,7 +102,7 @@ repoFiles.value.forEach(async repoFile => {
         });
 })
 repoFiles.value = repoFilesWithContents
-console.log('repoFiles.value', repoFiles.value)
+// console.log('repoFiles.value', repoFiles.value)
 
 const {
     launchConnectFlow,
@@ -123,7 +124,8 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
     watch(
         availableFiles,
         (newValue, oldValue) => {
-            console.log('watch availableFiles (useDropboxFlogs)', availableFlogs.value, availableFiles, newValue, oldValue)
+            // console.log('watch availableFiles (useDropboxFlogs)', availableFlogs.value, availableFiles, newValue, oldValue)
+
             // // Rather than merging the old and new values with this...
             // const removed = !oldValue ? [] : oldValue
             //     .filter((file) => newValue && !newValue.includes(file))
@@ -151,7 +153,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
     watch(
         availableRepoFiles,
         (newValue, oldValue) => {
-            console.log('watch availableRepoFiles (useDropboxFlogs)', availableRepoFlogs.value, availableRepoFiles, newValue, oldValue)
+            // console.log('watch availableRepoFiles (useDropboxFlogs)', availableRepoFlogs.value, availableRepoFiles, newValue, oldValue)
             availableRepoFlogs.value = availableRepoFiles.value.map<IDropboxFlog>(
                 (file) => ({ sourceType: 'dropbox', url: file.path, readOnly: file.readOnly } as IDropboxFlog)
             )
