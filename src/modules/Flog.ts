@@ -16,7 +16,9 @@ export interface IFlog extends IFlogCore {
 }
 
 export function serializeFlog(entriesList: IEntry[], pretext?: string): string {
-    return (pretext || '') + serializeEntries(entriesList)
+    const sE = serializeEntries(entriesList)
+    console.log('x', pretext + 'chad')
+    return (pretext ? pretext : '') + sE
 }
 
 export function serializeEntries(entriesList: IEntry[]): string {
@@ -68,15 +70,16 @@ export function deserializeFlog(rawEntryContent: string): IFlogCore {
 
         // "pretext" found before the first date is not returned by this deserializeFlog function (... yet?)
         // But this is how it can be parsed out here, after already splitting by date:
-        let firstEntryFound = false;
+        let firstEntryFound;
         pretext = splitItems.reduce((prev, item, index, arr) => {
             if (!firstEntryFound && isValidDate(item)) {
-                firstEntryFound = true;
+                firstEntryFound = index;
+                return prev ? prev + '\n\n' : prev;
             }
             if (firstEntryFound) {
                 return prev;
             } else {
-                return (prev || "") + (item || "") + "\n";
+                return (prev || "") + (item || "");
             }
         }, undefined);
         status = IFlogStatus.loaded
