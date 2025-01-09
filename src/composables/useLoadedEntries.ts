@@ -16,7 +16,7 @@ export function useLoadedEntries() {
     loadedEntries.value = [...loadedEntries.value, newEntry];
   }
   function loadEntriesFromString(stringEntriesList: string | undefined): void {
-    loadedEntries.value = stringEntriesList ? deserializeEntries(stringEntriesList) : [];
+    loadedEntries.value = stringEntriesList ? deserializeFlog(stringEntriesList) : [];
   }
   function serializeEntries(entriesList: IEntry[]): string {
     return entriesList.reduce<string>(
@@ -26,7 +26,7 @@ export function useLoadedEntries() {
       , '' //start accumulatedValue with an empty string
     )
   }
-  function deserializeEntries(entryData: string): IEntry[] {
+  function deserializeFlog(entryData: string): IEntry[] {
     const entriesList: (IEntry | undefined)[] = entryData
       // split text file at date delimiters
       .split(/^\n?\n?([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4})\n|\n\n([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4})\n/)
@@ -45,5 +45,5 @@ export function useLoadedEntries() {
   // onUnmounted(() => window.removeEventListener('mousemove', update))
 
   // expose managed state as return value and methods
-  return { loadedEntries, loadEntries, loadEntry, loadEntriesFromString, serializeEntries, deserializeEntries }
+  return { loadedEntries, loadEntries, loadEntry, loadEntriesFromString, serializeEntries, deserializeFlog }
 }
