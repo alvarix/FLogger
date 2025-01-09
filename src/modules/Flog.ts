@@ -44,7 +44,7 @@ export function deserializeFlog(rawEntryContent: string): IFlogCore {
     function isValidDate(dateString) {
         // const date = new Date(dateString);
         // return !isNaN(date.getTime());
-        return /([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4}|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2})/.test(
+        return /^([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4}|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2})$/.test(
             dateString
         );
     }
@@ -52,7 +52,7 @@ export function deserializeFlog(rawEntryContent: string): IFlogCore {
     let splitItems, filteredItems, itemsMappedToEntries;
     try {
         splitItems = rawEntryContent.split(
-            /(?<!.)([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4}|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2})\n|\n\n([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4}|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2})\n/
+            /(?:\n\n|^)([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4}|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2})\n/
         );
         // The following few steps convert array of
         //    [date,entry,date,entry,...]
