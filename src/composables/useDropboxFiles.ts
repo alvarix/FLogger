@@ -267,9 +267,10 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                 const windowFeatures = "popup=true,menubar=false,width=700height=700,innerWidth=700,innerHeight=700,left=100,top=100";
                 //@ts-expect-error
                 connectionPopupWindow.value = window.open(authUrl, 'dbauthPopupWindow', windowFeatures)
+                console.log('connectionPopupWindow.value', connectionPopupWindow.value)
             })
             .catch((error) => {
-                console.log(`Error getting auth URL:`, error?.message || error);
+                console.error(`Error getting auth URL:`, error?.message || error);
                 clearConnection();
             });
 

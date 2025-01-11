@@ -1,5 +1,6 @@
 import { ref, Ref, watch, onUpdated, onActivated } from "vue"
-import { IFlog, deserializeEntries, serializeEntries } from "@/modules/Flog"
+import type { IFlog } from "@/modules/Flog"
+import { IFlogStatus, deserializeFlog, serializeFlog } from "@/modules/Flog"
 import { useDropboxFiles } from "@/composables/useDropboxFiles"
 import { IDropboxFile } from "@/composables/useDropboxFiles";
 
@@ -76,10 +77,10 @@ for (const propName in repoFilesGlob) {
 // console.log("repoFiles.value", repoFiles.value);
 
 // Clientside fetches to get file contents for each path
-let repoFilesWithContents:IDropboxFile[] = []
+let repoFilesWithContents: IDropboxFile[] = []
 repoFiles.value.forEach(async repoFile => {
     // console.log(repoFile.path)
-    
+
     // As mentioned before...
     // ...when the frontend does fetch calls, it will add the '/repo_template/' part back.
     await fetch(`/repo_template/${repoFile.path}`)
@@ -106,7 +107,7 @@ repoFiles.value = repoFilesWithContents
 
 const {
     launchConnectFlow,
-    connectionPopupWindow, 
+    connectionPopupWindow,
     hasConnection,
     clearConnection: clearFileConnection,
     availableFiles,
@@ -167,8 +168,13 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
         loadFileContent(
             { path: flog.url },
             (result) => {
-                flog.loadedEntries = deserializeEntries(result.content)
+                flog.rawContent = result.content
                 flog.rev = result.rev;
+                const { pretext, loadedEntries, status } = deserializeFlog(result.content)
+                if (status != IFlogStatus.error) {
+                    flog.pretext = pretext
+                    flog.loadedEntries = loadedEntries
+                }
             }
         )
     }
@@ -182,7 +188,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
                 // Might be required like this to ensure writing new version of current version. 
                 // Or, it might allow specing a new rev to version rather than overwrite.
                 rev: flog.rev,
-                content: serializeEntries(flog.loadedEntries)
+                content: serializeFlog(flog.loadedEntries, flog.pretext)
             } as IDropboxFile,
             (result) => { flog.rev = result.rev } // can parameterize so calling app gets notice once save is complete 
         )
@@ -195,7 +201,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
                 path: flog.url,
                 // Is rev needed for mode add?
                 // rev: flog.rev, 
-                content: serializeEntries(flog.loadedEntries)
+                content: serializeFlog(flog.loadedEntries)
             } as IDropboxFile,
             () => { } // can parameterize so calling app gets notice once save is complete 
         )

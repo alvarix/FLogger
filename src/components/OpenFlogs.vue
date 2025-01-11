@@ -4,6 +4,7 @@ import { useFlogs } from "@/composables/useFlogs";
 import EntryData from "@/modules/EntryData.ts";
 import AddEntry from "@/components/AddEntry.vue";
 import EntryList from "@/components/EntryList.vue";
+import Pretext from "@/components/Pretext.vue";
 
 const {
   openFlogs,
@@ -64,11 +65,20 @@ const getTimestamp = () => ref(new Date().toLocaleDateString());
   <!-- Example description and UI -->
   <section class="container main">
     <div v-for="flog in openFlogs" :key="flog.id">
-      <h4 class="flog-title">{{ flog.url }}
+      <h4 class="flog-title">
+        {{ flog.url }}
 
-        <button class="small close-flog" @click.prevent="() => closeFlog(flog)">close flog</button>
+        <button class="small close-flog" @click.prevent="() => closeFlog(flog)">
+          close flog
+        </button>
       </h4>
-
+      <div v-if="flog.pretext?.trim() != ''">
+        <h5 class="no-margin-bottom">pretext</h5>
+        <Pretext :pretext="flog.pretext"/>
+      </div>
+      <div v-else>
+        <h5>no pretext</h5>
+      </div>
       <AddEntry
         @newEntry="(entryData) => addNewEntry(entryData, flog)"
         :copiedEntry="copiedEntry"
@@ -88,30 +98,15 @@ const getTimestamp = () => ref(new Date().toLocaleDateString());
 </template>
 
 <style scoped>
-
-.close-flog {
-  margin-left: 10px;
-}
-
 h4 {
   padding: 0;
+  margin-bottom: 0px;
 }
-#add-entry *:not(.date-validation) {
-  display: block;
+.no-margin-bottom {
+  margin-bottom: 0px;
 }
-
-input.error {
-  border: 1px solid red;
+h5 {
+  padding: 0;
 }
-
-.date-validation.error {
-  display: block;
-  color: red;
-}
-
-#add-entry label {
-  margin-top: 20px;
-}
-
 
 </style>
