@@ -15,7 +15,7 @@ const props = defineProps<{
           id="pretext"
           v-model="props.pretext"
           disabled
-          style="field-sizing: content"
+          class="auto-resize"
         ></textarea>
       </div>
     </div>

@@ -72,7 +72,7 @@ watch(() => props.copiedEntry, (newVal) => {
 				<em class='date-validation hidden' :class={error:hasError}>Please enter valid date</em>
 			</div>
 			<div>
-				<textarea autofocus id="entry" name="" cols="30" rows="2" v-model='form.entry' required></textarea>
+				<textarea class='auto-resize' autofocus id="entry" name="" cols="30" rows="2" v-model='form.entry' required></textarea>
 			</div>
 		</div>
 		<div><button class="big" type="submit">Add Entry</button></div>
