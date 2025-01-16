@@ -61,7 +61,7 @@ function save(entry) {
       <div v-if="!isEditing && !isEditingClick" @click="edit" class="entry__body"><pre class="entry__pre">{{ entry.entry }}</pre></div> 
       
       <!-- Display a textarea if editing -->
-      <textarea ref="entryTextarea" class='entry__textarea' v-else @blur="save" v-model="entry.entry" :readOnly="readOnly"></textarea>
+      <textarea ref="entryTextarea" class='entry__textarea auto-resize' v-else @blur="save" v-model="entry.entry" :readOnly="readOnly"></textarea>
     </div>
 </template>
 
@@ -89,7 +89,6 @@ h3 {
   padding: 20px;
   font-size: 12px;
   height: auto;
-  field-sizing: content;
   padding: 10px 20px ;
   
 }
