@@ -1,6 +1,5 @@
 // ThemeSwitcher.vue
 <template>
-  <div class="theme-controls">
     <button class="small" @click="toggleTheme">
       {{ isDark ? '🌙 Dark' : '☀️ Light' }}
     </button>
@@ -11,7 +10,6 @@
      (Following System) 
       
     </span>
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -25,9 +23,6 @@ const { isDark, isSystemTheme, toggleTheme, resetToSystem } = useTheme()
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  position absolute
-  top 15px
-  right 20px
   margin-top 0
 }
 
