@@ -42,7 +42,7 @@ const autoResizeTextarea = (el_id) => {
   }
 };
 
-
+// this watch is triggered when copying an entry
 watch(() => props.copiedEntry, (newVal) => {
   if (newVal && newVal.entry) {
     form.value.entry = newVal.entry; // Prepopulate the textarea with the copied entry
