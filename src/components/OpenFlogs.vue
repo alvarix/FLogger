@@ -97,7 +97,7 @@ const getTimestamp = () => ref(new Date().toLocaleDateString());
   </section>
 </template>
 
-<style scoped>
+<style scoped lang="styl">
 h4 {
   padding: 0;
   margin-bottom: 0px;
@@ -109,4 +109,6 @@ h5 {
   padding: 0;
 }
 
+button.close-flog 
+  margin-left 10px
 </style>

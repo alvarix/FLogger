@@ -73,9 +73,8 @@ function save(entry) {
 h3 {
   font-weight: 700;
   font-size: 14px;
-  margin: 40px 0 0 20px;
+  margin: 50px 0 20px 20px;
 }
-
 
 .entry__body {
   background-color: var(--misc-color);
@@ -84,6 +83,11 @@ h3 {
 .entry__pre
   white-space: pre-wrap;
 
+.entry__body,
+.entry__textarea {
+  font-size: 14px;
+}
+
 .entry__body, 
 .entry textarea,
 .entry input {
@@ -91,9 +95,7 @@ h3 {
   max-width: 600px;
   border-radius: 14px;
   padding: 20px;
-  font-size: 12px;
   padding: 10px 20px ;
-  
 }
 
 .entry__textarea {
@@ -104,6 +106,9 @@ h3 {
 .entry__body:hover {
   background-color: var(--input-color);
 }
+
+
+
 
 
 

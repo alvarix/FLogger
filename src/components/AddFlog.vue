@@ -76,7 +76,6 @@ const handleKeydown = (e) => {
     </button>
   </div>
   <form v-else id="add-flog" @submit.prevent="submitAdd" @mouseleave="hideDropdown" @keydown="handleKeydown">
-    <div class="form-inner">
       <div class="filename-controls">
         <input
           autofocus
@@ -104,7 +103,6 @@ const handleKeydown = (e) => {
           >Please enter valid file name</em
         >
       </div>
-    </div>
 <!--
     <div>
       <input
