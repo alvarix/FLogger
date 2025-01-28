@@ -36,10 +36,13 @@ function edit(entry) {
   nextTick(() => {
     if (entryTextarea.value) {
       entryTextarea.value.focus({ preventScroll: true });
-      // Set cursor position to the start of the text
+      // auto resize
       entryTextarea.value.style.height = entryTextarea.value.scrollHeight + "px";
+      // Set cursor position to the start of the text
       entryTextarea.value.selectionStart = 0;
       entryTextarea.value.selectionEnd = 0;
+      // scroll to 
+      entryTextarea.value.scrollIntoView({ behavior: "smooth" });
     }
   });
 }
