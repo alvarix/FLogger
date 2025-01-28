@@ -37,6 +37,7 @@ function edit(entry) {
     if (entryTextarea.value) {
       entryTextarea.value.focus({ preventScroll: true });
       // Set cursor position to the start of the text
+      entryTextarea.value.style.height = entryTextarea.value.scrollHeight + "px";
       entryTextarea.value.selectionStart = 0;
       entryTextarea.value.selectionEnd = 0;
     }
@@ -88,13 +89,13 @@ h3 {
   border-radius: 14px;
   padding: 20px;
   font-size: 12px;
-  height: auto;
   padding: 10px 20px ;
   
 }
 
 .entry__textarea {
   background-color: var(--input-color);
+  max-width: 95%;
 }
 
 .entry__body:hover {
