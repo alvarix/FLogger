@@ -7,22 +7,24 @@ const props = defineProps<{
 </script>
 
 <template>
-  <form @submit.prevent="">
-    <div class="form-inner">
-      <div>
-        <textarea
-          autofocus
-          id="pretext"
-          v-model="props.pretext"
-          disabled
-          class="auto-resize"
-        ></textarea>
-      </div>
-    </div>
-  </form>
+  <button class='small popbutton' popovertarget="my-popover">Flog Info</button>
+  <div v-text="props.pretext" id="my-popover" popover class="popover"> </div>
 </template>
 
-<style>
+<style lang="styl" scoped>
+
+
+.popover 
+  font-weight: 400;
+  padding: 1rem 1.5rem;
+  border-radius: 1rem;
+  max-width: 20ch;
+  line-height: 1.4;
+  border:0
+  top: 2rem;
+  margin: 0 auto;
+  box-shadow 0 0 6px #999
+
 form {
   padding: 0px 0px 10px 0px;
   margin: 0px 0px 42px 0px;
