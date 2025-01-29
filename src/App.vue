@@ -58,6 +58,11 @@ const { clearConnection } = useDropboxFlogs();
   </template>
 
  <style scoped lang="stylus">
+ 
+#logo
+    margin-bottom 0
+    padding-bottom 0
+
  .header 
     display flex
     flex-direction row-reverse

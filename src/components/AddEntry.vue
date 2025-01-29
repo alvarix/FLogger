@@ -80,7 +80,7 @@ watch(() => props.copiedEntry, (newVal) => {
 	</form>
 </template>
 
-<style scoped>
+<style lang='styl' scoped>
 #add-entry *:not(.date-validation) {
 	display:block;
 }
@@ -89,15 +89,12 @@ input.error {
 	border:1px solid var(--red-color);
 }
 
-input[type='submit'],
-.form-inner,
-.form-inner * {
-	background-color:var(--input-color);
-}
 
+.form-inner .date	
+	background none
+	margin-left 10px
 
-
-.form-inner {
+.form-inner textarea{
     max-width: 600px;
     border-radius: 14px;
     padding: 20px;
