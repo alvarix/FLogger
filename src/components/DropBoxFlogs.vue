@@ -9,6 +9,7 @@ import Intro from "@/components/Intro.vue";
 
 const {
   connectionPopupWindow,
+  openDbxPopup,
   hasConnection,
   availableFlogs,
   availableRepoFlogs,
@@ -23,6 +24,11 @@ watch(connectionPopupWindow, () => {
 
 const { openFlog } = useFlogs();
 // const props = defineProps({});
+
+const openPop = () => {
+  console.log("openPop", openDbxPopup);
+  openDbxPopup();
+};
 
 const selectFile = (file) => {
   console.log("selectFile", file);
@@ -49,8 +55,11 @@ function handleAddFlog(flogData) {
       </template>
       <template #body>
         <p>
-          Complete the Dropbox authorization in the
-          <a @click="connectionPopupWindow?.focus()">pop-up window</a>.
+          Complete the Dropbox authorization <a @click="connectionPopupWindow?.focus()">in the
+          pop-up window</a>.
+        </p>
+        <p>
+          If the window doesn't pop-up, <a @click="openPop()">click here</a>.
         </p>
       </template>
       <template #footer

@@ -15,6 +15,7 @@ export interface IDropboxFile {
 export interface IDropboxFiles {
     launchConnectFlow: () => void
     connectionPopupWindow: any
+    openDbxPopup: () => void
     hasConnection: Ref<boolean>
     clearConnection: () => void
     availableFiles: Ref<IDropboxFile[]>
@@ -74,6 +75,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
     };
 
     const dbxAuthCode = ref(getDbxAuthCodeFromUrl());
+    const dbxAuthUrl = ref();
 
     const hasRedirectedFromAuth = ref(!!dbxAuthCode.value);
 
@@ -258,21 +260,36 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                 true
             )
             .then((authUrl) => {
+                dbxAuthUrl.value = authUrl
                 clearConnection();
                 //@ts-expect-error
                 window.sessionStorage.setItem("codeVerifier", dbxAuth.codeVerifier);
                 //@ts-expect-error
                 console.log("dbxAuth.codeVerifier", dbxAuth.codeVerifier);
-                // dbxauth-popup: Replace open popup rather than redirecting to Db in this window
-                const windowFeatures = "popup=true,menubar=false,width=700height=700,innerWidth=700,innerHeight=700,left=100,top=100";
-                //@ts-expect-error
-                connectionPopupWindow.value = window.open(authUrl, 'dbauthPopupWindow', windowFeatures)
-                console.log('connectionPopupWindow.value', connectionPopupWindow.value)
+                // // dbxauth-popup: Replace open popup rather than redirecting to Db in this window
+                // const windowFeatures = "popup=true,menubar=false,width=700height=700,innerWidth=700,innerHeight=700,left=100,top=100";
+                // //@ts-expect-error
+                // connectionPopupWindow.value = window.open(authUrl, 'dbauthPopupWindow', windowFeatures)
+                // console.log('connectionPopupWindow.value', connectionPopupWindow.value)
+                openDbxPopup();
             })
             .catch((error) => {
                 console.error(`Error getting auth URL:`, error?.message || error);
                 clearConnection();
             });
+
+    }
+
+    const openDbxPopup = () => {
+        try {
+            const windowFeatures = "popup=true,menubar=false,width=700height=700,innerWidth=700,innerHeight=700,left=100,top=100";
+            connectionPopupWindow.value = window.open(dbxAuthUrl.value, 'dbauthPopupWindow', windowFeatures)
+            console.log('connectionPopupWindow.value', connectionPopupWindow.value)
+        }
+        catch (error) {
+            console.error(`Error getting auth URL:`, error?.message || error);
+            clearConnection();
+        };
 
     }
 
@@ -404,6 +421,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
         accountOwner,
         launchConnectFlow,
         connectionPopupWindow,
+        openDbxPopup,
         hasConnection,
         clearConnection,
         availableFiles,
