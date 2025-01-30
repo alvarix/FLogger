@@ -23,6 +23,7 @@ function addNewEntry(entryData, flog) {
   );
   addEntryToFlog(newEntry, flog);
   saveFlogToSource(flog);
+  alert("New entry added");
 }
 const copiedEntry = ref(null); // Initialize reactive copiedEntry
 let isEditing = ref(false);
