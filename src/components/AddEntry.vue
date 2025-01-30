@@ -72,7 +72,7 @@ watch(() => props.copiedEntry, (newVal) => {
 				<em class='date-validation hidden' :class={error:hasError}>Please enter valid date</em>
 			</div>
 			<div>
-				<textarea class='auto-resize' autofocus id="entry" name="" cols="30" rows="2" v-model='form.entry' required></textarea>
+				<textarea class='auto-resize' autofocus id="entry" name=""  v-model='form.entry' required></textarea>
 			</div>
 		</div>
 		<div><button class="big" type="submit">Add Entry</button></div>
@@ -89,7 +89,6 @@ input.error {
 	border:1px solid var(--red-color);
 }
 
-
 .form-inner .date	
 	background none
 	margin-left 10px
@@ -99,7 +98,6 @@ input.error {
     border-radius: 14px;
     padding: 20px;
 }
-
 
 input.date {
 	font-weight: bold;
@@ -113,6 +111,7 @@ input, textarea {
 
 textarea {
 	width: 100%;
+	box-sizing border-box
 }
 
 .date-validation.error {

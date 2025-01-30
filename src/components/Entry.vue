@@ -86,6 +86,8 @@ h3 {
 .entry__body,
 .entry__textarea {
   font-size: 14px;
+  width 100%
+  box-sizing border-box
 }
 
 .entry__body, 
