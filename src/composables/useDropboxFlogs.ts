@@ -13,6 +13,7 @@ export interface IDropboxFlogs {
     launchConnectFlow: () => void;
     // pass through from useDropboxFiles
     connectionPopupWindow: boolean;
+    openDbxPopup: () => void;
     // pass through from useDropboxFiles
     hasConnection: Ref<boolean>;
     // pass through from useDropboxFiles
@@ -108,6 +109,7 @@ repoFiles.value = repoFilesWithContents
 const {
     launchConnectFlow,
     connectionPopupWindow,
+    openDbxPopup,
     hasConnection,
     clearConnection: clearFileConnection,
     availableFiles,
@@ -216,6 +218,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
     return {
         launchConnectFlow,
         connectionPopupWindow,
+        openDbxPopup,
         hasConnection,
         clearConnection,
         availableFlogs,
