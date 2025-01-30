@@ -36,7 +36,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
     console.log('VITE_VERCEL_URL', import.meta.env.VITE_VERCEL_URL)
     // @ts-expect-error - Unsure why env isn't in the type definition for import.meta
     console.log('VERCEL_URL', import.meta.env.VERCEL_URL)
-    const hostname = (environment == 'production') ? 'flogger.vercel.app'
+    const hostname = (environment == 'production') ? 'flogger.app'
         // @ts-expect-error - Unsure why env isn't in the type definition for import.meta
         : import.meta.env.VITE_VERCEL_URL || import.meta.env.VERCEL_URL;
     console.log('hostname', hostname)
