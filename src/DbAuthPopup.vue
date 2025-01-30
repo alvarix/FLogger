@@ -24,6 +24,6 @@ import PacmanLoader from 'vue-spinner/src/PacmanLoader.vue'
 }
 
 * {
-    font-family Inter, system-ui, Avenir, Helvetica, Arial, sans-serif
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif
 }
 </style>
