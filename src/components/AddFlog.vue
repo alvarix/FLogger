@@ -103,19 +103,6 @@ const handleKeydown = (e) => {
           >Please enter valid file name</em
         >
       </div>
-<!--
-    <div>
-      <input
-        type="button"
-        value="Cancel"
-        @click="
-          () => {
-            showInput = false;
-          }
-        "
-      />
-    </div>
-  -->
   </form>
 </template>
 
@@ -148,13 +135,9 @@ input[type="button"] {
   cursor: pointer;
 }
 
-  
-  
 .filename-controls 
     position: relative;
   
-
-
 .filename 
   background-color: var(--input-color);
   padding 20px
@@ -162,7 +145,7 @@ input[type="button"] {
   font-weight: bold;
   border-color: lightsteelblue 
   border-style solid
-  font-size: 14px;
+  font-size: 16px;
   outline-color: var(--input-color)
   width: 100%;
   box-sizing: border-box;
