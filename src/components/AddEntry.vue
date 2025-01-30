@@ -42,7 +42,7 @@ const autoResizeTextarea = (el_id) => {
   }
 };
 
-
+// this watch is triggered when copying an entry
 watch(() => props.copiedEntry, (newVal) => {
   if (newVal && newVal.entry) {
     form.value.entry = newVal.entry; // Prepopulate the textarea with the copied entry
@@ -72,7 +72,7 @@ watch(() => props.copiedEntry, (newVal) => {
 				<em class='date-validation hidden' :class={error:hasError}>Please enter valid date</em>
 			</div>
 			<div>
-				<textarea class='auto-resize' autofocus id="entry" name="" cols="30" rows="2" v-model='form.entry' required></textarea>
+				<textarea class='auto-resize' autofocus id="entry" name=""  v-model='form.entry' required></textarea>
 			</div>
 		</div>
 		<div><button class="big" type="submit">Add Entry</button></div>
@@ -80,7 +80,7 @@ watch(() => props.copiedEntry, (newVal) => {
 	</form>
 </template>
 
-<style scoped>
+<style lang='styl' scoped>
 #add-entry *:not(.date-validation) {
 	display:block;
 }
@@ -89,20 +89,15 @@ input.error {
 	border:1px solid var(--red-color);
 }
 
-input[type='submit'],
-.form-inner,
-.form-inner * {
-	background-color:var(--input-color);
-}
+.form-inner .date	
+	background none
+	margin-left 10px
 
-
-
-.form-inner {
+.form-inner textarea{
     max-width: 600px;
     border-radius: 14px;
     padding: 20px;
 }
-
 
 input.date {
 	font-weight: bold;
@@ -116,6 +111,7 @@ input, textarea {
 
 textarea {
 	width: 100%;
+	box-sizing border-box
 }
 
 .date-validation.error {

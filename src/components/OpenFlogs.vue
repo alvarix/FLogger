@@ -23,6 +23,7 @@ function addNewEntry(entryData, flog) {
   );
   addEntryToFlog(newEntry, flog);
   saveFlogToSource(flog);
+  alert("New entry added");
 }
 const copiedEntry = ref(null); // Initialize reactive copiedEntry
 let isEditing = ref(false);
@@ -68,22 +69,21 @@ const getTimestamp = () => ref(new Date().toLocaleDateString());
       <h4 class="flog-title">
         {{ flog.url }}
 
+        <span v-if="flog.pretext?.trim() != ''">
+          <Pretext :pretext="flog.pretext"/>
+        </span>
         <button class="small close-flog" @click.prevent="() => closeFlog(flog)">
           close flog
         </button>
       </h4>
-      <div v-if="flog.pretext?.trim() != ''">
-        <h5 class="no-margin-bottom">pretext</h5>
-        <Pretext :pretext="flog.pretext"/>
-      </div>
-      <div v-else>
-        <h5>no pretext</h5>
-      </div>
+      
       <AddEntry
-        @newEntry="(entryData) => addNewEntry(entryData, flog)"
-        :copiedEntry="copiedEntry"
-        :timestamp="getTimestamp()"
+      @newEntry="(entryData) => addNewEntry(entryData, flog)"
+      :copiedEntry="copiedEntry"
+      :timestamp="getTimestamp()"
       />
+      
+
       <EntryList
         :entries="flog.loadedEntries"
         :isEditing="isEditing"
@@ -97,11 +97,12 @@ const getTimestamp = () => ref(new Date().toLocaleDateString());
   </section>
 </template>
 
-<style scoped>
-h4 {
-  padding: 0;
-  margin-bottom: 0px;
-}
+<style scoped lang="styl">
+h4 
+  margin 10px 0 10px
+  padding 0 0 10px 0
+  font-style italic 
+
 .no-margin-bottom {
   margin-bottom: 0px;
 }
@@ -109,4 +110,6 @@ h5 {
   padding: 0;
 }
 
+button.small
+  margin-left 10px
 </style>

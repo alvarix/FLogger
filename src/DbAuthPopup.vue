@@ -24,7 +24,6 @@ import PacmanLoader from 'vue-spinner/src/PacmanLoader.vue'
 }
 
 * {
-  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas,
-    "DejaVu Sans Mono", monospace;
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif
 }
 </style>

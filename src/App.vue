@@ -18,20 +18,23 @@ const { clearConnection } = useDropboxFlogs();
 </script>
 
 <template>
-  <div :class="{ 'connected' : hasConnection }">
-    <ThemeSwitcher />
-    
-    <div
-      id="authed-section"
-      :style="{ display: hasConnection ? 'block' : 'none' }"
-    >
-      <button class="dbx__btn small" @click="clearConnection">
-        <img alt="Dropbox account" src="/Dropbox_Icon.svg" width="16" height="16"> Disconnect {{ accountOwner }}
-      </button>
-    </div>
-    
+  <main :class="{ 'connected' : hasConnection }">
+    <div class="header">
 
-    <div>
+      <div class="theme-controls">
+        <ThemeSwitcher />
+        
+        <div
+          id="authed-section"
+          :style="{ display: hasConnection ? 'block' : 'none' }"
+        >
+          <button class="dbx__btn small" @click="clearConnection">
+            <img alt="Dropbox account" src="/Dropbox_Icon.svg" width="16" height="16"> Disconnect {{ accountOwner }}
+          </button>
+        </div>
+      </div>
+      
+
       <h1 id="logo">
         <pre>
 ███████╗██╗      ██████╗  ██████╗  ██████╗ ███████╗██████╗ 
@@ -51,15 +54,23 @@ const { clearConnection } = useDropboxFlogs();
     <OpenFlogs />
     <br />
     <EntryList :entries="loadedEntries || []" />
-  </div>
+  </main>
   </template>
 
  <style scoped lang="stylus">
+ 
+#logo
+    margin-bottom 0
+    padding-bottom 0
+
+ .header 
+    display flex
+    flex-direction row-reverse
+    justify-content space-between
+    @media (max-width: 499px)
+        flex-direction column
+    
   .dbx__btn
-    position absolute
-    top 55px
-    right 20px
-    margin-top 0
     display flex
     align-items center
     gap 5px

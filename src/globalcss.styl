@@ -1,5 +1,6 @@
 :root 
     font-family Inter, system-ui, Avenir, Helvetica, Arial, sans-serif
+    font-size 16px
     line-height 1.5
     font-weight 400
     color-scheme light dark
@@ -16,6 +17,7 @@
     --accent-bold #646cff
     */
 
+    --font Inter, system-ui, Avenir, Helvetica, Arial, sans-serif
     --misc-color light-dark(#ebe8dc, #252521)
     --button-color light-dark(#eae8df, #252521)
     
@@ -28,7 +30,8 @@
     --red-color light-dark(#e0521d, #e0521d)
 
 li a
-  word-break: break-all;
+  word-break break-all
+  overflow-wrap break-word
 
 button 
     background-color var(--button-color)
@@ -61,14 +64,12 @@ input:not(submit), textarea
 
 #logo pre 
     color var(--color)
-    @media (max-width: 450px)
-        margin-top 30px
 
     
 body 
     background-color var(--bg-color)
     color var(--color)
-    font-family ui-monospace "Cascadia Code" "Source Code Pro" Menlo Consolas
+    Xfont-family ui-monospace "Cascadia Code" "Source Code Pro" Menlo Consolas
 
 a
     font-weight 500
@@ -112,7 +113,7 @@ h1
 
 h2
   font-size 2em
-  font-family "DejaVu Sans Mono", monospace
+  Xfont-family "DejaVu Sans Mono", monospace
 
 h3
     font-size 1.3em
@@ -122,6 +123,7 @@ h4
     font-weight 600
 
 #app
+    box-sizing border-box
     max-width 1280px
     margin 0 auto
     padding 2rem
@@ -141,3 +143,8 @@ ul
 
 .auto-resize 
     field-sizing content
+
+
+
+
+//@media (max-width: 499px)
