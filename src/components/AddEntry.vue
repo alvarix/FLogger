@@ -101,12 +101,12 @@ input.error {
 
 input.date {
 	font-weight: bold;
-	font-size: 14px;
 	border: none;
 }
 
 input, textarea {
 	padding: 5px;
+	font-size: 16px;
 }
 
 textarea {
