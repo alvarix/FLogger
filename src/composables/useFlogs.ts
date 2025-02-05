@@ -1,7 +1,12 @@
 import { ref } from "vue"
-import { IFlog } from "@/modules/Flog"
+import type { IFlog } from "@/modules/Flog"
+import { IFlogStatus } from "@/modules/Flog"
 import { IEntry } from '@/modules/EntryData'
 import { useDropboxFlogs, IDropboxFlog } from "@/composables/useDropboxFlogs";
+
+// Re-export these for convenience
+export type { IFlog as IFlog }
+export { IFlogStatus as IFlogStatus }
 
 const {
     saveFlogEntries: saveFlogEntries_dropbox,
@@ -42,7 +47,7 @@ export const useFlogs = () => {
         if (deleteEntryIndex !== -1) {
             // Remove the entry
             flog.loadedEntries.splice(deleteEntryIndex, 1);
-    
+
             // Save the updated flog to the source to persist the changes
             saveFlogToSource(flog);
         } else {

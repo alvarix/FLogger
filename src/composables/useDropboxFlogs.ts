@@ -4,6 +4,10 @@ import { IFlogStatus, deserializeFlog, serializeFlog } from "@/modules/Flog"
 import { useDropboxFiles } from "@/composables/useDropboxFiles"
 import { IDropboxFile } from "@/composables/useDropboxFiles";
 
+// Re-export these for convenience
+export type { IFlog as IFlog }
+export { IFlogStatus as IFlogStatus };
+
 export interface IDropboxFlog extends IFlog {
     rev: string;
 }
@@ -173,6 +177,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
                 flog.rawContent = result.content
                 flog.rev = result.rev;
                 const { pretext, loadedEntries, status } = deserializeFlog(result.content)
+                flog.status = status
                 if (status != IFlogStatus.error) {
                     flog.pretext = pretext
                     flog.loadedEntries = loadedEntries
