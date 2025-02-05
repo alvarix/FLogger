@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, nextTick } from "vue";
-import { IEntry } from '../modules/EntryData'
+import { IEntry } from "../modules/EntryData";
 
 const props = defineProps<{
   entry: IEntry;
@@ -8,18 +8,14 @@ const props = defineProps<{
   readOnly?: boolean;
 }>();
 
-
 // Emits an event to the parent
-const emit = defineEmits([
-  'update-entry',
-  'stop-editing'
-]);
+const emit = defineEmits(["update-entry", "stop-editing"]);
 
 // Utility function to format timestamp to MM/DD/YYYY
 function formatDate(timestamp: string | number | Date): string {
   const date = new Date(timestamp);
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
   const year = date.getFullYear();
   return `${month}/${day}/${year}`;
 }
@@ -37,11 +33,12 @@ function edit(entry) {
     if (entryTextarea.value) {
       entryTextarea.value.focus({ preventScroll: true });
       // auto resize
-      entryTextarea.value.style.height = entryTextarea.value.scrollHeight + "px";
+      entryTextarea.value.style.height =
+        entryTextarea.value.scrollHeight + "px";
       // Set cursor position to the start of the text
       entryTextarea.value.selectionStart = 0;
       entryTextarea.value.selectionEnd = 0;
-      // scroll to 
+      // scroll to
       entryTextarea.value.scrollIntoView({ behavior: "smooth" });
     }
   });
@@ -49,24 +46,29 @@ function edit(entry) {
 
 // Function to emit the update when blur occurs
 function save(entry) {
-  emit('update-entry', entry);
-  emit('stop-editing', props.index);
+  emit("update-entry", entry);
+  emit("stop-editing", props.index);
   isEditingClick.value = false;
 }
-
 </script>
-
-
-
 
 <template>
   <div class="entry">
-      <h3>{{ formattedDate }}</h3>
-      <div v-if="!isEditing && !isEditingClick" @click="edit" class="entry__body"><pre class="entry__pre">{{ entry.entry }}</pre></div> 
-      
-      <!-- Display a textarea if editing -->
-      <textarea ref="entryTextarea" class='entry__textarea auto-resize' v-else @blur="save" v-model="entry.entry" :readOnly="readOnly"></textarea>
+    <h3>{{ formattedDate }}</h3>
+    <div v-if="!isEditing && !isEditingClick" @click="edit" class="entry__body">
+      <pre class="entry__pre">{{ entry.entry }}</pre>
     </div>
+
+    <!-- Display a textarea if editing -->
+    <textarea
+      ref="entryTextarea"
+      class="entry__textarea auto-resize"
+      v-else
+      @blur="save"
+      v-model="entry.entry"
+      :readOnly="readOnly"
+    ></textarea>
+  </div>
 </template>
 
 <style scoped lang="stylus">
@@ -91,7 +93,7 @@ h3 {
   box-sizing border-box
 }
 
-.entry__body, 
+.entry__body,
 .entry textarea,
 .entry input {
   text-align: left;
@@ -109,12 +111,4 @@ h3 {
 .entry__body:hover {
   background-color: var(--input-color);
 }
-
-
-
-
-
-
-
-
 </style>
