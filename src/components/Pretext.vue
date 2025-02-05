@@ -45,6 +45,10 @@ function save() {
   <button class="small popbutton" popovertarget="my-popover">Flog Info</button>
   <div id="my-popover" popover class="popover">
     <div class="pretext">
+      <button class="small popbutton" popovertarget="my-popover" popovertargetactin="hide">
+        close
+      </button>
+
       <div v-if="!isEditing" @click="edit" class="pretext__body">
         <pre class="pretext__pre">{{ props.pretext }}</pre>
       </div>
@@ -64,6 +68,9 @@ function save() {
 
 <style lang="styl" scoped>
 
+.popbutton {
+  margin: 1rem 0rem;
+}
 
 .popover
   font-weight: 400;
