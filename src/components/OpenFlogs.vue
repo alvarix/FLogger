@@ -106,7 +106,7 @@ const getTimestamp = () => ref(new Date().toLocaleDateString());
         <GridLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
         <ClipLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
         <RiseLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/> -->
-        <BeatLoader
+        <PacmanLoader
           :loading="flog.status != IFlogStatus.loaded"
           :color="color"
           :size="size"
