@@ -1,10 +1,27 @@
 <script setup>
 import { ref } from "vue";
-import { useFlogs } from "@/composables/useFlogs";
+import { useFlogs, IFlogStatus } from "@/composables/useFlogs";
 import EntryData from "@/modules/EntryData.ts";
 import AddEntry from "@/components/AddEntry.vue";
 import EntryList from "@/components/EntryList.vue";
 import Pretext from "@/components/Pretext.vue";
+
+// import PulseLoader from "vue-spinner/src/PulseLoader.vue";
+// import GridLoader from "vue-spinner/src/GridLoader.vue";
+// import ClipLoader from "vue-spinner/src/ClipLoader.vue";
+// import RiseLoader from "vue-spinner/src/RiseLoader.vue";
+// import BeatLoader from "vue-spinner/src/BeatLoader.vue";
+// import SyncLoader from "vue-spinner/src/SyncLoader.vue";
+// import RotateLoader from "vue-spinner/src/RotateLoader.vue";
+// import FadeLoader from "vue-spinner/src/FadeLoader.vue";
+import PacmanLoader from "vue-spinner/src/PacmanLoader.vue";
+// import SquareLoader from "vue-spinner/src/SquareLoader.vue";
+// import ScaleLoader from "vue-spinner/src/ScaleLoader.vue";
+// import SkewLoader from "vue-spinner/src/SkewLoader.vue";
+// import MoonLoader from "vue-spinner/src/MoonLoader.vue";
+// import RingLoader from "vue-spinner/src/RingLoader.vue";
+// import BounceLoader from "vue-spinner/src/BounceLoader.vue";
+// import DotLoader from "vue-spinner/src/DotLoader.vue";
 
 const {
   openFlogs,
@@ -60,6 +77,7 @@ const handleUpdateEntry = (flog, updatedEntry) => {
   }
 };
 
+
 const getTimestamp = () => ref(new Date().toLocaleDateString());
 
 // Function to catch update from child and emit to grandparent
@@ -81,6 +99,7 @@ function handleUpdatePretext(flog, updatedPretext) {
         {{ flog.url }}
 
         <span v-if="flog.pretext?.trim() != ''">
+
           <Pretext
             :pretext="flog.pretext"
             :readOnly="flog.readOnly"
@@ -108,12 +127,53 @@ function handleUpdatePretext(flog, updatedPretext) {
         @copy-entry="handleCopyEntry"
         @delete-entry="(entry) => handleDeleteEntry(flog, entry)"
         @update-entry="(entry) => handleUpdateEntry(flog, entry)"
+
       />
+
+      <div id="spinner">
+        <!-- <PulseLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
+        <GridLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
+        <ClipLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
+        <RiseLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/> -->
+        <PacmanLoader
+          :loading="flog.status != IFlogStatus.loaded"
+          :color="color"
+          :size="size"
+        /><br />
+        <!-- <SyncLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
+        <RotateLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
+        <FadeLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
+        <PacmanLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
+        <SquareLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
+        <ScaleLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
+        <SkewLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
+        <MoonLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
+        <RingLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
+        <BounceLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
+        <DotLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/> -->
+      </div>
+      <div v-if="flog.status == IFlogStatus.loaded">
+        <EntryList
+          :entries="flog.loadedEntries"
+          :isEditing="isEditing"
+          :readOnly="flog.readOnly"
+          @edit-entry="editEntryFromFlog"
+          @copy-entry="handleCopyEntry"
+          @delete-entry="(entry) => handleDeleteEntry(flog, entry)"
+          @update-entry="(entry) => handleUpdateEntry(flog, entry)"
+        />
+      </div>
     </div>
   </section>
 </template>
 
 <style scoped lang="styl">
+#spinner {
+  text-align: left;
+  width: 100%;
+  padding: 1rem;
+}
+
 h4
   margin 10px 0 10px
   padding 0 0 10px 0
