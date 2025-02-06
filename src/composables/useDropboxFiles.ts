@@ -35,14 +35,12 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
     console.log('VITE_VERCEL_URL', import.meta.env.VITE_VERCEL_URL)
     // @ts-expect-error - Unsure why env isn't in the type definition for import.meta
     console.log('VERCEL_URL', import.meta.env.VERCEL_URL)
-    const hostname = (environment == 'production') ? 'flogger.vercel.app'
-        // @ts-expect-error - Unsure why env isn't in the type definition for import.meta
-        : import.meta.env.VITE_VERCEL_URL || import.meta.env.VERCEL_URL;
-    console.log('hostname', hostname)
 
-    const protocol = (hostname == 'localhost' ? 'http://' : 'https://');
+    const hostname = location.hostname;
 
-    const port = (hostname == 'localhost' ? ':5173' : '');
+    const protocol = location.protocol + '//';
+
+    const port = location.port ? ':' + location.port : '';
 
     var CLIENT_ID = "85vbmd9vlyyb5kp" //Flogger data
     //"irjhf3obwytvv53"; //flogger-ccc4
