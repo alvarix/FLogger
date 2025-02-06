@@ -17,8 +17,7 @@ export interface IFlog extends IFlogCore {
 
 export function serializeFlog(entriesList: IEntry[], pretext?: string): string {
     const sE = serializeEntries(entriesList)
-    console.log('x', pretext + 'chad')
-    return (pretext ? pretext : '') + sE
+    return (pretext ? pretext + '\n\n' : '') + sE
 }
 
 export function serializeEntries(entriesList: IEntry[]): string {
@@ -74,7 +73,7 @@ export function deserializeFlog(rawEntryContent: string): IFlogCore {
         pretext = splitItems.reduce((prev, item, index, arr) => {
             if (!firstEntryFound && isValidDate(item)) {
                 firstEntryFound = index;
-                return prev ? prev + '\n\n' : prev;
+                return prev;
             }
             if (firstEntryFound) {
                 return prev;

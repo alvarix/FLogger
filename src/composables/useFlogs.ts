@@ -37,6 +37,10 @@ export const useFlogs = () => {
         flog.loadedEntries.unshift(entry)
     }
 
+    const updatePretext = (pretext: string, flog: IFlog) => {
+        flog.pretext = pretext
+    }
+
     const deleteEntryFromFlog = (flog: IFlog, entry: IEntry) => {
         if (!flog || !Array.isArray(flog.loadedEntries)) {
             console.error('Flog or flog.loadedEntries is undefined or not an array');
@@ -95,6 +99,7 @@ export const useFlogs = () => {
         openFlog,
         closeFlog,
         addEntryToFlog,
+        updatePretext,
         saveFlogToSource,
         deleteEntryFromFlog,
         editEntryFromFlog,

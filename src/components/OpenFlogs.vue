@@ -27,6 +27,7 @@ const {
   openFlogs,
   closeFlog,
   addEntryToFlog,
+  updatePretext,
   deleteEntryFromFlog,
   editEntryFromFlog,
   saveFlogToSource,
@@ -78,6 +79,16 @@ const handleUpdateEntry = (flog, updatedEntry) => {
 
 
 const getTimestamp = () => ref(new Date().toLocaleDateString());
+
+// Function to catch update from child and emit to grandparent
+function handleUpdatePretext(flog, updatedPretext) {
+  if (flog && !flog.readOnly) {
+    console.log("handleUpdatePretext() called");
+    console.log("new pretext:", updatedPretext);
+    updatePretext(updatedPretext, flog);
+    saveFlogToSource(flog);
+  }
+}
 </script>
 
 <template>
@@ -88,7 +99,14 @@ const getTimestamp = () => ref(new Date().toLocaleDateString());
         {{ flog.url }}
 
         <span v-if="flog.pretext?.trim() != ''">
-          <Pretext :pretext="flog.pretext" />
+
+          <Pretext
+            :pretext="flog.pretext"
+            :readOnly="flog.readOnly"
+            @update-pretext="
+              (updatedPretext) => handleUpdatePretext(flog, updatedPretext)
+            "
+          />
         </span>
         <button class="small close-flog" @click.prevent="() => closeFlog(flog)">
           close flog
@@ -99,6 +117,17 @@ const getTimestamp = () => ref(new Date().toLocaleDateString());
         @newEntry="(entryData) => addNewEntry(entryData, flog)"
         :copiedEntry="copiedEntry"
         :timestamp="getTimestamp()"
+      />
+
+      <EntryList
+        :entries="flog.loadedEntries"
+        :isEditing="isEditing"
+        :readOnly="flog.readOnly"
+        @edit-entry="editEntryFromFlog"
+        @copy-entry="handleCopyEntry"
+        @delete-entry="(entry) => handleDeleteEntry(flog, entry)"
+        @update-entry="(entry) => handleUpdateEntry(flog, entry)"
+
       />
 
       <div id="spinner">
