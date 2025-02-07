@@ -56,7 +56,10 @@ function save(entry) {
   <div class="entry">
     <h3>{{ formattedDate }}</h3>
     <div v-if="!isEditing && !isEditingClick" @click="edit" class="entry__body">
-      <pre class="entry__pre">{{ entry.entry }}</pre>
+      <VueShowdown   
+        flavor="github"
+        :markdown="props.entry.entry" 
+      />
     </div>
 
     <!-- Display a textarea if editing -->

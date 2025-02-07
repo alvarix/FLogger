@@ -14,7 +14,9 @@
     "dropbox": "^10.34.0",
     "pinia": "^2.1.4",
     "qs": "^6.12.1",
+    "showdown": "^2.1.0",
     "vue": "^3.2.47",
+    "vue-showdown": "^4.2.0",
     "vue-spinner": "^1.0.4"
   },
   "devDependencies": {
