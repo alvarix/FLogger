@@ -56,7 +56,10 @@ function save(entry) {
   <div class="entry">
     <h3>{{ formattedDate }}</h3>
     <div v-if="!isEditing && !isEditingClick" @click="edit" class="entry__body">
-      <pre class="entry__pre">{{ entry.entry }}</pre>
+      <VueShowdown   
+        flavor="github"
+        :markdown="props.entry.entry" 
+      />
     </div>
 
     <!-- Display a textarea if editing -->
@@ -71,26 +74,34 @@ function save(entry) {
   </div>
 </template>
 
-<style scoped lang="stylus">
-h3 {
-  font-weight: 700;
-  font-size: 14px;
-  margin: 50px 0 20px 20px;
-}
+<style lang="styl">
+.entry__body 
+  ul 
+    padding-left 20px
+    list-style-type disc
+</style>
 
-.entry__body {
-  background-color: var(--misc-color);
-}
 
-.entry__pre
+<style lang="styl" scoped>
+
+h3
+  font-weight 700
+  font-size 14px
+  margin 50px 0 20px 20px 
+
+.entry__body 
+  background-color: var(--misc-color)
+
+
+.entry__pre {
   white-space: pre-wrap;
-
+}
 .entry__body,
 .entry__textarea {
   font-size: 16px;
   font-family: var(--font);
-  width 100%
-  box-sizing border-box
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .entry__body,
