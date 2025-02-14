@@ -3,7 +3,7 @@ import { ref, watch, onMounted, nextTick } from "vue";
 // as per compiler: [@vue/compiler-sfc] `defineEmits` is a compiler macro and no longer needs to be imported.
 // import { defineEmits } from "vue";
 
-const emit = defineEmits(["newFlog"]);
+const emit = defineEmits(["newFlog", "openFlog"]);
 const newFlog = ref({ filename: "" }); // Initialize newFlog as a reactive variable
 
 let typedFilename = ref("");

@@ -1,4 +1,6 @@
-export interface IEntry extends EntryData {}
+export interface IEntry extends EntryData {
+  id?: any
+}
 
 export default class EntryData {
   date: Date;

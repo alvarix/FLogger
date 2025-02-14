@@ -1,86 +1,88 @@
 <script setup>
-import { ref, watch, onMounted, nextTick  } from 'vue'
-import EntryData from '../modules/EntryData.ts';
-import { defineEmits } from 'vue';
-
+import { ref, watch, onMounted, nextTick } from "vue";
+import EntryData from "@/modules/EntryData.ts";
+import { defineEmits } from "vue";
 
 const props = defineProps({
-  copiedEntry: Object // Accept the copied entry as a prop
+  entryValue: EntryData | undefined, // Accept the copied entry as a prop
 });
 
+const emit = defineEmits(["newEntry"]);
+const newEntry = ref(""); // Initialize newEntry as a reactive variable
 
-const emit = defineEmits(['newEntry']);
-const newEntry = ref('');  // Initialize newEntry as a reactive variable
+let hasError = ref(false);
 
-// as per compiler: [@vue/compiler-sfc] `defineEmits` is a compiler macro and no longer needs to be imported.
-let hasError = ref(false);	
-
-let form = ref( 
-			new EntryData( 
-				new Date().toLocaleDateString(),
-				'',
-			),
+let form = ref(
+  new EntryData(new Date().toLocaleDateString(), props.entryValue || "")
 );
 
 const submitAdd = (event) => {
-//			 if (this.isValidDate() == true ) {
-	//console.log(form)
-	 emit('newEntry', form);
-//		 } else {
-//		 	this.hasError= true;
-
-//		 }
-
+  emit("newEntry", form);
+  form.value = new EntryData(new Date().toLocaleDateString(), props.entryValue || "");
 };
 
 // Function to automatically resize the textarea based on content
 const autoResizeTextarea = (el_id) => {
   const textarea = document.getElementById(el_id);
   if (textarea) {
-    textarea.style.height = 'auto'; // Reset height to shrink if needed
+    textarea.style.height = "auto"; // Reset height to shrink if needed
     textarea.style.height = `${textarea.scrollHeight}px`; // Set the height based on scrollHeight
   }
 };
 
 // this watch is triggered when copying an entry
-watch(() => props.copiedEntry, (newVal) => {
-  if (newVal && newVal.entry) {
-    form.value.entry = newVal.entry; // Prepopulate the textarea with the copied entry
-	const addEntryForm = document.getElementById('add-entry');
+watch(
+  () => props.entryValue,
+  (newVal) => {
+    if (!newVal || !newVal?.entry) {
+      form.value.entry = "";
+    } else if (newVal?.entry) {
+      form.value.entry = newVal.entry; // Prepopulate the textarea with the copied entry
+      const addEntryForm = document.getElementById("add-entry");
 
-	nextTick(() => autoResizeTextarea('entry')); // Adjust the textarea size after the DOM update
+      nextTick(() => autoResizeTextarea("entry")); // Adjust the textarea size after the DOM update
 
-	alert('Your entry was copied into the editor');
-
-    if (addEntryForm) {
-      addEntryForm.scrollIntoView({ behavior: 'smooth' }); // Smooth scroll to the form
-    }
+      if (addEntryForm) {
+        addEntryForm.scrollIntoView({ behavior: "smooth" }); // Smooth scroll to the form
+      }
+	}
   }
-});
+);
 </script>
 
 <template>
+  <form id="add-entry" @submit.prevent="submitAdd">
+    <div class="form-inner">
+      <div>
+        <input
+          :class="['date', { error: hasError }]"
+          id="time"
+          type="text"
+          :placeholder="form.date"
+          v-model="form.date"
+          required
+        />
 
-
-
-
-	<form  id='add-entry' @submit.prevent="submitAdd">
-		<div class="form-inner">
-			<div>
-				<input :class="['date', {error:hasError}]" id='time' type="text" :placeholder="form.date" v-model="form.date" required >
-				
-				<em class='date-validation hidden' :class={error:hasError}>Please enter valid date</em>
-			</div>
-			<div>
-				<textarea class='auto-resize' autofocus id="entry" name=""  v-model='form.entry' required></textarea>
-			</div>
-		</div>
-		<div><button class="big" type="submit">Add Entry</button></div>
-		
-	</form>
+        <em class="date-validation hidden" :class="{ error: hasError }"
+          >Please enter valid date</em
+        >
+      </div>
+      <div>
+        <textarea
+          class="auto-resize"
+          autofocus
+          id="entry"
+          name=""
+          v-model="form.entry"
+          required
+        ></textarea>
+      </div>
+    </div>
+    <div><button class="big" type="submit">Add Entry</button></div>
+  </form>
 </template>
 
-<style lang='styl' scoped>
+<style lang="styl" scoped>
 #add-entry *:not(.date-validation) {
 	display:block;
 }
@@ -89,7 +91,7 @@ input.error {
 	border:1px solid var(--red-color);
 }
 
-.form-inner .date	
+.form-inner .date
 	background none
 	margin-left 10px
 
@@ -129,5 +131,4 @@ input[type=submit] {
 #add-entry label {
 	margin-top: 20px;
 }
-
 </style>

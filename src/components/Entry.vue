@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, computed, nextTick } from "vue";
-import { IEntry } from "../modules/EntryData";
+import { ref, computed, nextTick, watch } from "vue";
+import EntryData, { IEntry } from "../modules/EntryData";
 
 const props = defineProps<{
   entry: IEntry;
-  isEditing: boolean;
+  isEditing?: boolean;
   readOnly?: boolean;
 }>();
 
@@ -23,43 +23,81 @@ function formatDate(timestamp: string | number | Date): string {
 // Computed property to format the entry date
 const formattedDate = computed(() => formatDate(props.entry.date));
 
-let isEditingClick = ref(false);
+// In order to react to props that update after initial component load,
+// we need to make local reactive refs and watch the props
+const entryText = ref<string>(props.entry.entry);
+const isEditingClick = ref<boolean | null>(props.isEditing);
+const isReadOnly = ref<boolean | null>(props.readOnly);
 const entryTextarea = ref(null);
 
-function edit(entry) {
+function edit() {
   isEditingClick.value = true;
-  // textarea isnt in dom yet, so next click needed
   nextTick(() => {
-    if (entryTextarea.value) {
-      entryTextarea.value.focus({ preventScroll: true });
-      // auto resize
-      entryTextarea.value.style.height =
-        entryTextarea.value.scrollHeight + "px";
-      // Set cursor position to the start of the text
-      entryTextarea.value.selectionStart = 0;
-      entryTextarea.value.selectionEnd = 0;
-      // scroll to
+    if (entryTextarea) {
+      // Adjust the textarea size after the DOM update
+      // entryTextarea.value.style.height = "auto"; // Reset height to shrink if needed
+      entryTextarea.value.style.height = `${entryTextarea.scrollHeight}px`; // Set the height based on scrollHeight
+      // Set cursor position to the end of the text
+      entryTextarea.value.selectionStart = entryTextarea.value.textLength;
+      entryTextarea.value.selectionEnd = entryTextarea.value.textLength;
+      // Smooth scroll to the form
       entryTextarea.value.scrollIntoView({ behavior: "smooth" });
+      // alert("wait for it");
+      entryTextarea.value.focus();
     }
   });
 }
 
+watch(
+  () => props.entry,
+  (newValue) => {
+    // console.log('watch props.entry')
+    entryText.value = newValue.entry;
+  }
+);
+
+// watch(
+//   entryText,
+//   (newValue) => {
+//     // console.log('watch entryText', newValue)
+//   }
+// );
+
+watch(
+  () => props.isEditing,
+  (newValue, oldValue) => {
+    // console.log('watch props.isEditing', props.isEditing, newValue, oldValue, isEditingClick.value)
+    if (!!newValue) edit();
+    // else if (isEditingClick.value) isEditingClick.value = false;
+  },
+  { immediate: true }
+);
+
+watch(
+  () => props.readOnly,
+  (newValue) => {
+    // console.log('watch props.readOnly')
+    isReadOnly.value = newValue;
+  }
+);
+
 // Function to emit the update when blur occurs
-function save(entry) {
-  emit("update-entry", entry);
-  emit("stop-editing", props.index);
-  isEditingClick.value = false;
+function save(thisEntry) {
+  // console.log("save triggered", thisEntry.srcElement.value, entryText.value);
+  // Pass back same entry prop with new entry text overwritten
+  emit("update-entry", { ...props.entry, entry: entryText.value });
+  // // This doesn't work right now because Entry doesn't have its own index to pass back.
+  // emit("stop-editing", props.index);
+  // // This is not necessary and triggers a re-render on focus
+  // isEditingClick.value = false;
 }
 </script>
 
 <template>
   <div class="entry">
     <h3>{{ formattedDate }}</h3>
-    <div v-if="!isEditing && !isEditingClick" @click="edit" class="entry__body">
-      <VueShowdown   
-        flavor="github"
-        :markdown="props.entry.entry" 
-      />
+    <div v-if="!isEditingClick" @click="edit" class="entry__body">
+      <VueShowdown flavor="github" :markdown="entryText" />
     </div>
 
     <!-- Display a textarea if editing -->
@@ -68,28 +106,27 @@ function save(entry) {
       class="entry__textarea auto-resize"
       v-else
       @blur="save"
-      v-model="entry.entry"
-      :readOnly="readOnly"
+      v-model="entryText"
+      :readOnly="isReadOnly"
     ></textarea>
   </div>
 </template>
 
 <style lang="styl">
-.entry__body 
-  ul 
+.entry__body
+  ul
     padding-left 20px
     list-style-type disc
 </style>
-
 
 <style lang="styl" scoped>
 
 h3
   font-weight 700
   font-size 14px
-  margin 50px 0 20px 20px 
+  margin 50px 0 20px 20px
 
-.entry__body 
+.entry__body
   background-color: var(--misc-color)
 
 
