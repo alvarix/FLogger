@@ -1,7 +1,8 @@
-<script setup>
-import { ref } from "vue";
+<script setup lang="ts">
+import { ref, unref } from "vue";
 import { useFlogs, IFlogStatus } from "@/composables/useFlogs";
-import EntryData from "@/modules/EntryData.ts";
+import EntryData, { IEntry } from "@/modules/EntryData";
+import { IFlog } from "@/modules/Flog";
 import AddEntry from "@/components/AddEntry.vue";
 import EntryList from "@/components/EntryList.vue";
 import Pretext from "@/components/Pretext.vue";
@@ -34,24 +35,26 @@ const {
 } = useFlogs();
 // const props = defineProps({});
 
-function addNewEntry(entryData, flog) {
-  const newEntry = new EntryData(
-    new Date(entryData.value.date),
-    entryData.value.entry
-  );
+const addEntryValue = ref(null); // Initialize reactive addEntryValue
+const isEditingIndex = ref(new Map()); // Keep a map of [flog, index] pairs to look up index of entry being edit PER flog
+
+function addNewEntry(entryData: IEntry, flog: IFlog) {
+  const newEntry = new EntryData(new Date(entryData.date), entryData.entry);
   addEntryToFlog(newEntry, flog);
   saveFlogToSource(flog);
+  isEditingIndex.value = new Map([[flog, 0]]); // Create a new map with one entry rather than track multiple entries being edited across flogs at the same time
+  // isEditingIndex.value.set(flog,0); // Use the above line instead of this one.
+  addEntryValue.value = undefined;
   alert("New entry added");
 }
-const copiedEntry = ref(null); // Initialize reactive copiedEntry
-let isEditing = ref(false);
 
-const handleCopyEntry = (entry) => {
-  copiedEntry.value = entry;
+const handleCopyEntry = (entry: IEntry) => {
+  addEntryValue.value = entry;
+  alert("Your entry was copied into the editor");
 };
 
 // Handle entry deletion with confirmation
-const handleDeleteEntry = (flog, entry) => {
+const handleDeleteEntry = (flog: IFlog, entry: IEntry) => {
   const confirmDelete = window.confirm(
     "Are you sure you want to delete this entry?"
   );
@@ -66,7 +69,7 @@ const handleDeleteEntry = (flog, entry) => {
 };
 
 // Function to handle the update event from the grandchild and update flog
-const handleUpdateEntry = (flog, updatedEntry) => {
+const handleUpdateEntry = (flog: IFlog, updatedEntry: IEntry) => {
   console.log("handleUpdateEntry() in grandparent called");
   console.log("Received updated entry:", updatedEntry);
 
@@ -77,11 +80,15 @@ const handleUpdateEntry = (flog, updatedEntry) => {
   }
 };
 
-
 const getTimestamp = () => ref(new Date().toLocaleDateString());
 
+const loaderProps = {
+  size: undefined,
+  color: undefined,
+};
+
 // Function to catch update from child and emit to grandparent
-function handleUpdatePretext(flog, updatedPretext) {
+function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
   if (flog && !flog.readOnly) {
     console.log("handleUpdatePretext() called");
     console.log("new pretext:", updatedPretext);
@@ -94,12 +101,11 @@ function handleUpdatePretext(flog, updatedPretext) {
 <template>
   <!-- Example description and UI -->
   <section class="container main">
-    <div v-for="flog in openFlogs" :key="flog.id">
+    <div v-for="flog in openFlogs" :key="flog.url">
       <h4 class="flog-title">
         {{ flog.url }}
 
         <span v-if="flog.pretext?.trim() != ''">
-
           <Pretext
             :pretext="flog.pretext"
             :readOnly="flog.readOnly"
@@ -114,36 +120,36 @@ function handleUpdatePretext(flog, updatedPretext) {
       </h4>
 
       <AddEntry
-        @newEntry="(entryData) => addNewEntry(entryData, flog)"
-        :copiedEntry="copiedEntry"
+        @newEntry="(entryData) => addNewEntry(unref(entryData), flog)"
+        :entryValue="addEntryValue"
         :timestamp="getTimestamp()"
       />
       <div id="spinner">
-        <!-- <PulseLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
-        <GridLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
-        <ClipLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
-        <RiseLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/> -->
+        <!-- <PulseLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <GridLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <ClipLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <RiseLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/> -->
         <PacmanLoader
           :loading="flog.status != IFlogStatus.loaded"
-          :color="color"
-          :size="size"
+          :color="loaderProps.color"
+          :size="loaderProps.size"
         /><br />
-        <!-- <SyncLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
-        <RotateLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
-        <FadeLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
-        <PacmanLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
-        <SquareLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
-        <ScaleLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
-        <SkewLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
-        <MoonLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
-        <RingLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
-        <BounceLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
-        <DotLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/> -->
+        <!-- <SyncLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <RotateLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <FadeLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <PacmanLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <SquareLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <ScaleLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <SkewLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <MoonLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <RingLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <BounceLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <DotLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/> -->
       </div>
       <div v-if="flog.status == IFlogStatus.loaded">
         <EntryList
           :entries="flog.loadedEntries"
-          :isEditing="isEditing"
+          :isEditingIndex="isEditingIndex.get(flog)"
           :readOnly="flog.readOnly"
           @edit-entry="editEntryFromFlog"
           @copy-entry="handleCopyEntry"

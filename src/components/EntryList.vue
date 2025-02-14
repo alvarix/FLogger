@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import Entry from "@/components/Entry.vue";
 import { IEntry } from "@/modules/EntryData";
 import { useFlogs } from "@/composables/useFlogs";
@@ -7,6 +7,7 @@ import { useFlogs } from "@/composables/useFlogs";
 const props = defineProps<{
   entries?: Array<IEntry>;
   readOnly?: boolean;
+  isEditingIndex?: number;
 }>();
 
 const emit = defineEmits([
@@ -16,7 +17,7 @@ const emit = defineEmits([
   "update-entry",
 ]);
 
-function changeEntry(actionName, entry) {
+function changeEntry(actionName: "copy" | "delete" | "edit" | "update", entry: IEntry) {
   emit(`${actionName}-entry`, entry);
 }
 
@@ -31,6 +32,12 @@ function updateEntry(updatedEntry: IEntry) {
 
 // Track the currently editing entry ID
 const editingEntryId = ref(null);
+watch(
+  () => props.isEditingIndex,
+  (newValue) => {
+    editingEntryId.value = newValue;
+  }
+);
 
 // Function to check if the entry is in editing mode
 const isEditingEntry = (index) => {
@@ -47,9 +54,10 @@ const setEditing = (index) => {
 
 // Handle stop-editing event from the child component
 const stopEditingEntry = (index) => {
-  if (editingEntryId.value === index) {
-    editingEntryId.value = null; // Stop editing the entry
-  }
+  // This doesn't work right now because Entry doesn't have its own index to pass back.
+  // if (editingEntryId.value === index) {
+  //   editingEntryId.value = null; // Stop editing the entry
+  // }
 };
 
 // not used
@@ -69,16 +77,30 @@ const toggleButton = () => {
   <ul class="entry-list">
     <li v-for="(entry, index) in entries" :key="index">
       <Entry
+        :key="entry.entry"
         :entry="entry"
         :readOnly="readOnly"
         :isEditing="isEditingEntry(index)"
         @stop-editing="stopEditingEntry(index)"
         @update-entry="updateEntry"
-
-        />
-      <button class='small entry__btn' @click="changeEntry('copy',entry)">Copy</button>
-      <button v-if="!readOnly" class='small entry__btn' @click="setEditing(index)">{{ editButtonText }}</button>
-      <button v-if="!readOnly" class='small entry__btn entry__btn--warn' @click="changeEntry('delete',entry)">Delete</button>
+      />
+      <button class="small entry__btn" @click="changeEntry('copy', entry)">
+        Copy
+      </button>
+      <button
+        v-if="!readOnly"
+        class="small entry__btn"
+        @click="setEditing(index)"
+      >
+        {{ editButtonText }}
+      </button>
+      <button
+        v-if="!readOnly"
+        class="small entry__btn entry__btn--warn"
+        @click="changeEntry('delete', entry)"
+      >
+        Delete
+      </button>
     </li>
   </ul>
 </template>
@@ -89,8 +111,6 @@ const toggleButton = () => {
   list-style: none;
   margin-top: 10px;
 }
-
-
 
 .entry__btn:hover {
   color: #000;
