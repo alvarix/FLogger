@@ -3,6 +3,7 @@ import type { IFlog } from "@/modules/Flog"
 import { IFlogStatus, deserializeFlog, serializeFlog } from "@/modules/Flog"
 import { useDropboxFiles } from "@/composables/useDropboxFiles"
 import { IDropboxFile } from "@/composables/useDropboxFiles";
+import { timestamp, useTimestamp } from "@vueuse/core";
 
 // Re-export these for convenience
 export type { IFlog as IFlog }
@@ -180,7 +181,8 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
                 flog.status = status
                 if (status != IFlogStatus.error) {
                     flog.pretext = pretext
-                    flog.loadedEntries = loadedEntries
+                    const timestamp = Date.now()
+                    flog.loadedEntries = loadedEntries.map((entry, index) => ({ ...entry, id: timestamp + '_' + index }))
                 }
             }
         )

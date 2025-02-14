@@ -23,7 +23,7 @@ function formatDate(timestamp: string | number | Date): string {
 // Computed property to format the entry date
 const formattedDate = computed(() => formatDate(props.entry.date));
 
-// In order to react to props that update after initial component load, 
+// In order to react to props that update after initial component load,
 // we need to make local reactive refs and watch the props
 const entryText = ref<string>(props.entry.entry);
 const isEditingClick = ref<boolean | null>(props.isEditing);
@@ -69,6 +69,7 @@ watch(
   (newValue) => {
     // console.log('watch props.isEditing')
     if (!!newValue) edit();
+    else if (isEditingClick.value) isEditingClick.value = false;
   },
   { immediate: true }
 );
@@ -83,11 +84,9 @@ watch(
 
 // Function to emit the update when blur occurs
 function save(thisEntry) {
-  console.log('save triggered', thisEntry.srcElement.value, entryText.value)
-  emit("update-entry", new EntryData(
-    props.entry.date,
-    entryText.value
-  ));
+  console.log("save triggered", thisEntry.srcElement.value, entryText.value);
+  // Pass back same entry prop with new entry text overwritten
+  emit("update-entry", { ...props.entry, entry: entryText.value });
   // // This doesn't work right now because Entry doesn't have its own index to pass back.
   // emit("stop-editing", props.index);
   // // This is not necessary and triggers a re-render on focus
