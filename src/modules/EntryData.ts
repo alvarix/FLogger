@@ -1,5 +1,5 @@
 export interface IEntry extends EntryData {
-  id: any
+  id?: any
 }
 
 export default class EntryData {

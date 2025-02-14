@@ -10,7 +10,6 @@ const props = defineProps({
 const emit = defineEmits(["newEntry"]);
 const newEntry = ref(""); // Initialize newEntry as a reactive variable
 
-// as per compiler: [@vue/compiler-sfc] `defineEmits` is a compiler macro and no longer needs to be imported.
 let hasError = ref(false);
 
 let form = ref(

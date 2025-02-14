@@ -42,7 +42,6 @@ function edit() {
       entryTextarea.value.selectionEnd = entryTextarea.value.textLength;
       // Smooth scroll to the form
       entryTextarea.value.scrollIntoView({ behavior: "smooth" });
-      console.log("scrollIntoView");
       // alert("wait for it");
       entryTextarea.value.focus();
     }
@@ -66,10 +65,10 @@ watch(
 
 watch(
   () => props.isEditing,
-  (newValue) => {
-    // console.log('watch props.isEditing')
+  (newValue, oldValue) => {
+    // console.log('watch props.isEditing', props.isEditing, newValue, oldValue, isEditingClick.value)
     if (!!newValue) edit();
-    else if (isEditingClick.value) isEditingClick.value = false;
+    // else if (isEditingClick.value) isEditingClick.value = false;
   },
   { immediate: true }
 );
@@ -84,7 +83,7 @@ watch(
 
 // Function to emit the update when blur occurs
 function save(thisEntry) {
-  console.log("save triggered", thisEntry.srcElement.value, entryText.value);
+  // console.log("save triggered", thisEntry.srcElement.value, entryText.value);
   // Pass back same entry prop with new entry text overwritten
   emit("update-entry", { ...props.entry, entry: entryText.value });
   // // This doesn't work right now because Entry doesn't have its own index to pass back.

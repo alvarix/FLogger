@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, unref } from "vue";
+import { ref, unref, computed } from "vue";
 import { useFlogs, IFlogStatus } from "@/composables/useFlogs";
 import EntryData, { IEntry } from "@/modules/EntryData";
 import { IFlog } from "@/modules/Flog";
@@ -36,16 +36,16 @@ const {
 // const props = defineProps({});
 
 const addEntryValue = ref(null); // Initialize reactive addEntryValue
-const isEditingIndex = ref(new Map()); // Keep a map of [flog, index] pairs to look up index of entry being edit PER flog
+const isEditingIndices = ref(new Map()); // Keep a map of [flog, index] pairs to look up index of entry being edit PER flog
+const isEditingIndex = (flog:IFlog) => isEditingIndices.value.get(flog);
 
 function addNewEntry(entryData: IEntry, flog: IFlog) {
   const newEntry = new EntryData(new Date(entryData.date), entryData.entry);
   addEntryToFlog(newEntry, flog);
   saveFlogToSource(flog);
-  isEditingIndex.value = new Map([[flog, 0]]); // Create a new map with one entry rather than track multiple entries being edited across flogs at the same time
-  // isEditingIndex.value.set(flog,0); // Use the above line instead of this one.
+  isEditingIndices.value.set(flog, 0);
   addEntryValue.value = undefined;
-  alert("New entry added");
+  // alert("New entry added");
 }
 
 const handleCopyEntry = (entry: IEntry) => {
@@ -75,7 +75,8 @@ const handleUpdateEntry = (flog: IFlog, updatedEntry: IEntry) => {
 
   if (flog) {
     editEntryFromFlog(flog, updatedEntry);
-    isEditingIndex.value = new Map([]); // Create a new map with one entry rather than track multiple entries being edited across flogs at the same time
+    isEditingIndices.value.delete(flog)
+    // = new Map([]); // Create a new map with one entry rather than track multiple entries being edited across flogs at the same time
   } else {
     console.error("flog is not defined or initialized");
   }
@@ -150,7 +151,7 @@ function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
       <div v-if="flog.status == IFlogStatus.loaded">
         <EntryList
           :entries="flog.loadedEntries"
-          :isEditingIndex="isEditingIndex.get(flog)"
+          :isEditingIndex="isEditingIndex(flog)"
           :readOnly="flog.readOnly"
           @edit-entry="editEntryFromFlog"
           @copy-entry="handleCopyEntry"
