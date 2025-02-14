@@ -118,18 +118,6 @@ function handleUpdatePretext(flog, updatedPretext) {
         :copiedEntry="copiedEntry"
         :timestamp="getTimestamp()"
       />
-
-      <EntryList
-        :entries="flog.loadedEntries"
-        :isEditing="isEditing"
-        :readOnly="flog.readOnly"
-        @edit-entry="editEntryFromFlog"
-        @copy-entry="handleCopyEntry"
-        @delete-entry="(entry) => handleDeleteEntry(flog, entry)"
-        @update-entry="(entry) => handleUpdateEntry(flog, entry)"
-
-      />
-
       <div id="spinner">
         <!-- <PulseLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>
         <GridLoader :loading="flog.status != IFlogStatus.loaded" :color="color" :size="size" /><br/>

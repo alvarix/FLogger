@@ -1,7 +1,6 @@
 
 <script setup>
 import { useDropboxFiles } from "@/composables/useDropboxFiles";
-import EntryList from "@/components/EntryList.vue";
 import DropBoxFlogs from "@/components/DropBoxFlogs.vue";
 import OpenFlogs from "@/components/OpenFlogs.vue";
 import { useDropboxFlogs } from "@/composables/useDropboxFlogs.ts";
@@ -52,8 +51,6 @@ const { clearConnection } = useDropboxFlogs();
       </Suspense>
     </div>
     <OpenFlogs />
-    <br />
-    <EntryList :entries="loadedEntries || []" />
   </main>
   </template>
 
