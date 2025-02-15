@@ -17,7 +17,10 @@ const emit = defineEmits([
   "update-entry",
 ]);
 
-function changeEntry(actionName: "copy" | "delete" | "edit" | "update", entry: IEntry) {
+function changeEntry(
+  actionName: "copy" | "delete" | "edit" | "update",
+  entry: IEntry
+) {
   emit(`${actionName}-entry`, entry);
 }
 
@@ -31,12 +34,13 @@ function updateEntry(updatedEntry: IEntry) {
 }
 
 // Track the currently editing entry ID
-const editingEntryId = ref(null);
+const editingEntryId = ref<number | null>(props.isEditingIndex);
 watch(
   () => props.isEditingIndex,
-  (newValue) => {
+  (newValue, oldValue) => {
     editingEntryId.value = newValue;
-  }
+  },
+  { immediate: true }
 );
 
 // Function to check if the entry is in editing mode
@@ -75,7 +79,7 @@ const toggleButton = () => {
 
 <template>
   <ul class="entry-list">
-    <li v-for="(entry, index) in entries" :key="index">
+    <li v-for="(entry, index) in entries" :key="entry.entry">
       <Entry
         :key="entry.entry"
         :entry="entry"
