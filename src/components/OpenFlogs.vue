@@ -37,7 +37,7 @@ const {
 
 const addEntryValue = ref(null); // Initialize reactive addEntryValue
 const isEditingIndices = ref(new Map()); // Keep a map of [flog, index] pairs to look up index of entry being edit PER flog
-const isEditingIndex = (flog:IFlog) => isEditingIndices.value.get(flog);
+const isEditingIndex = (flog: IFlog) => isEditingIndices.value.get(flog);
 
 function addNewEntry(entryData: IEntry, flog: IFlog) {
   const newEntry = new EntryData(new Date(entryData.date), entryData.entry);
@@ -75,7 +75,8 @@ const handleUpdateEntry = (flog: IFlog, updatedEntry: IEntry) => {
 
   if (flog) {
     editEntryFromFlog(flog, updatedEntry);
-    isEditingIndices.value.delete(flog)
+    isEditingIndices.value.delete(flog);
+    // console.log("deleting", isEditingIndices.value.delete(flog));
     // = new Map([]); // Create a new map with one entry rather than track multiple entries being edited across flogs at the same time
   } else {
     console.error("flog is not defined or initialized");

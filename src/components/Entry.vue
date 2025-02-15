@@ -65,7 +65,7 @@ watch(
 
 watch(
   () => props.isEditing,
-  (newValue, oldValue) => {
+  (newValue) => {
     // console.log('watch props.isEditing', props.isEditing, newValue, oldValue, isEditingClick.value)
     if (!!newValue) edit();
     // else if (isEditingClick.value) isEditingClick.value = false;
