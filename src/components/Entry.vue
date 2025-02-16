@@ -9,7 +9,7 @@ const props = defineProps<{
 }>();
 
 // Emits an event to the parent
-const emit = defineEmits(["update-entry", "stop-editing"]);
+const emit = defineEmits(["update-entry", "start-editing", "stop-editing"]);
 
 // Utility function to format timestamp to MM/DD/YYYY
 function formatDate(timestamp: string | number | Date): string {
@@ -26,14 +26,16 @@ const formattedDate = computed(() => formatDate(props.entry.date));
 // In order to react to props that update after initial component load,
 // we need to make local reactive refs and watch the props
 const entryText = ref<string>(props.entry.entry);
-const isEditingClick = ref<boolean | null>(props.isEditing);
 const isReadOnly = ref<boolean | null>(props.readOnly);
 const entryTextarea = ref(null);
 
-function edit() {
-  isEditingClick.value = true;
+const handleStartEditing = () => {
+  emit("start-editing", props.entry) // Or { ...props.entry, entry: entryText.value } ??
+}
+
+function setupEditing() {
   nextTick(() => {
-    if (entryTextarea) {
+    if (entryTextarea.value) {
       // Adjust the textarea size after the DOM update
       // entryTextarea.value.style.height = "auto"; // Reset height to shrink if needed
       entryTextarea.value.style.height = `${entryTextarea.scrollHeight}px`; // Set the height based on scrollHeight
@@ -48,6 +50,17 @@ function edit() {
   });
 }
 
+// Function to emit the update when blur occurs
+function handleBlur(thisEntry) {
+  // console.log("handleBlur triggered", thisEntry.srcElement.value, entryText.value);
+  // Pass back same entry prop with new entry text overwritten
+  emit("update-entry", { ...props.entry, entry: entryText.value });
+  // // This doesn't work right now because Entry doesn't have its own index to pass back.
+  // emit("stop-editing", props.index);
+  emit("stop-editing");
+  // // This is not necessary and triggers a re-render on focus
+}
+
 watch(
   () => props.entry,
   (newValue) => {
@@ -56,19 +69,10 @@ watch(
   }
 );
 
-// watch(
-//   entryText,
-//   (newValue) => {
-//     // console.log('watch entryText', newValue)
-//   }
-// );
-
 watch(
   () => props.isEditing,
   (newValue) => {
-    // console.log('watch props.isEditing', props.isEditing, newValue, oldValue, isEditingClick.value)
-    if (!!newValue) edit();
-    // else if (isEditingClick.value) isEditingClick.value = false;
+    if (!!newValue) setupEditing();
   },
   { immediate: true }
 );
@@ -81,22 +85,12 @@ watch(
   }
 );
 
-// Function to emit the update when blur occurs
-function save(thisEntry) {
-  // console.log("save triggered", thisEntry.srcElement.value, entryText.value);
-  // Pass back same entry prop with new entry text overwritten
-  emit("update-entry", { ...props.entry, entry: entryText.value });
-  // // This doesn't work right now because Entry doesn't have its own index to pass back.
-  // emit("stop-editing", props.index);
-  // // This is not necessary and triggers a re-render on focus
-  // isEditingClick.value = false;
-}
 </script>
 
 <template>
   <div class="entry">
     <h3>{{ formattedDate }}</h3>
-    <div v-if="!isEditingClick" @click="edit" class="entry__body">
+    <div v-if="!props.isEditing" @click="handleStartEditing" class="entry__body">
       <VueShowdown flavor="github" :markdown="entryText" />
     </div>
 
@@ -105,7 +99,7 @@ function save(thisEntry) {
       ref="entryTextarea"
       class="entry__textarea auto-resize"
       v-else
-      @blur="save"
+      @blur="handleBlur"
       v-model="entryText"
       :readOnly="isReadOnly"
     ></textarea>
