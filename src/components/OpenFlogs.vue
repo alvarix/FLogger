@@ -36,17 +36,29 @@ const {
 // const props = defineProps({});
 
 const addEntryValue = ref(null); // Initialize reactive addEntryValue
-const isEditingIndices = ref(new Map()); // Keep a map of [flog, index] pairs to look up index of entry being edit PER flog
-const isEditingIndex = (flog: IFlog) => isEditingIndices.value.get(flog);
+const isEditingFlogEntries = ref(new Map<IFlog, IEntry>()); // Keep a map of [flog, index] pairs to look up index of entry being edit PER flog
+const getFlogEditingEntry = (flog: IFlog): IEntry | undefined =>
+  isEditingFlogEntries.value.get(flog);
 
 function addNewEntry(entryData: IEntry, flog: IFlog) {
   const newEntry = new EntryData(new Date(entryData.date), entryData.entry);
   addEntryToFlog(newEntry, flog);
   saveFlogToSource(flog);
-  isEditingIndices.value.set(flog, 0);
+  isEditingFlogEntries.value.set(flog, newEntry);
   addEntryValue.value = undefined;
   // alert("New entry added");
 }
+
+const handleStartEditingEntry = (flog: IFlog, entry: IEntry) => {
+  // console.log('handleStartEditingEntry', entry)
+  isEditingFlogEntries.value.set(flog, entry);
+};
+
+const handleStopEditingEntry = (flog: IFlog) => {
+  // console.log('handleStopEditingEntry')
+  isEditingFlogEntries.value.set(flog, undefined);
+  isEditingFlogEntries.value.delete(flog);
+};
 
 const handleCopyEntry = (entry: IEntry) => {
   addEntryValue.value = entry;
@@ -70,13 +82,13 @@ const handleDeleteEntry = (flog: IFlog, entry: IEntry) => {
 
 // Function to handle the update event from the grandchild and update flog
 const handleUpdateEntry = (flog: IFlog, updatedEntry: IEntry) => {
-  console.log("handleUpdateEntry() in grandparent called");
-  console.log("Received updated entry:", updatedEntry);
+  // console.log("handleUpdateEntry() in grandparent called");
+  // console.log("Received updated entry:", updatedEntry);
 
   if (flog) {
     editEntryFromFlog(flog, updatedEntry);
-    isEditingIndices.value.delete(flog);
-    // console.log("deleting", isEditingIndices.value.delete(flog));
+    isEditingFlogEntries.value.delete(flog);
+    // console.log("deleting", isEditingFlogEntries.value.delete(flog));
     // = new Map([]); // Create a new map with one entry rather than track multiple entries being edited across flogs at the same time
   } else {
     console.error("flog is not defined or initialized");
@@ -93,8 +105,8 @@ const loaderProps = {
 // Function to catch update from child and emit to grandparent
 function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
   if (flog && !flog.readOnly) {
-    console.log("handleUpdatePretext() called");
-    console.log("new pretext:", updatedPretext);
+    // console.log("handleUpdatePretext() called");
+    // console.log("new pretext:", updatedPretext);
     updatePretext(updatedPretext, flog);
     saveFlogToSource(flog);
   }
@@ -152,12 +164,14 @@ function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
       <div v-if="flog.status == IFlogStatus.loaded">
         <EntryList
           :entries="flog.loadedEntries"
-          :isEditingIndex="isEditingIndex(flog)"
+          :editingEntry="getFlogEditingEntry(flog)"
           :readOnly="flog.readOnly"
           @edit-entry="editEntryFromFlog"
           @copy-entry="handleCopyEntry"
           @delete-entry="(entry) => handleDeleteEntry(flog, entry)"
           @update-entry="(entry) => handleUpdateEntry(flog, entry)"
+          @start-editing="(entry) => handleStartEditingEntry(flog, entry)"
+          @stop-editing="() => handleStopEditingEntry(flog)"
         />
       </div>
     </div>

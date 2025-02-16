@@ -2,12 +2,11 @@
 import { ref, watch } from "vue";
 import Entry from "@/components/Entry.vue";
 import { IEntry } from "@/modules/EntryData";
-import { useFlogs } from "@/composables/useFlogs";
 
 const props = defineProps<{
   entries?: Array<IEntry>;
   readOnly?: boolean;
-  isEditingIndex?: number;
+  editingEntry?: IEntry;
 }>();
 
 const emit = defineEmits([
@@ -15,53 +14,55 @@ const emit = defineEmits([
   "delete-entry",
   "edit-entry",
   "update-entry",
+  "start-editing",
+  "stop-editing",
 ]);
 
 function changeEntry(
   actionName: "copy" | "delete" | "edit" | "update",
   entry: IEntry
 ) {
+  // console.log('changeEntry', actionName)
   emit(`${actionName}-entry`, entry);
 }
 
 // Function to catch update from child and emit to grandparent
 function updateEntry(updatedEntry: IEntry) {
   if (!props.readOnly) {
-    console.log("updateEntry() called");
-    console.log("Forwarding updated entry to grandparent:", updatedEntry);
+    // console.log("updateEntry() called");
+    // console.log("Forwarding updated entry to grandparent:", updatedEntry);
     emit("update-entry", updatedEntry);
   }
 }
 
 // Track the currently editing entry ID
-const editingEntryId = ref<number | null>(props.isEditingIndex);
+// console.log("props.editingEntry", props.editingEntry);
+const editingEntry = ref<IEntry | undefined>(props.editingEntry || null);
 watch(
-  () => props.isEditingIndex,
-  (newValue, oldValue) => {
-    editingEntryId.value = newValue;
+  () => props.editingEntry,
+  (newValue) => {
+    // console.log("watch props.editingEntry", newValue);
+    editingEntry.value = newValue;
   },
   { immediate: true }
 );
 
-// Function to check if the entry is in editing mode
-const isEditingEntry = (index) => {
-  return editingEntryId.value === index;
-};
-
 const editButtonText = ref("Edit");
 
-// Function to set the editing mode for a specific entry
-const setEditing = (index) => {
-  editingEntryId.value = index;
-  //toggleButton();
+const handleStartEditingEntry = (entry) => {
+  emit("start-editing", entry);
 };
 
 // Handle stop-editing event from the child component
-const stopEditingEntry = (index) => {
-  // This doesn't work right now because Entry doesn't have its own index to pass back.
-  // if (editingEntryId.value === index) {
-  //   editingEntryId.value = null; // Stop editing the entry
-  // }
+const handleStopEditingEntry = (entry) => {
+  // console.log(
+  //   `handleStopEditingEntry(...)`,
+  //   entry,
+  //   editingEntry.value,
+  //   entry == editingEntry.value,
+  //   entry === editingEntry.value
+  // );
+  emit("stop-editing");
 };
 
 // not used
@@ -84,8 +85,9 @@ const toggleButton = () => {
         :key="entry.entry"
         :entry="entry"
         :readOnly="readOnly"
-        :isEditing="isEditingEntry(index)"
-        @stop-editing="stopEditingEntry(index)"
+        :isEditing="editingEntry == entry"
+        @start-editing="() => handleStartEditingEntry(entry)"
+        @stop-editing="() => handleStopEditingEntry(entry)"
         @update-entry="updateEntry"
       />
       <button class="small entry__btn" @click="changeEntry('copy', entry)">
@@ -94,7 +96,7 @@ const toggleButton = () => {
       <button
         v-if="!readOnly"
         class="small entry__btn"
-        @click="setEditing(index)"
+        @click="handleStartEditingEntry(entry)"
       >
         {{ editButtonText }}
       </button>
@@ -102,6 +104,7 @@ const toggleButton = () => {
         v-if="!readOnly"
         class="small entry__btn entry__btn--warn"
         @click="changeEntry('delete', entry)"
+        :disabled="editingEntry == entry"
       >
         Delete
       </button>
@@ -122,5 +125,10 @@ const toggleButton = () => {
 
 .entry__btn--warn:hover {
   color: red;
+}
+
+.entry__btn:disabled, 
+.entry__btn--warn:hover:disabled {
+  color: #888;
 }
 </style>
