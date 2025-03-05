@@ -35,7 +35,7 @@ function formatDate(timestamp, locale = "en-US", options) {
 }
 
 // Computed property to format the entry date
-const formattedDate = computed(() => formatDate(props.entry.date));
+const formattedDate =  formatDate(props.entry.date);
 
 // In order to react to props that update after initial component load,
 // we need to make local reactive refs and watch the props
