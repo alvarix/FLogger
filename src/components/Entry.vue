@@ -11,13 +11,27 @@ const props = defineProps<{
 // Emits an event to the parent
 const emit = defineEmits(["update-entry", "start-editing", "stop-editing"]);
 
-// Utility function to format timestamp to MM/DD/YYYY
-function formatDate(timestamp: string | number | Date): string {
-  const date = new Date(timestamp);
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const year = date.getFullYear();
-  return `${month}/${day}/${year}`;
+/**
+ * Formats a given timestamp to a localized date and time string.
+ *
+ * @param {string|number|Date} timestamp - The timestamp to format.
+ * @param {string} [locale="en-US"] - Optional locale string.
+ * @param {Intl.DateTimeFormatOptions} [options] - Optional formatting options.
+ * @returns {string} The localized formatted date and time string.
+ */
+function formatDate(timestamp, locale = "en-US", options) {
+  const date = new Date(timestamp)
+  const defaultOptions = {
+    month: "2-digit",
+    day: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }
+  // Return the date formatted with either the provided options or default options
+  return date.toLocaleString(locale, options || defaultOptions)
 }
 
 // Computed property to format the entry date
@@ -89,7 +103,8 @@ watch(
 
 <template>
   <div class="entry">
-    <h3>{{ formattedDate }}</h3>
+    <h3>{{ formattedDate }}  </h3>
+    <h6>{{ entry.date }}</h6>
     <div v-if="!props.isEditing" @click="handleStartEditing" class="entry__body">
       <VueShowdown flavor="github" :markdown="entryText" />
     </div>
