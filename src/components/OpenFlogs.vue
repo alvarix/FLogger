@@ -1,28 +1,12 @@
 <script setup lang="ts">
-import { ref, unref, computed } from "vue";
+import { ref, unref, onMounted } from "vue";
 import { useFlogs, IFlogStatus } from "@/composables/useFlogs";
 import EntryData, { IEntry } from "@/modules/EntryData";
 import { IFlog } from "@/modules/Flog";
 import AddEntry from "@/components/AddEntry.vue";
 import EntryList from "@/components/EntryList.vue";
 import Pretext from "@/components/Pretext.vue";
-
-// import PulseLoader from "vue-spinner/src/PulseLoader.vue";
-// import GridLoader from "vue-spinner/src/GridLoader.vue";
-// import ClipLoader from "vue-spinner/src/ClipLoader.vue";
-// import RiseLoader from "vue-spinner/src/RiseLoader.vue";
-// import BeatLoader from "vue-spinner/src/BeatLoader.vue";
-// import SyncLoader from "vue-spinner/src/SyncLoader.vue";
-// import RotateLoader from "vue-spinner/src/RotateLoader.vue";
-// import FadeLoader from "vue-spinner/src/FadeLoader.vue";
 import PacmanLoader from "vue-spinner/src/PacmanLoader.vue";
-// import SquareLoader from "vue-spinner/src/SquareLoader.vue";
-// import ScaleLoader from "vue-spinner/src/ScaleLoader.vue";
-// import SkewLoader from "vue-spinner/src/SkewLoader.vue";
-// import MoonLoader from "vue-spinner/src/MoonLoader.vue";
-// import RingLoader from "vue-spinner/src/RingLoader.vue";
-// import BounceLoader from "vue-spinner/src/BounceLoader.vue";
-// import DotLoader from "vue-spinner/src/DotLoader.vue";
 
 const {
   openFlogs,
@@ -33,100 +17,135 @@ const {
   editEntryFromFlog,
   saveFlogToSource,
 } = useFlogs();
-// const props = defineProps({});
 
-const addEntryValue = ref(null); // Initialize reactive addEntryValue
-const isEditingFlogEntries = ref(new Map<IFlog, IEntry>()); // Keep a map of [flog, index] pairs to look up index of entry being edit PER flog
+const addEntryValue = ref(null); // Reactive value for addEntry input
+const isEditingFlogEntries = ref(new Map<IFlog, IEntry>());
+// Lookup editing entry per flog
 const getFlogEditingEntry = (flog: IFlog): IEntry | undefined =>
   isEditingFlogEntries.value.get(flog);
 
+/**
+ * Adds a new entry to a flog.
+ *
+ * @param {IEntry} entryData - The entry data.
+ * @param {IFlog} flog - The flog to which the entry is added.
+ */
 function addNewEntry(entryData: IEntry, flog: IFlog) {
   const newEntry = new EntryData(new Date(entryData.date), entryData.entry);
   addEntryToFlog(newEntry, flog);
   saveFlogToSource(flog);
   isEditingFlogEntries.value.set(flog, newEntry);
   addEntryValue.value = undefined;
-  // alert("New entry added");
 }
 
+/**
+ * Handles starting the editing of an entry.
+ *
+ * @param {IFlog} flog - The flog where the entry resides.
+ * @param {IEntry} entry - The entry being edited.
+ */
 const handleStartEditingEntry = (flog: IFlog, entry: IEntry) => {
-  // console.log('handleStartEditingEntry', entry)
   isEditingFlogEntries.value.set(flog, entry);
 };
 
+/**
+ * Handles stopping the editing of an entry.
+ *
+ * @param {IFlog} flog - The flog where the entry resides.
+ */
 const handleStopEditingEntry = (flog: IFlog) => {
-  // console.log('handleStopEditingEntry')
   isEditingFlogEntries.value.set(flog, undefined);
   isEditingFlogEntries.value.delete(flog);
 };
 
+/**
+ * Copies an entry to the add entry editor.
+ *
+ * @param {IEntry} entry - The entry to copy.
+ */
 const handleCopyEntry = (entry: IEntry) => {
   addEntryValue.value = entry;
   alert("Your entry was copied into the editor");
 };
 
-// Handle entry deletion with confirmation
+/**
+ * Deletes an entry after confirmation.
+ *
+ * @param {IFlog} flog - The flog where the entry resides.
+ * @param {IEntry} entry - The entry to delete.
+ */
 const handleDeleteEntry = (flog: IFlog, entry: IEntry) => {
   const confirmDelete = window.confirm(
     "Are you sure you want to delete this entry?"
   );
-
-  // If the user confirms deletion, proceed with removing the entry
   if (confirmDelete) {
-    deleteEntryFromFlog(flog, entry); // Delete the entry
+    deleteEntryFromFlog(flog, entry);
     console.log("Entry deleted successfully");
   } else {
     console.log("Entry deletion canceled");
   }
 };
 
-// Function to handle the update event from the grandchild and update flog
+/**
+ * Handles updating an entry in a flog.
+ *
+ * @param {IFlog} flog - The flog where the entry resides.
+ * @param {IEntry} updatedEntry - The updated entry.
+ */
 const handleUpdateEntry = (flog: IFlog, updatedEntry: IEntry) => {
-  // console.log("handleUpdateEntry() in grandparent called");
-  // console.log("Received updated entry:", updatedEntry);
-
   if (flog) {
     editEntryFromFlog(flog, updatedEntry);
     isEditingFlogEntries.value.delete(flog);
-    // console.log("deleting", isEditingFlogEntries.value.delete(flog));
-    // = new Map([]); // Create a new map with one entry rather than track multiple entries being edited across flogs at the same time
   } else {
     console.error("flog is not defined or initialized");
   }
 };
 
-const getTimestamp = () => ref(new Date().toLocaleDateString());
+/**
+ * Returns the current timestamp as a localized date and time string.
+ *
+ * @returns {string} The current date and time.
+ */
+ function getTimestamp() {
+  const now = new Date()
+  // Combine the localized date and time strings
+  return `${now.toLocaleDateString()} ${now.toLocaleTimeString()}`
+}
 
 const loaderProps = {
   size: undefined,
   color: undefined,
 };
 
-// Function to catch update from child and emit to grandparent
+/**
+ * Handles updating the pretext for a flog.
+ *
+ * @param {IFlog} flog - The flog to update.
+ * @param {string} updatedPretext - The new pretext.
+ */
 function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
   if (flog && !flog.readOnly) {
-    // console.log("handleUpdatePretext() called");
-    // console.log("new pretext:", updatedPretext);
     updatePretext(updatedPretext, flog);
     saveFlogToSource(flog);
   }
 }
+
+// If you need to do any client-only setup, you can still use onMounted here.
+onMounted(() => {
+  // Any additional onMounted logic here
+});
 </script>
 
 <template>
-  <!-- Example description and UI -->
   <section class="container main">
     <div v-for="flog in openFlogs" :key="flog.url">
       <h4 class="flog-title">
         {{ flog.url }}
-
         <span v-if="flog.pretext?.trim() != ''">
           <Pretext
             :pretext="flog.pretext"
             :readOnly="flog.readOnly"
-            @update-pretext="
-              (updatedPretext) => handleUpdatePretext(flog, updatedPretext)
-            "
+            @update-pretext="(updatedPretext) => handleUpdatePretext(flog, updatedPretext)"
           />
         </span>
         <button class="small close-flog" @click.prevent="() => closeFlog(flog)">
@@ -139,28 +158,15 @@ function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
         :entryValue="addEntryValue"
         :timestamp="getTimestamp()"
       />
+      
       <div id="spinner">
-        <!-- <PulseLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <GridLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <ClipLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <RiseLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/> -->
         <PacmanLoader
           :loading="flog.status != IFlogStatus.loaded"
           :color="loaderProps.color"
           :size="loaderProps.size"
         /><br />
-        <!-- <SyncLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <RotateLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <FadeLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <PacmanLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <SquareLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <ScaleLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <SkewLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <MoonLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <RingLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <BounceLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <DotLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/> -->
       </div>
+      
       <div v-if="flog.status == IFlogStatus.loaded">
         <EntryList
           :entries="flog.loadedEntries"
