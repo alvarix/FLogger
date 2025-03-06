@@ -51,55 +51,65 @@ watch(
 </script>
 
 <template>
+  
   <form id="add-entry" @submit.prevent="submitAdd">
-    <div class="form-inner">
-      <div>
-        <input
-          :class="['date', { error: hasError }]"
-          id="time"
-          type="text"
-          :placeholder="form.date"
-          v-model="form.date"
-          required
-        />
-
-        <em class="date-validation hidden" :class="{ error: hasError }"
-          >Please enter valid date</em
-        >
-      </div>
-      <div>
-        <textarea
-          class="auto-resize"
-          autofocus
-          id="entry"
-          name=""
-          v-model="form.entry"
-          required
-        ></textarea>
-      </div>
+    <div class="flex justify-center md:justify-start">
+      <button class="big" type="submit"></button>
     </div>
-    <div><button class="big" type="submit">Add Entry</button></div>
   </form>
 </template>
 
 <style lang="styl" scoped>
-#add-entry *:not(.date-validation) {
-	display:block;
-}
 
-input.error {
-	border:1px solid var(--red-color);
-}
+
+.big
+  display: flex
+  align-items: center
+  justify-content: center
+  width: 30vw
+  height: 30vw
+  @media screen and (min-width: 600px)
+    width: 10vw
+    height: 10vw
+    
+  border-radius: 50%
+  background-color: var(--button-color);
+  color: var(--color)
+  font-size: 10vw
+  font-weight: bold
+  position: relative
+  border: none
+  cursor: pointer
+
+  &::before,
+  &::after
+    content: ""
+    position: absolute
+    background-color: currentColor
+
+  &::before
+    width: 50%
+    height: 10%
+
+  &::after
+    width: 10%
+    height: 50%
+
+input.error 
+	border 1px solid var(--red-color);
+
+
+
 
 .form-inner .date
 	background none
 	margin-left 10px
 
-.form-inner textarea{
+.form-inner textarea
     max-width: 600px;
     border-radius: 14px;
     padding: 20px;
-}
+
 
 input.date {
 	font-weight: bold;
