@@ -114,7 +114,7 @@ function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
 </script>
 
 <template>
-  <!-- Example description and UI -->
+  <h6 class="vue-file">OpenFlogs.vue</h6>
   <section class="container main">
     <div v-for="flog in openFlogs" :key="flog.url">
       <h4 class="flog-title">

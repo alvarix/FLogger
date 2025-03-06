@@ -79,6 +79,8 @@ const toggleButton = () => {
 </script>
 
 <template>
+
+  <h6 class="vue-file">EntryList.vue</h6>
   <ul class="entry-list">
     <li v-for="(entry, index) in entries" :key="entry.entry">
       <Entry

@@ -18,6 +18,7 @@ const { clearConnection } = useDropboxFlogs();
 
 <template>
   <main :class="{ 'connected' : hasConnection }">
+    <h6 class="vue-file">App.vue</h6>
     <div class="header">
 
       <div class="theme-controls">
