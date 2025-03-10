@@ -93,7 +93,7 @@ const toggleButton = () => {
         @update-entry="updateEntry"
       />
       <div v-if="editingEntry == entry" class="entry__btns"> 
-        <button  class="entry__btn" @click="">
+        <button  class="entry__btn mr-8" @click="">
           #
         </button>
 
