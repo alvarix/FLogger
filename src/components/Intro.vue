@@ -4,6 +4,7 @@ const { launchConnectFlow } = useDropboxFlogs();
 </script>
 
 <template>
+  <h6 class="vue-file">Intro.vue</h6>
   <p>
     Welcome to Flogger!<br />
     A project by

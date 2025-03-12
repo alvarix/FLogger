@@ -41,7 +41,9 @@ function save() {
 }
 </script>
 
-<template>
+<template>  
+  <h6 class="vue-file">Pretext.vue</h6>
+
   <button class="small popbutton" popovertarget="my-popover">Flog Info</button>
   <div id="my-popover" popover class="popover">
     <div class="pretext">

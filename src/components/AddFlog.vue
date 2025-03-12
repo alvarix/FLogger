@@ -64,6 +64,8 @@ const handleKeydown = (e) => {
 </script>
 
 <template>
+
+  <h6 class="vue-file">AddFlog.vue</h6>
   <div v-if="!showInput">
     <button
       @click="
