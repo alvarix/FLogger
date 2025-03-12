@@ -1,3 +1,12 @@
+<template>
+  
+  <form id="add-entry" @submit.prevent="submitAdd">
+    <div class="flex justify-center md:justify-start">
+      <button class="big" type="submit"></button>
+    </div>
+  </form>
+</template>
+
 <script setup>
 import { ref, watch, onMounted, nextTick } from "vue";
 import EntryData from "@/modules/EntryData.ts";
@@ -49,15 +58,6 @@ watch(
   }
 );
 </script>
-
-<template>
-  
-  <form id="add-entry" @submit.prevent="submitAdd">
-    <div class="flex justify-center md:justify-start">
-      <button class="big" type="submit"></button>
-    </div>
-  </form>
-</template>
 
 <style lang="styl" scoped>
 
