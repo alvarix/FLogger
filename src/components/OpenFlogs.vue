@@ -1,3 +1,53 @@
+<template>
+  <section class="container main">
+    <div v-for="flog in openFlogs" :key="flog.url">
+      <h4 class="flog-title">
+        {{ flog.url }}
+        <span v-if="flog.pretext?.trim() != ''">
+          <Pretext
+            :pretext="flog.pretext"
+            :readOnly="flog.readOnly"
+            @update-pretext="
+              (updatedPretext) => handleUpdatePretext(flog, updatedPretext)
+            "
+          />
+        </span>
+        <button class="small close-flog" @click.prevent="() => closeFlog(flog)">
+          close flog
+        </button>
+      </h4>
+
+      <AddEntry
+        @newEntry="(entryData) => addNewEntry(unref(entryData), flog)"
+        :entryValue="addEntryValue"
+        :timestamp="getTimestamp()"
+      />
+
+      <div id="spinner">
+        <PacmanLoader
+          :loading="flog.status != IFlogStatus.loaded"
+          :color="loaderProps.color"
+          :size="loaderProps.size"
+        /><br />
+      </div>
+
+      <div v-if="flog.status == IFlogStatus.loaded">
+        <EntryList
+          :entries="flog.loadedEntries"
+          :editingEntry="getFlogEditingEntry(flog)"
+          :readOnly="flog.readOnly"
+          @edit-entry="editEntryFromFlog"
+          @copy-entry="handleCopyEntry"
+          @delete-entry="(entry) => handleDeleteEntry(flog, entry)"
+          @update-entry="(entry) => handleUpdateEntry(flog, entry)"
+          @start-editing="(entry) => handleStartEditingEntry(flog, entry)"
+          @stop-editing="() => handleStopEditingEntry(flog)"
+        />
+      </div>
+    </div>
+  </section>
+</template>
+
 <script setup lang="ts">
 import { ref, unref, onMounted } from "vue";
 import { useFlogs, IFlogStatus } from "@/composables/useFlogs";
@@ -106,10 +156,10 @@ const handleUpdateEntry = (flog: IFlog, updatedEntry: IEntry) => {
  *
  * @returns {string} The current date and time.
  */
- function getTimestamp() {
-  const now = new Date()
+function getTimestamp() {
+  const now = new Date();
   // Combine the localized date and time strings
-  return `${now.toLocaleDateString()} ${now.toLocaleTimeString()}`
+  return `${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
 }
 
 const loaderProps = {
@@ -135,54 +185,6 @@ onMounted(() => {
   // Any additional onMounted logic here
 });
 </script>
-
-<template>
-  <section class="container main">
-    <div v-for="flog in openFlogs" :key="flog.url">
-      <h4 class="flog-title">
-        {{ flog.url }}
-        <span v-if="flog.pretext?.trim() != ''">
-          <Pretext
-            :pretext="flog.pretext"
-            :readOnly="flog.readOnly"
-            @update-pretext="(updatedPretext) => handleUpdatePretext(flog, updatedPretext)"
-          />
-        </span>
-        <button class="small close-flog" @click.prevent="() => closeFlog(flog)">
-          close flog
-        </button>
-      </h4>
-
-      <AddEntry
-        @newEntry="(entryData) => addNewEntry(unref(entryData), flog)"
-        :entryValue="addEntryValue"
-        :timestamp="getTimestamp()"
-      />
-      
-      <div id="spinner">
-        <PacmanLoader
-          :loading="flog.status != IFlogStatus.loaded"
-          :color="loaderProps.color"
-          :size="loaderProps.size"
-        /><br />
-      </div>
-      
-      <div v-if="flog.status == IFlogStatus.loaded">
-        <EntryList
-          :entries="flog.loadedEntries"
-          :editingEntry="getFlogEditingEntry(flog)"
-          :readOnly="flog.readOnly"
-          @edit-entry="editEntryFromFlog"
-          @copy-entry="handleCopyEntry"
-          @delete-entry="(entry) => handleDeleteEntry(flog, entry)"
-          @update-entry="(entry) => handleUpdateEntry(flog, entry)"
-          @start-editing="(entry) => handleStartEditingEntry(flog, entry)"
-          @stop-editing="() => handleStopEditingEntry(flog)"
-        />
-      </div>
-    </div>
-  </section>
-</template>
 
 <style scoped lang="styl">
 #spinner {
