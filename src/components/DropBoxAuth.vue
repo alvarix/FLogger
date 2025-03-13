@@ -1,3 +1,10 @@
+<template>
+  <!-- Example description and UI -->
+  <section class="container main">
+    <h3>Dropbox Authorization in progress...</h3>
+  </section>
+</template>
+
 <script setup>
 import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
 
@@ -7,13 +14,6 @@ import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
 useDropboxFlogs();
 
 </script>
-
-<template>
-  <!-- Example description and UI -->
-  <section class="container main">
-    <h3>Dropbox Authorization in progress...</h3>
-  </section>
-</template>
 
 <style scoped>
 

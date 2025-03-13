@@ -1,3 +1,50 @@
+<template>
+  <h6 class="vue-file">EntryList.vue</h6>
+  <ul class="entry-list">
+    <li v-for="(entry, index) in entries" :key="entry.entry">
+      <Entry
+        :key="entry.entry"
+        :entry="entry"
+        :readOnly="readOnly"
+        :isEditing="editingEntry == entry"
+        @start-editing="() => handleStartEditingEntry(entry)"
+        @stop-editing="() => handleStopEditingEntry(entry)"
+        @update-entry="updateEntry"
+      />
+      <div v-if="editingEntry == entry" class="entry__btns">
+        <button class="entry__btn mr-8" @click="">#</button>
+
+        <button class="small entry__btn" @click="changeEntry('update', entry)">
+          Save
+        </button>
+        <button class="small entry__btn" @click="changeEntry('edit', entry)">
+          Cancel
+        </button>
+      </div>
+      <div v-else class="entry__btns">
+        <button
+          v-if="!readOnly"
+          class="small entry__btn"
+          @click="handleStartEditingEntry(entry)"
+        >
+          {{ editButtonText }}
+        </button>
+        <button class="small entry__btn" @click="changeEntry('copy', entry)">
+          Copy
+        </button>
+        <button
+          v-if="!readOnly"
+          class="small entry__btn entry__btn--warn"
+          @click="changeEntry('delete', entry)"
+          :disabled="editingEntry == entry"
+        >
+          Delete
+        </button>
+      </div>
+    </li>
+  </ul>
+</template>
+
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import Entry from "@/components/Entry.vue";
@@ -78,56 +125,6 @@ const toggleButton = () => {
 };
 </script>
 
-<template>
-
-  <h6 class="vue-file">EntryList.vue</h6>
-  <ul class="entry-list">
-    <li v-for="(entry, index) in entries" :key="entry.entry">
-      <Entry
-        :key="entry.entry"
-        :entry="entry"
-        :readOnly="readOnly"
-        :isEditing="editingEntry == entry"
-        @start-editing="() => handleStartEditingEntry(entry)"
-        @stop-editing="() => handleStopEditingEntry(entry)"
-        @update-entry="updateEntry"
-      />
-      <div v-if="editingEntry == entry" class="entry__btns"> 
-        <button  class="entry__btn mr-8" @click="">
-          #
-        </button>
-
-        <button class="small entry__btn" @click="changeEntry('update', entry)">
-          Save
-        </button>
-        <button class="small entry__btn" @click="changeEntry('edit', entry)">
-          Cancel
-        </button>
-      </div>
-      <div v-else class="entry__btns">
-        <button
-          v-if="!readOnly"
-          class="small entry__btn"
-          @click="handleStartEditingEntry(entry)"
-        >
-          {{ editButtonText }}
-        </button>
-        <button class="small entry__btn" @click="changeEntry('copy', entry)">
-          Copy
-        </button>
-        <button
-          v-if="!readOnly"
-          class="small entry__btn entry__btn--warn"
-          @click="changeEntry('delete', entry)"
-          :disabled="editingEntry == entry"
-        >
-          Delete
-        </button>
-      </div>
-    </li>
-  </ul>
-</template>
-
 <style scoped>
 .entry-list > li {
   border-radius: 14px;
@@ -143,7 +140,7 @@ const toggleButton = () => {
   color: red;
 }
 
-.entry__btn:disabled, 
+.entry__btn:disabled,
 .entry__btn--warn:hover:disabled {
   color: #888;
 }

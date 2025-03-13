@@ -1,50 +1,3 @@
-<script setup>
-import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
-import { useFlogs } from "@/composables/useFlogs";
-import AddFlog from "@/components/AddFlog.vue";
-// const { accountInfo } = useDropboxFiles();
-import { ref, watch } from "vue";
-import Modal from "@/components/Modal.vue";
-import Intro from "@/components/Intro.vue";
-
-const {
-  connectionPopupWindow,
-  openDbxPopup,
-  hasConnection,
-  availableFlogs,
-  availableRepoFlogs,
-  loadFlogEntries,
-  addFlog,
-} = useDropboxFlogs();
-
-const showModal = ref(false);
-watch(connectionPopupWindow, () => {
-  showModal.value = connectionPopupWindow ? true : false;
-});
-
-const { openFlog } = useFlogs();
-// const props = defineProps({});
-
-const openPop = () => {
-  console.log("openPop", openDbxPopup);
-  openDbxPopup();
-};
-
-const selectFile = (file) => {
-  console.log("selectFile", file);
-  loadFlogEntries(file);
-  openFlog(file);
-};
-
-function handleAddFlog(flogData) {
-  console.log("Not implemented yet", flogData.value.filename);
-  addFlog({
-    url: flogData.value.filename + ".flogger.txt",
-    loadedEntries: [],
-  });
-}
-</script>
-
 <template>
   <!-- <button id="show-modal" @click="showModal = true">Show Modal</button> -->
   <Teleport to="body">
@@ -116,6 +69,53 @@ function handleAddFlog(flogData) {
     </div>
   </section>
 </template>
+
+<script setup>
+import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
+import { useFlogs } from "@/composables/useFlogs";
+import AddFlog from "@/components/AddFlog.vue";
+// const { accountInfo } = useDropboxFiles();
+import { ref, watch } from "vue";
+import Modal from "@/components/Modal.vue";
+import Intro from "@/components/Intro.vue";
+
+const {
+  connectionPopupWindow,
+  openDbxPopup,
+  hasConnection,
+  availableFlogs,
+  availableRepoFlogs,
+  loadFlogEntries,
+  addFlog,
+} = useDropboxFlogs();
+
+const showModal = ref(false);
+watch(connectionPopupWindow, () => {
+  showModal.value = connectionPopupWindow ? true : false;
+});
+
+const { openFlog } = useFlogs();
+// const props = defineProps({});
+
+const openPop = () => {
+  console.log("openPop", openDbxPopup);
+  openDbxPopup();
+};
+
+const selectFile = (file) => {
+  console.log("selectFile", file);
+  loadFlogEntries(file);
+  openFlog(file);
+};
+
+function handleAddFlog(flogData) {
+  console.log("Not implemented yet", flogData.value.filename);
+  addFlog({
+    url: flogData.value.filename + ".flogger.txt",
+    loadedEntries: [],
+  });
+}
+</script>
 
 <style scoped lang="stylus">
 #add-entry *:not(.date-validation) {

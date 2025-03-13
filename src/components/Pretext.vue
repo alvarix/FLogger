@@ -1,3 +1,30 @@
+<template>  
+  <h6 class="vue-file">Pretext.vue</h6>
+
+  <button class="small popbutton" popovertarget="my-popover">Flog Info</button>
+  <div id="my-popover" popover class="popover">
+    <div class="pretext">
+      <button class="small popbutton" popovertarget="my-popover" popovertargetactin="hide">
+        close
+      </button>
+
+      <div v-if="!isEditing" @click="edit" class="pretext__body">
+        <pre class="pretext__pre">{{ props.pretext }}</pre>
+      </div>
+
+      <!-- Display a textarea if editing -->
+      <textarea
+        v-else
+        ref="pretextTextarea"
+        class="pretext__textarea auto-resize"
+        @blur="save"
+        v-model="pretextValue"
+        :readOnly="readOnly"
+      ></textarea>
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { ref, toRef, nextTick } from "vue";
 
@@ -40,33 +67,6 @@ function save() {
   isEditing.value = false;
 }
 </script>
-
-<template>  
-  <h6 class="vue-file">Pretext.vue</h6>
-
-  <button class="small popbutton" popovertarget="my-popover">Flog Info</button>
-  <div id="my-popover" popover class="popover">
-    <div class="pretext">
-      <button class="small popbutton" popovertarget="my-popover" popovertargetactin="hide">
-        close
-      </button>
-
-      <div v-if="!isEditing" @click="edit" class="pretext__body">
-        <pre class="pretext__pre">{{ props.pretext }}</pre>
-      </div>
-
-      <!-- Display a textarea if editing -->
-      <textarea
-        v-else
-        ref="pretextTextarea"
-        class="pretext__textarea auto-resize"
-        @blur="save"
-        v-model="pretextValue"
-        :readOnly="readOnly"
-      ></textarea>
-    </div>
-  </div>
-</template>
 
 <style lang="styl" scoped>
 
