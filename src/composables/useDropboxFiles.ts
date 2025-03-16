@@ -13,6 +13,7 @@ export interface IDropboxFile {
 }
 
 export interface IDropboxFiles {
+    accountInfo: Ref<string | null>
     launchConnectFlow: () => void
     connectionPopupWindow: any
     hasConnection: Ref<boolean>
