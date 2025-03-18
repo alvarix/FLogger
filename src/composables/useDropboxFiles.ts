@@ -1,4 +1,4 @@
-import { ref, Ref, watch } from "vue"
+import { ref, Ref, watch, onBeforeUnmount } from "vue"
 import fetch from "cross-fetch";
 import { Dropbox, DropboxAuth, Timestamp as DropboxTimestamp } from "dropbox";
 // See https://dropbox.github.io/dropbox-sdk-js/Dropbox.html
@@ -13,6 +13,7 @@ export interface IDropboxFile {
 }
 
 export interface IDropboxFiles {
+    accountInfo: Ref<string | null>
     launchConnectFlow: () => void
     connectionPopupWindow: any
     hasConnection: Ref<boolean>
@@ -24,6 +25,21 @@ export interface IDropboxFiles {
     addFile: (file: IDropboxFile, callback: () => any) => void
     accountOwner: Ref<string | null>
 }
+
+// let refreshTokenInterval;
+// const refreshToken = () => {
+//     console.log("refreshToken before expiry");
+//     // dbxAuth.checkAndRefreshAccessToken();
+// }
+// const clearRefreshTokenInterval = () => {
+//     console.log("clearing refreshTokenInterval");
+//     if (refreshTokenInterval) clearInterval(refreshTokenInterval)
+// }
+// onBeforeUnmount(() => {
+//     clearRefreshTokenInterval();
+// })
+
+let hasInitialized = false;
 
 export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFiles => {
 
@@ -41,20 +57,6 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
     const protocol = location.protocol + '//';
 
     const port = location.port ? ':' + location.port : '';
-
-    var CLIENT_ID = "85vbmd9vlyyb5kp" //Flogger data
-    //"irjhf3obwytvv53"; //flogger-ccc4
-    //"lsu851xgok0qryy"; //Flogger Starscream
-    //"k2i486lvdpfjyhj"; //"q5qja4ma5qcl0qc"; //flogger-chad: q5qja4ma5qcl0qc //ORIGINAL EXAMPLE: 42zjexze6mfpf7x
-
-    const config = {
-        // @ts-expect-error - Unsure how to cast or spec ...args for use as the fetch params
-        fetch: (...args) => { return fetch(...args) },
-        // fetch: (args) => fetch(args),
-        clientId: CLIENT_ID,
-    };
-
-    const dbxAuth = new DropboxAuth(config);
 
     const dbxAuthReturnUri = `${protocol}${hostname}${port}/dbauthpopup/`;
     console.log('dbxAuthReturnUri', dbxAuthReturnUri)
@@ -75,157 +77,218 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
 
     const hasRedirectedFromAuth = ref(!!dbxAuthCode.value);
 
-    const availableFiles = ref<IDropboxFile[]>([]);
-    const availableRepoFiles = ref<IDropboxFile[]>([]);
-
-    const hasConnection = ref(false)
-
     // // Support for .flogger.config settings file. 
     // // Commenting out for now.
     // const settingsFile = ref<{}>();
 
+    var CLIENT_ID = "85vbmd9vlyyb5kp" //Flogger data
+    //"irjhf3obwytvv53"; //flogger-ccc4
+    //"lsu851xgok0qryy"; //Flogger Starscream
+    //"k2i486lvdpfjyhj"; //"q5qja4ma5qcl0qc"; //flogger-chad: q5qja4ma5qcl0qc //ORIGINAL EXAMPLE: 42zjexze6mfpf7x
 
-    if (hasRedirectedFromAuth.value) {
+    const config = {
+        // @ts-expect-error - Unsure how to cast or spec ...args for use as the fetch params
+        fetch: (...args) => { return fetch(...args) },
+        // fetch: (args) => fetch(args),
+        clientId: CLIENT_ID,
+    };
 
-        const codeVerifier = window.sessionStorage.getItem("codeVerifier");
-        dbxAuth.setCodeVerifier(codeVerifier);
+    const dbxAuth = new DropboxAuth(config);
 
-        // dbxauth-popup: Not needed because code is in URL of popup, which gets closed. Opener window is simply reloaded.
-        // const reloadUrl = removeAuthCodeFromUrl(window.location.href);
+    const hasConnection = ref(false)
+    let accessToken
+    const availableFiles = ref<IDropboxFile[]>([]);
+    const availableRepoFiles = ref<IDropboxFile[]>([]);
 
-        console.log("step 1");
-        dbxAuth
-            // 1. Get token
-            .getAccessTokenFromCode(dbxAuthReturnUri, dbxAuthCode.value)
-            // 2. Save token and reload
-            .then((response) => {
-                console.log("step 2");
-                // dbxauth-popup: Set accessToken in sessionStorage of opener instead of current window, reload opener instead of current, and close current.
-                window.opener.sessionStorage.setItem(
-                    "accessToken",
-                    // @ts-expect-error
-                    response.result.access_token
-                );
-                // window.opener.connectionPopupWindow.value = false;
-                window.opener.location.reload();
-                window.close();
-            })
-            .catch((e) => {
-                console.log("Error getting access token from URL:", e.error || e);
-                // dbxauth-popup: Reload opener instead of current, and close current.
-                // window.opener.connectionPopupWindow.value = false;
-                window.opener.reload();
-                window.close();
-            });
+
+    // We only want to execute logic for returning from Dropbox once on page load
+    // This conditional prevents it from executing every place this composable is used.
+    if (!hasInitialized) {
+
+        if (hasRedirectedFromAuth.value) {
+
+            const codeVerifier = window.sessionStorage.getItem("codeVerifier");
+            dbxAuth.setCodeVerifier(codeVerifier);
+
+            // dbxauth-popup: Not needed because code is in URL of popup, which gets closed. Opener window is simply reloaded.
+            // const reloadUrl = removeAuthCodeFromUrl(window.location.href);
+
+            console.log("step 1");
+            dbxAuth
+                // 1. Get token
+                .getAccessTokenFromCode(dbxAuthReturnUri, dbxAuthCode.value)
+                // 2. Save token and reload
+                .then((response) => {
+                    console.log("step 2");
+                    // console.log("getAccessTokenFromCode result:", response.result)
+                    // dbxauth-popup: Set accessToken in sessionStorage of opener instead of current window, reload opener instead of current, and close current.
+                    window.opener.sessionStorage.setItem(
+                        "accessToken",
+                        // @ts-expect-error
+                        response.result.access_token
+                    );
+                    // dbxauth-popup: Set expiresIn in sessionStorage of opener.
+                    window.opener.sessionStorage.setItem(
+                        "expiresIn",
+                        // @ts-expect-error
+                        response.result.expires_in
+                    );
+                    // window.opener.connectionPopupWindow.value = false;
+                    window.opener.location.reload();
+                    window.close();
+                })
+                .catch((e) => {
+                    console.log("Error getting access token from URL:", e.error || e);
+                    // dbxauth-popup: Reload opener instead of current, and close current.
+                    // window.opener.connectionPopupWindow.value = false;
+                    window.opener.reload();
+                    window.close();
+                });
+        }
+
+        // 3. Get token
+        // 3.b. Get expires in value
+        accessToken = window.sessionStorage.getItem("accessToken");
+        let expiresIn = window.sessionStorage.getItem("expiresIn") as any || -1;
+        hasConnection.value = (accessToken && accessToken != "") ? true : false
+        if (hasConnection.value) {
+            console.log("step 3a from sessionStorage");
+            dbxAuth.setAccessToken(accessToken);
+        } else {
+            console.log("step 3b check from dbxAuth");
+            window.sessionStorage.removeItem("accessToken");
+            window.sessionStorage.removeItem("codeVerifier");
+            window.sessionStorage.removeItem("expiresIn");
+            // clearRefreshTokenInterval();
+
+            accessToken = dbxAuth.getAccessToken();
+
+            const now = new Date();
+            const then = dbxAuth.getAccessTokenExpiresAt();
+            if (then) {
+                const diffInMilliseconds = now.getTime() - then.getTime();
+                expiresIn = Math.floor(diffInMilliseconds / 1000);
+            }
+        }
+        console.log("accessToken:", accessToken);
+        console.log('expiresIn', expiresIn)
+
+        // // 3.c. Set interval to refresh token
+        // // This interval needs to be cleared, but unsure where
+        // if (expiresIn && expiresIn > 0) {
+        //     refreshTokenInterval = window.setInterval(
+        //         refreshToken,
+        //         expiresIn * 0.9
+        //     )
+        //     console.log('refreshTokenInterval', refreshTokenInterval)
+        // }
+
+        hasInitialized = true
     }
 
-    // 3. Get token
-    let accessToken = window.sessionStorage.getItem("accessToken");
-    hasConnection.value = (accessToken && accessToken != "") ? true : false
-    if (hasConnection.value) {
-        console.log("step 3a from sessionStorage");
-        dbxAuth.setAccessToken(accessToken);
-    } else {
-        console.log("step 3b check from dbxAuth");
-        window.sessionStorage.removeItem("accessToken");
-        accessToken = dbxAuth.getAccessToken();
-    }
-
-    console.log("accessToken:", accessToken);
 
     var dbx = new Dropbox({
         auth: dbxAuth,
     });
 
-
     const checkAvailableFiles = () => {
         // 4. Check/refresh token
         console.log("step 4");
-        dbxAuth.checkAndRefreshAccessToken();
-        // 5. Use token to get files
-        console.log("step 5");
-        dbx
-            .filesListFolder({
-                path: "",
-                recursive: true
-            })
-            // 6. Set availableFiles to display
-            .then((response) => {
-                console.log("step 6");
+        dbxAuth.checkAndRefreshAccessToken()
+            // @ts-expect-error - Unsure why checkAndRefreshAccessToken is typed to return void but expecting a promise works.
+            .then(async () => {
+                // 5. Use token to get files
+                console.log("step 5");
+                dbx
+                    .filesListFolder({
+                        path: "",
+                        recursive: true
+                    })
+                    // 6. Set availableFiles to display
+                    .then((response) => {
+                        console.log("step 6");
 
-                // Support for repo template/default files
-                // Create a map of the paths in repoTemplateFiles to efficiently check against files in user's dropbox
-                // Use lowercase to avoid mixed case possibilities, because 
-                // Dropbox supports cased filenames but enforces case insensative uniqueness
-                const repoTemplateFilesMap = new Map<string, boolean>()
-                repoTemplateFiles.forEach(item => repoTemplateFilesMap.set('/' + item.path.toLowerCase(), true))
-
-                // Support for repo template/default files
-                // * Var to easily check if a template file exists in the filesListFolder response
-                let repoFilePathsFound = new Map<string, boolean>()
-
-                // Set availableFiles from filesListFolder response 
-                // Filtering out files that match the repoTemplateFiles
-                availableFiles.value = response.result.entries
-                    .filter((item) => (item.path_lower.endsWith(".flogger") || item.path_lower.endsWith(".flogger.txt")))
-                    .filter(item => !repoTemplateFilesMap.get(item.path_lower))
-                    .map((item) => {
-                        const newFile: IDropboxFile = {
-                            path: item.path_display,
-                            // @ts-expect-error - Unsure how to get item typed correctly
-                            rev: item.rev,
-                            tag: item[".tag"],
-                            // @ts-expect-error - Unsure how to get item typed correctly
-                            modified: item.server_modified
-                        }
-                        return newFile;
-                    });
-
-                // Support for repo template/default files
-                // Set availableRepoFiles from filesListFolder response 
-                // Filtering out files that DON'T match the repoTemplateFiles
-                // And set the keys in repoFilePathsFound
-                availableRepoFiles.value = response.result.entries
-                    .filter((item) => (item.path_lower.endsWith(".flogger") || item.path_lower.endsWith(".flogger.txt")))
-                    .filter(item => repoTemplateFilesMap.get(item.path_lower))
-                    .map((item) => {
-                        const newFile: IDropboxFile = {
-                            path: item.path_display,
-                            // @ts-expect-error - Unsure how to get item typed correctly
-                            rev: item.rev,
-                            tag: item[".tag"],
-                            // @ts-expect-error - Unsure how to get item typed correctly
-                            modified: item.server_modified,
-                            readOnly: true,
-                        }
-                        // * Var to easily check if a template file exists in the filesListFolder response
+                        // Support for repo template/default files
+                        // Create a map of the paths in repoTemplateFiles to efficiently check against files in user's dropbox
                         // Use lowercase to avoid mixed case possibilities, because 
                         // Dropbox supports cased filenames but enforces case insensative uniqueness
-                        repoFilePathsFound.set(item.path_lower, true);
-                        return newFile;
-                    });
+                        const repoTemplateFilesMap = new Map<string, boolean>()
+                        repoTemplateFiles.forEach(item => repoTemplateFilesMap.set('/' + item.path.toLowerCase(), true))
 
-                // Each repoTemplateFiles should have a key in repoFilePathsFound with value true.
-                // Otherwise need to create the file in Dropbox.
-                // console.log('repoTemplateFiles', repoTemplateFiles)
-                // console.log('repoFilePathsFound', repoFilePathsFound)
-                repoTemplateFiles.forEach(file => {
-                    const pathLower = file.path.toLowerCase();
-                    if (!repoFilePathsFound.get('/' + pathLower)) {
-                        console.log(`Initializing ${file.path}`, file)
-                        addFile({
-                            path: file.path,
-                            content: file.content
-                        }, (response) => {
-                            console.log(`Done initializing ${file.path}`, response)
+                        // Support for repo template/default files
+                        // * Var to easily check if a template file exists in the filesListFolder response
+                        let repoFilePathsFound = new Map<string, boolean>()
+
+                        // Set availableFiles from filesListFolder response 
+                        // Filtering out files that match the repoTemplateFiles
+                        availableFiles.value = response.result.entries
+                            .filter((item) => (item.path_lower.endsWith(".flogger") || item.path_lower.endsWith(".flogger.txt")))
+                            .filter(item => !repoTemplateFilesMap.get(item.path_lower))
+                            .map((item) => {
+                                const newFile: IDropboxFile = {
+                                    path: item.path_display,
+                                    // @ts-expect-error - Unsure how to get item typed correctly
+                                    rev: item.rev,
+                                    tag: item[".tag"],
+                                    // @ts-expect-error - Unsure how to get item typed correctly
+                                    modified: item.server_modified
+                                }
+                                return newFile;
+                            });
+
+                        // Support for repo template/default files
+                        // Set availableRepoFiles from filesListFolder response 
+                        // Filtering out files that DON'T match the repoTemplateFiles
+                        // And set the keys in repoFilePathsFound
+                        availableRepoFiles.value = response.result.entries
+                            .filter((item) => (item.path_lower.endsWith(".flogger") || item.path_lower.endsWith(".flogger.txt")))
+                            .filter(item => repoTemplateFilesMap.get(item.path_lower))
+                            .map((item) => {
+                                const newFile: IDropboxFile = {
+                                    path: item.path_display,
+                                    // @ts-expect-error - Unsure how to get item typed correctly
+                                    rev: item.rev,
+                                    tag: item[".tag"],
+                                    // @ts-expect-error - Unsure how to get item typed correctly
+                                    modified: item.server_modified,
+                                    readOnly: true,
+                                }
+                                // * Var to easily check if a template file exists in the filesListFolder response
+                                // Use lowercase to avoid mixed case possibilities, because 
+                                // Dropbox supports cased filenames but enforces case insensative uniqueness
+                                repoFilePathsFound.set(item.path_lower, true);
+                                return newFile;
+                            });
+
+                        // Each repoTemplateFiles should have a key in repoFilePathsFound with value true.
+                        // Otherwise need to create the file in Dropbox.
+                        // console.log('repoTemplateFiles', repoTemplateFiles)
+                        // console.log('repoFilePathsFound', repoFilePathsFound)
+                        repoTemplateFiles.forEach(file => {
+                            const pathLower = file.path.toLowerCase();
+                            if (!repoFilePathsFound.get('/' + pathLower)) {
+                                console.log(`Initializing ${file.path}`, file)
+                                addFile({
+                                    path: file.path,
+                                    content: file.content
+                                }, (response) => {
+                                    console.log(`Done initializing ${file.path}`, response)
+                                })
+                            }
                         })
-                    }
-                })
+                    })
+                    .catch((e) => {
+                        console.log("Error listing dropbox folders:", e?.message || e);
+                        clearConnection();
+                    });
             })
-            .catch((e) => {
-                console.log("Error listing dropbox folders:", e?.message || e);
+            .catch((error) => {
+                console.log(
+                    `Error refreshing access`,
+                    error?.message || error
+                );
                 clearConnection();
-            });
+            })
 
     }
 
@@ -278,7 +341,9 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
         console.log("clearConnection");
         connectionPopupWindow.value = undefined;
         window.sessionStorage.removeItem("accessToken");
+        window.sessionStorage.removeItem("expiresIn");
         window.sessionStorage.removeItem("codeVerifier");
+        // clearRefreshTokenInterval();
         dbxAuthCode.value = undefined;
         accessToken = undefined;
         hasConnection.value = false
@@ -289,54 +354,76 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
     const loadFileContent = async (file: IDropboxFile, callback: (result: { rev: string, content: string }) => any) => {
         // console.log('loadFileContent file', file)
 
-        dbxAuth.checkAndRefreshAccessToken();
-        await dbx
-            .filesDownload({ path: file.path })
-            .then((response) => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const fileData = e.target.result;
-                    callback(
-                        {
-                            rev: response.result.rev,
-                            content: fileData as string
-                        }
-                    )
-                };
-                //@ts-expect-error - dbx doesn't have typing for fileBlob for some reason
-                reader.readAsText(response.result.fileBlob);
+        // dbxAuth.checkAndRefreshAccessToken();
+        dbxAuth.checkAndRefreshAccessToken()
+            // @ts-expect-error - Unsure why checkAndRefreshAccessToken is typed to return void but expecting a promise works.
+            .then(async () => {
+                await dbx
+                    .filesDownload({ path: file.path })
+                    .then((response) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const fileData = e.target.result;
+                            callback(
+                                {
+                                    rev: response.result.rev,
+                                    content: fileData as string
+                                }
+                            )
+                        };
+                        //@ts-expect-error - dbx doesn't have typing for fileBlob for some reason
+                        reader.readAsText(response.result.fileBlob);
+                    })
+                    .catch((error) => {
+                        console.log(
+                            `Error downloading file ${file.path} :`,
+                            error?.message || error
+                        );
+                        clearConnection();
+                    });
             })
             .catch((error) => {
                 console.log(
-                    `Error downloading file ${file.path} :`,
+                    `Error refreshing access`,
                     error?.message || error
                 );
                 clearConnection();
-            });
+            })
     }
 
     const saveFileContent = async (file: IDropboxFile, callback: (result: any) => any) => {
         // console.log('saveFileContent file', file)
 
-        dbxAuth.checkAndRefreshAccessToken();
-        await dbx
-            .filesUpload(
-                {
-                    path: file.path,
-                    contents: file.content,
-                    mode: { ".tag": "update", "update": file.rev }
-                }
-            )
-            .then((response) => {
-                callback(response.result)
+        dbxAuth.checkAndRefreshAccessToken()
+            // @ts-expect-error - Unsure why checkAndRefreshAccessToken is typed to return void but expecting a promise works.
+            .then(async () => {
+                await dbx
+                    .filesUpload(
+                        {
+                            path: file.path,
+                            contents: file.content,
+                            mode: { ".tag": "update", "update": file.rev }
+                        }
+                    )
+                    .then((response) => {
+                        callback(response.result)
+                    })
+                    .catch((error) => {
+                        console.log(
+                            `Error saving file ${file.path} :`,
+                            error.error.error_summary
+                        );
+                        alert(`Error saving file ${file.path}:\n\n${error.error.error_summary}`)
+                        // clearConnection();
+                    });
             })
             .catch((error) => {
                 console.log(
-                    `Error uploading file ${file.path} :`,
-                    error.error.error_summary
+                    `Error refreshing access`,
+                    error?.message || error
                 );
-                // clearConnection();
-            });
+                clearConnection();
+            })
     }
 
     const addFile = async (file: IDropboxFile, callback: (result?: any) => any) => {
@@ -346,29 +433,40 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
         //     availableFiles.value = availableFiles.value.concat([file])
         // }
 
-        dbxAuth.checkAndRefreshAccessToken();
-        await dbx
-            .filesUpload(
-                {
-                    // Must add the slash in front of paths. This is relative to the root of the app folder in Dropbox
-                    path: "/" + file.path,
-                    contents: file.content,
-                    mode: { ".tag": "add" }
-                }
-            )
-            .then((response) => {
-                console.log(response)
-                // addToAvailable(file)
-                checkAvailableFiles()
-                callback(response.result)
+        dbxAuth.checkAndRefreshAccessToken()
+            // @ts-expect-error - Unsure why checkAndRefreshAccessToken is typed to return void but expecting a promise works.
+            .then(async () => {
+                await dbx
+                    .filesUpload(
+                        {
+                            // Must add the slash in front of paths. This is relative to the root of the app folder in Dropbox
+                            path: "/" + file.path,
+                            contents: file.content,
+                            mode: { ".tag": "add" }
+                        }
+                    )
+                    .then((response) => {
+                        console.log(response)
+                        // addToAvailable(file)
+                        checkAvailableFiles()
+                        callback(response.result)
+                    })
+                    .catch((error) => {
+                        console.log(
+                            `Error adding file ${file.path} :`,
+                            error.error.error_summary
+                        );
+                        alert(`Error adding file ${file.path}:\n\n${error.error.error_summary}`)
+                        // clearConnection();
+                    });
             })
             .catch((error) => {
                 console.log(
-                    `Error uploading file ${file.path} :`,
-                    error.error.error_summary
+                    `Error refreshing access`,
+                    error?.message || error
                 );
-                // clearConnection();
-            });
+                clearConnection();
+            })
     }
 
     const accountOwner = ref<string | null>(null);
@@ -384,6 +482,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                 accountOwner.value = response.result.email;
             }).catch(error => {
                 console.log("Error fetching account info:", error);
+                clearConnection();
             });
         });
     };
