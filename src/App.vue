@@ -11,7 +11,7 @@
             id="authed-section"
             :style="{ display: hasConnection ? 'block' : 'none' }"
           >
-            <button class="dbx__btn small" @click="clearConnection">
+            <button class="dbx__btn small" @click="disconnect">
               <img
                 alt="Dropbox account"
                 src="/Dropbox_Icon.svg"
@@ -74,6 +74,12 @@ onMounted(() => {
     });
   }
 });
+
+const disconnect = () => {
+  clearConnection();
+  dialog.value.close();
+}
+
 </script>
 
 <style scoped lang="stylus">

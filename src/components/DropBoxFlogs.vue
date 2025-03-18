@@ -8,8 +8,8 @@
       </template>
       <template #body>
         <p>
-          Complete the Dropbox authorization <a @click="connectionPopupWindow?.focus()">in the
-          pop-up window</a>.
+          Complete the Dropbox authorization
+          <a @click="connectionPopupWindow?.focus()">in the pop-up window</a>.
         </p>
         <p>
           If the window doesn't pop-up, <a @click="openPop()">click here</a>.
@@ -34,7 +34,6 @@
       :style="{ display: hasConnection ? 'none' : 'block' }"
     >
       <Intro />
-  
     </div>
 
     <div
@@ -89,13 +88,16 @@ const {
   addFlog,
 } = useDropboxFlogs();
 
+const { openFlog } = useFlogs();
+// const props = defineProps({});
+
+const defaultFlogAlreadyOpened = ref(!!window.sessionStorage.getItem("defaultFlogAlreadyOpened"));
+const defaultFlogFilepath = "/default.flogger.txt";
+
 const showModal = ref(false);
 watch(connectionPopupWindow, () => {
   showModal.value = connectionPopupWindow ? true : false;
 });
-
-const { openFlog } = useFlogs();
-// const props = defineProps({});
 
 const openPop = () => {
   console.log("openPop", openDbxPopup);
@@ -107,6 +109,23 @@ const selectFile = (file) => {
   loadFlogEntries(file);
   openFlog(file);
 };
+
+watch(
+  [hasConnection, availableFlogs],
+  () => {
+    if (hasConnection.value && !defaultFlogAlreadyOpened.value) {
+      const defaultFlogFile = availableFlogs.value.filter(
+        (file) => file.url == defaultFlogFilepath
+      )[0];
+      if (defaultFlogFile) {
+        defaultFlogAlreadyOpened.value = true;
+        window.sessionStorage.setItem("defaultFlogAlreadyOpened", defaultFlogAlreadyOpened.value);
+        selectFile(defaultFlogFile);
+      }
+    }
+  },
+  { immediate: true }
+);
 
 function handleAddFlog(flogData) {
   console.log("Not implemented yet", flogData.value.filename);

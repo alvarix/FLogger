@@ -41,6 +41,9 @@ export interface IDropboxFiles {
 
 let hasInitialized = false;
 
+const defaultFlogFilename = 'default.flogger.txt'
+const defaultFlogContents = 'This is your default flog, where quick entries can be made without needing to find and open a flog first.'
+
 export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFiles => {
 
     // @ts-expect-error - Unsure why env isn't in the type definition for import.meta
@@ -219,12 +222,17 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                         // * Var to easily check if a template file exists in the filesListFolder response
                         let repoFilePathsFound = new Map<string, boolean>()
 
+                        // Support for default flog
+                        let foundDefaultFlog = false;
+
                         // Set availableFiles from filesListFolder response 
                         // Filtering out files that match the repoTemplateFiles
                         availableFiles.value = response.result.entries
                             .filter((item) => (item.path_lower.endsWith(".flogger") || item.path_lower.endsWith(".flogger.txt")))
                             .filter(item => !repoTemplateFilesMap.get(item.path_lower))
                             .map((item) => {
+                                // Support for default flog
+                                if (item.path_display == "/" + defaultFlogFilename) foundDefaultFlog = true;
                                 const newFile: IDropboxFile = {
                                     path: item.path_display,
                                     // @ts-expect-error - Unsure how to get item typed correctly
@@ -235,6 +243,17 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                                 }
                                 return newFile;
                             });
+
+                        // Support for default flog
+                        if (!foundDefaultFlog) {
+                            console.log(`Creating default flog ${defaultFlogFilename}`)
+                            addFile({
+                                path: defaultFlogFilename,
+                                content: defaultFlogContents
+                            }, (response) => {
+                                console.log(`Done initializing ${defaultFlogFilename}`, response)
+                            })
+                        }
 
                         // Support for repo template/default files
                         // Set availableRepoFiles from filesListFolder response 
@@ -343,6 +362,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
         window.sessionStorage.removeItem("accessToken");
         window.sessionStorage.removeItem("expiresIn");
         window.sessionStorage.removeItem("codeVerifier");
+        window.sessionStorage.removeItem("defaultFlogAlreadyOpened")
         // clearRefreshTokenInterval();
         dbxAuthCode.value = undefined;
         accessToken = undefined;
@@ -376,10 +396,10 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                     })
                     .catch((error) => {
                         console.log(
-                            `Error downloading file ${file.path} :`,
+                            `Error downloading file ${file.path} :`, file, 
                             error?.message || error
                         );
-                        clearConnection();
+                        // clearConnection();
                     });
             })
             .catch((error) => {
