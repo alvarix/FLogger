@@ -362,6 +362,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
         window.sessionStorage.removeItem("accessToken");
         window.sessionStorage.removeItem("expiresIn");
         window.sessionStorage.removeItem("codeVerifier");
+        window.sessionStorage.removeItem("defaultFlogAlreadyOpened")
         // clearRefreshTokenInterval();
         dbxAuthCode.value = undefined;
         accessToken = undefined;
