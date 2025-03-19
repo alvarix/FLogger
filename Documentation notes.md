@@ -12,7 +12,7 @@
 ---
 
 # Documentation ideas
-1. List major functions, then minor functions
+1. List major functions, then minor functions (Arcanca, Assign player roles)
 2. 
 # Refactor ideas
 1. Rename files for their centrality in the app (or include components therein)

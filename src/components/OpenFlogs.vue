@@ -1,3 +1,45 @@
+<script>
+/**
+ * @description Display of Flog with edit controls
+ * @props none
+ * @emits {handleUpdatePretext} - Gathers updated pretext from child and emits to parent.
+ * @slots none 
+ * @computed none
+ * @methods
+ *  - handleUpdatePretext - Updates the pretext of a flog.
+ *  - addNewEntry - Adds a new entry to a flog.
+ *  - handleStartEditingEntry - Starts editing an entry in a flog.
+ *  - handleStopEditingEntry - Stops editing an entry in a flog.
+ *  - handleCopyEntry - Copies an entry to the editor.
+ *  - handleDeleteEntry - Deletes an entry from a flog.
+ *  - handleUpdateEntry - Updates an entry in a flog.
+ *  - getTimestamp - Returns the current timestamp.
+ *  - closeFlog - Closes a flog (imported from useFlogs.ts).
+ * @watch none
+ * @dependencies
+ *   PacmanLoader - loader
+ * @example
+ *   <OpenFlogs />
+ * @relationships
+ *   @parent 
+ *    App.vue - if authenticated and not in list view, displays default flog
+ *   @children
+ *    - AddEntry - Adds new entries to the flog.
+ *    - EntryList - Displays the list of entries in the flog.
+ *    - Pretext - Displays and updates the pretext of the flog.
+ *   @siblings none
+ * @imports
+ *   @components
+ *     - AddEntry from '@/components/AddEntry.vue' - Adds new entries to the flog.
+ *     - EntryList from '@/components/EntryList.vue' - Displays the list of entries in the flog.
+ *     - Pretext from '@/components/Pretext.vue' - Displays and updates the pretext of the flog.
+ *   @composables
+ *     - useFlogs from '@/composables/useFlogs' - Provides flog-related functionalities.
+ *   @modules
+ *     - EntryData from '@/modules/EntryData' - Represents entry data.
+ *     - Flog from '@/modules/Flog' - Represents a flog.
+ */
+</script>
 <template>
   <h6 class="vue-file">OpenFlogs.vue</h6>
   <section class="container main">
