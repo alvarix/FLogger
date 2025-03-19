@@ -1,4 +1,3 @@
-
 # Notes
 - DropBoxFlogs.vue 
   - The main UI window (used to be)
@@ -8,7 +7,6 @@
   - is the workhorse 
   - and the interface btwn UI and DBX?
 
-
 ---
 
 # Documentation ideas
@@ -17,18 +15,23 @@
 # Refactor ideas
 1. Rename files for their centrality in the app (or include components therein)
    1. eg: Home (import )
+2. Break up monolith files
+   1. useFlogs
+      1. display
+      2. edit 
+      3. delete 
+      4. ...
+   2. 
 
-
-1. Remove any mention of Dropbox past the data interface
-2. OpenFlogs = OpenFlog etc down the chain
-3. 
+3. Remove any mention of Dropbox past the data interface
+4. OpenFlogs = OpenFlog etc down the chain
+5. 
 ---
-
-
 
 # App Actions
 
 1. Entry
+   1. View *
    1. Add *
    2. Edit  
    3. Delete 
@@ -73,8 +76,6 @@
             1. modules/EntryData
          2. modules/EntryData
       6. Pretext
-
-
 
 # Component documentation sample
 

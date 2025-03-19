@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 /**
  * @description Display of Flog with edit controls
  * @props none
