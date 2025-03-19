@@ -1,4 +1,31 @@
 
+# Notes
+- DropBoxFlogs.vue 
+  - The main UI window (used to be)
+    - auth
+    - Flogs list
+- useFLogs.ts 
+  - is the workhorse 
+  - and the interface btwn UI and DBX?
+
+
+---
+
+# Documentation ideas
+1. List major functions, then minor functions
+2. 
+# Refactor ideas
+1. Rename files for their centrality in the app (or include components therein)
+   1. eg: Home (import )
+
+
+1. Remove any mention of Dropbox past the data interface
+2. OpenFlogs = OpenFlog etc down the chain
+3. 
+---
+
+
+
 # App Actions
 
 1. Entry
@@ -20,7 +47,7 @@
 2. Flogs
 3. DBX
 
-# Component Embeds
+# Embeds
 1. App.vue
    1. ThemeSwitcher
    2. DropBoxFlogs
@@ -32,30 +59,36 @@
          2. modules/Flog
          3. useDropboxFiles
       3. AddFlog
-         1. 
       4. Intro
+         1. useDropboxFlogs
       5. Modal
    3. OpenFlogs
+      1. useFlogs
+      2. modules/EntryData
+      3. modules/Flog
+      4. AddEntry
+         1. modules/EntryData
+      5. EntryList
+         1. Entry
+            1. modules/EntryData
+         2. modules/EntryData
+      6. Pretext
 
----
 
----
 
 # Component documentation sample
 
 ```
 
 /**
- * @component ComponentName
  * @description A concise description of what this component does and its purpose in the application.
  * 
  * @props {Type} propName - Description of the prop and what it's used for.
  * @props {String} title - The title displayed in the component header.
- * @props {Boolean} isActive - Determines if the component is in active state.
  * 
  * @emits {EventName} - Description of when this event is emitted and what data it contains.
  * @emits {update:selectedItem} - Emitted when a new item is selected, contains the item object.
- * 
+ *  
  * @slots
  *   default - Description of the default slot.
  *   header - Content for the component header area.
@@ -86,54 +119,17 @@
  *     Main content goes here
  *   </component-name>
  *
- * @author Your Name
- * @lastModified 2025-03-16
- */
-```
-# Relationships documentation sample
-```
-/**
- * @component ComponentName
- * @description A concise description of what this component does and its purpose in the application.
- * 
+ *
  * @relationships
  *   @parent ParentComponentName - Describes how this component is used within the parent component.
  *   @children
  *     - ChildComponentName - Explains the purpose of this child component.
- *     - AnotherChildComponent - Describes when and why this component is used.
  *   @siblings
  *     - SiblingComponent - Explains how this component interacts with sibling components.
- * 
  * @imports
  *   @components
  *     - ImportedComponent from '@/components/path/ImportedComponent.vue' - Describes its role.
- *     - AnotherComponent from '@/components/path/AnotherComponent.vue' - Explains when it's used.
- *   @services
- *     - userService from '@/services/userService.js' - Explains what services this component uses.
- *   @stores
- *     - userStore from '@/store/modules/user.js' - Describes store interactions.
- *   @mixins
- *     - formMixin from '@/mixins/formMixin.js' - Explains what functionality this mixin provides.
- *   @directives
- *     - v-tooltip from '@/directives/tooltip.js' - Describes custom directives used.
- * 
- * @routeContext
- *   - Used in route '/dashboard' - Explains the routing context where this component appears.
- *   - Accessed via Named Route 'user-profile' - Specifies named routes that lead to this component.
- * 
- * @layouts
- *   - DefaultLayout - Specifies which layout this component typically appears in.
- * 
- * @api
- *   - '/api/users' (GET) - Lists API endpoints this component interacts with.
- *   - '/api/settings' (PUT) - Describes the purpose of this API interaction.
- * 
- * @fileStructure
- *   - Located in '@/components/users/' - Helps understand the file organization.
- *   - Related files: 'UserModel.js', 'userHelpers.js' - Lists related utility files.
- * 
- * ... (rest of the documentation)
+ *   @composables
+ *   @modules
  */
-
-
 ```
