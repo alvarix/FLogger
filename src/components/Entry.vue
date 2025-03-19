@@ -1,3 +1,22 @@
+<template>
+  <div class="entry">
+    <h3>{{ formattedDate }}</h3>
+    <div v-if="!props.isEditing" @click="handleStartEditing" class="entry__body">
+      <VueShowdown flavor="github" :markdown="entryText" />
+    </div>
+
+    <!-- Display a textarea if editing -->
+    <textarea
+      ref="entryTextarea"
+      class="entry__textarea auto-resize"
+      v-else
+      @blur="handleBlur"
+      v-model="entryText"
+      :readOnly="isReadOnly"
+    ></textarea>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { ref, computed, nextTick, watch } from "vue";
 import EntryData, { IEntry } from "../modules/EntryData";
@@ -86,25 +105,6 @@ watch(
 );
 
 </script>
-
-<template>
-  <div class="entry">
-    <h3>{{ formattedDate }}</h3>
-    <div v-if="!props.isEditing" @click="handleStartEditing" class="entry__body">
-      <VueShowdown flavor="github" :markdown="entryText" />
-    </div>
-
-    <!-- Display a textarea if editing -->
-    <textarea
-      ref="entryTextarea"
-      class="entry__textarea auto-resize"
-      v-else
-      @blur="handleBlur"
-      v-model="entryText"
-      :readOnly="isReadOnly"
-    ></textarea>
-  </div>
-</template>
 
 <style lang="styl">
 .entry__body

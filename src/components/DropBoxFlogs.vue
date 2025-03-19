@@ -1,50 +1,3 @@
-<script setup>
-import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
-import { useFlogs } from "@/composables/useFlogs";
-import AddFlog from "@/components/AddFlog.vue";
-// const { accountInfo } = useDropboxFiles();
-import { ref, watch } from "vue";
-import Modal from "@/components/Modal.vue";
-import Intro from "@/components/Intro.vue";
-
-const {
-  connectionPopupWindow,
-  openDbxPopup,
-  hasConnection,
-  availableFlogs,
-  availableRepoFlogs,
-  loadFlogEntries,
-  addFlog,
-} = useDropboxFlogs();
-
-const showModal = ref(false);
-watch(connectionPopupWindow, () => {
-  showModal.value = connectionPopupWindow ? true : false;
-});
-
-const { openFlog } = useFlogs();
-// const props = defineProps({});
-
-const openPop = () => {
-  console.log("openPop", openDbxPopup);
-  openDbxPopup();
-};
-
-const selectFile = (file) => {
-  console.log("selectFile", file);
-  loadFlogEntries(file);
-  openFlog(file);
-};
-
-function handleAddFlog(flogData) {
-  console.log("Not implemented yet", flogData.value.filename);
-  addFlog({
-    url: flogData.value.filename + ".flogger.txt",
-    loadedEntries: [],
-  });
-}
-</script>
-
 <template>
   <!-- <button id="show-modal" @click="showModal = true">Show Modal</button> -->
   <Teleport to="body">
@@ -55,8 +8,8 @@ function handleAddFlog(flogData) {
       </template>
       <template #body>
         <p>
-          Complete the Dropbox authorization <a @click="connectionPopupWindow?.focus()">in the
-          pop-up window</a>.
+          Complete the Dropbox authorization
+          <a @click="connectionPopupWindow?.focus()">in the pop-up window</a>.
         </p>
         <p>
           If the window doesn't pop-up, <a @click="openPop()">click here</a>.
@@ -81,7 +34,6 @@ function handleAddFlog(flogData) {
       :style="{ display: hasConnection ? 'none' : 'block' }"
     >
       <Intro />
-  
     </div>
 
     <div
@@ -116,6 +68,73 @@ function handleAddFlog(flogData) {
     </div>
   </section>
 </template>
+
+<script setup>
+import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
+import { useFlogs } from "@/composables/useFlogs";
+import AddFlog from "@/components/AddFlog.vue";
+// const { accountInfo } = useDropboxFiles();
+import { ref, watch } from "vue";
+import Modal from "@/components/Modal.vue";
+import Intro from "@/components/Intro.vue";
+
+const {
+  connectionPopupWindow,
+  openDbxPopup,
+  hasConnection,
+  availableFlogs,
+  availableRepoFlogs,
+  loadFlogEntries,
+  addFlog,
+} = useDropboxFlogs();
+
+const { openFlog } = useFlogs();
+// const props = defineProps({});
+
+const defaultFlogAlreadyOpened = ref(!!window.sessionStorage.getItem("defaultFlogAlreadyOpened"));
+const defaultFlogFilepath = "/default.flogger.txt";
+
+const showModal = ref(false);
+watch(connectionPopupWindow, () => {
+  showModal.value = connectionPopupWindow ? true : false;
+});
+
+const openPop = () => {
+  console.log("openPop", openDbxPopup);
+  openDbxPopup();
+};
+
+const selectFile = (file) => {
+  console.log("selectFile", file);
+  loadFlogEntries(file);
+  openFlog(file);
+};
+
+watch(
+  [hasConnection, availableFlogs],
+  () => {
+    if (hasConnection.value && !defaultFlogAlreadyOpened.value) {
+      const defaultFlogFile = availableFlogs.value.filter(
+        (file) => file.url == defaultFlogFilepath
+      )[0];
+      if (defaultFlogFile) {
+        defaultFlogAlreadyOpened.value = true;
+        window.sessionStorage.setItem("defaultFlogAlreadyOpened", defaultFlogAlreadyOpened.value);
+        selectFile(defaultFlogFile);
+      }
+    }
+  },
+  { immediate: true }
+);
+
+function handleAddFlog(flogData) {
+  console.log("Not implemented yet", flogData.value.filename);
+  addFlog({
+    url: flogData.value.filename + ".flogger.txt",
+    loadedEntries: [],
+  });
+}
+</script>
 
 <style scoped lang="stylus">
 #add-entry *:not(.date-validation) {

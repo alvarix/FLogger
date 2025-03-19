@@ -1,3 +1,48 @@
+<template>
+
+  <h6 class="vue-file">AddFlog.vue</h6>
+  <div v-if="!showInput">
+    <button
+      @click="
+        () => {
+          showInput = true;
+        }
+      "
+    >
+      add new flog
+    </button>
+  </div>
+  <form v-else id="add-flog" @submit.prevent="submitAdd" @mouseleave="hideDropdown" @keydown="handleKeydown">
+      <div class="filename-controls">
+        <input
+          autofocus
+          autocomplete="off"
+          :class="['filename', { error: hasError }]"
+          id="filename"
+          type="text"
+          placeholder="search or create new flog"
+          v-model="typedFilename"
+          @focus="showDropdown = true"
+          @input="showDropdown = true"
+        />
+        <!-- required
+          @change="change" -->
+        <div class="autoc-select" v-show="showDropdown">
+          <ul id="files">
+            <li v-for="item in matchedFlogs">
+              <a href="#" @click.prevent="() => selectFlog(item)">{{
+                item.path_display ?? item.url
+              }}</a>
+            </li>
+          </ul>
+        </div>
+        <em class="date-validation hidden" :class="{ error: hasError }"
+          >Please enter valid file name</em
+        >
+      </div>
+  </form>
+</template>
+
 <script setup>
 import { ref, watch, onMounted, nextTick } from "vue";
 // as per compiler: [@vue/compiler-sfc] `defineEmits` is a compiler macro and no longer needs to be imported.
@@ -62,49 +107,6 @@ const handleKeydown = (e) => {
   }
 };
 </script>
-
-<template>
-  <div v-if="!showInput">
-    <button
-      @click="
-        () => {
-          showInput = true;
-        }
-      "
-    >
-      add new flog
-    </button>
-  </div>
-  <form v-else id="add-flog" @submit.prevent="submitAdd" @mouseleave="hideDropdown" @keydown="handleKeydown">
-      <div class="filename-controls">
-        <input
-          autofocus
-          autocomplete="off"
-          :class="['filename', { error: hasError }]"
-          id="filename"
-          type="text"
-          placeholder="search or create new flog"
-          v-model="typedFilename"
-          @focus="showDropdown = true"
-          @input="showDropdown = true"
-        />
-        <!-- required
-          @change="change" -->
-        <div class="autoc-select" v-show="showDropdown">
-          <ul id="files">
-            <li v-for="item in matchedFlogs">
-              <a href="#" @click.prevent="() => selectFlog(item)">{{
-                item.path_display ?? item.url
-              }}</a>
-            </li>
-          </ul>
-        </div>
-        <em class="date-validation hidden" :class="{ error: hasError }"
-          >Please enter valid file name</em
-        >
-      </div>
-  </form>
-</template>
 
 <style scoped lang="stylus">
 

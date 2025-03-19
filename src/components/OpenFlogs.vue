@@ -1,3 +1,68 @@
+<template>
+  <h6 class="vue-file">OpenFlogs.vue</h6>
+  <section class="container main">
+    <div v-for="flog in openFlogs" :key="flog.url">
+      <h4 class="flog-title">
+        {{ flog.url }}
+
+        <span v-if="flog.pretext?.trim() != ''">
+          <Pretext
+            :pretext="flog.pretext"
+            :readOnly="flog.readOnly"
+            @update-pretext="
+              (updatedPretext) => handleUpdatePretext(flog, updatedPretext)
+            "
+          />
+        </span>
+        <button class="small close-flog" @click.prevent="() => closeFlog(flog)">
+          close flog
+        </button>
+      </h4>
+
+      <AddEntry
+        @newEntry="(entryData) => addNewEntry(unref(entryData), flog)"
+        :entryValue="addEntryValue"
+        :timestamp="getTimestamp()"
+      />
+      <div id="spinner">
+        <!-- <PulseLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <GridLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <ClipLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <RiseLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/> -->
+        <PacmanLoader
+          :loading="flog.status != IFlogStatus.loaded"
+          :color="loaderProps.color"
+          :size="loaderProps.size"
+        /><br />
+        <!-- <SyncLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <RotateLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <FadeLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <PacmanLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <SquareLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <ScaleLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <SkewLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <MoonLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <RingLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <BounceLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
+        <DotLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/> -->
+      </div>
+      <div v-if="flog.status == IFlogStatus.loaded">
+        <EntryList
+          :entries="flog.loadedEntries"
+          :editingEntry="getFlogEditingEntry(flog)"
+          :readOnly="flog.readOnly"
+          @edit-entry="editEntryFromFlog"
+          @copy-entry="handleCopyEntry"
+          @delete-entry="(entry) => handleDeleteEntry(flog, entry)"
+          @update-entry="(entry) => handleUpdateEntry(flog, entry)"
+          @start-editing="(entry) => handleStartEditingEntry(flog, entry)"
+          @stop-editing="() => handleStopEditingEntry(flog)"
+        />
+      </div>
+    </div>
+  </section>
+</template>
+
 <script setup lang="ts">
 import { ref, unref, computed } from "vue";
 import { useFlogs, IFlogStatus } from "@/composables/useFlogs";
@@ -112,71 +177,6 @@ function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
   }
 }
 </script>
-
-<template>
-  <!-- Example description and UI -->
-  <section class="container main">
-    <div v-for="flog in openFlogs" :key="flog.url">
-      <h4 class="flog-title">
-        {{ flog.url }}
-
-        <span v-if="flog.pretext?.trim() != ''">
-          <Pretext
-            :pretext="flog.pretext"
-            :readOnly="flog.readOnly"
-            @update-pretext="
-              (updatedPretext) => handleUpdatePretext(flog, updatedPretext)
-            "
-          />
-        </span>
-        <button class="small close-flog" @click.prevent="() => closeFlog(flog)">
-          close flog
-        </button>
-      </h4>
-
-      <AddEntry
-        @newEntry="(entryData) => addNewEntry(unref(entryData), flog)"
-        :entryValue="addEntryValue"
-        :timestamp="getTimestamp()"
-      />
-      <div id="spinner">
-        <!-- <PulseLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <GridLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <ClipLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <RiseLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/> -->
-        <PacmanLoader
-          :loading="flog.status != IFlogStatus.loaded"
-          :color="loaderProps.color"
-          :size="loaderProps.size"
-        /><br />
-        <!-- <SyncLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <RotateLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <FadeLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <PacmanLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <SquareLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <ScaleLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <SkewLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <MoonLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <RingLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <BounceLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <DotLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/> -->
-      </div>
-      <div v-if="flog.status == IFlogStatus.loaded">
-        <EntryList
-          :entries="flog.loadedEntries"
-          :editingEntry="getFlogEditingEntry(flog)"
-          :readOnly="flog.readOnly"
-          @edit-entry="editEntryFromFlog"
-          @copy-entry="handleCopyEntry"
-          @delete-entry="(entry) => handleDeleteEntry(flog, entry)"
-          @update-entry="(entry) => handleUpdateEntry(flog, entry)"
-          @start-editing="(entry) => handleStartEditingEntry(flog, entry)"
-          @stop-editing="() => handleStopEditingEntry(flog)"
-        />
-      </div>
-    </div>
-  </section>
-</template>
 
 <style scoped lang="styl">
 #spinner {
