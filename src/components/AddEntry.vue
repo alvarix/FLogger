@@ -130,14 +130,13 @@ input.error {
 	border: 1px solid var(--red-color);
 }
 
-
-
 .form-inner .date {
 	background: none;
 	margin-left: 10px;
 }
 .form-inner textarea {
     max-width: 600px;
+    height: 50vw;
     border-radius: 14px;
     padding: 20px;
 }
