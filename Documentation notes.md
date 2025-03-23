@@ -77,6 +77,38 @@
          2. modules/EntryData
       6. Pretext
 
+1. App.vue
+   1. ThemeSwitcher
+   2. DropBoxFlogs
+      3. AddFlog
+      4. Intro
+      5. Modal
+   3. OpenFlogs
+      3. modules/Flog
+      4. AddEntry
+      5. EntryList
+         1. Entry
+      6. Pretext
+
+# Embeds rethought
+1. Login
+   1. Modal
+   2. Intro
+2. Flog
+   1. NewEntry
+   2. EntryList
+      1. Entry
+         1. Pretext
+3. FlogList
+   1. AddFlog
+   2. DeleteFLog
+      
+         
+
+
+
+
+
 # Component documentation sample
 
 ```
