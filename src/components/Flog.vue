@@ -56,8 +56,8 @@
             "
           />
         </span>
-        <button class="small close-flog" @click.prevent="() => closeFlog(flog)">
-          close flog
+        <button class="small close-flog" @click.prevent="closeFlogHandler()">
+          flog list
         </button>
       </h4>
 
@@ -98,14 +98,11 @@ import { IFlog } from "@/modules/Flog";
 import AddEntry from "@/components/AddEntry.vue";
 import EntryList from "@/components/EntryList.vue";
 import Pretext from "@/components/Pretext.vue";
-
-
 import PacmanLoader from "vue-spinner/src/PacmanLoader.vue";
 
 
 const {
   openFlogs,
-  closeFlog,
   addEntryToFlog,
   updatePretext,
   deleteEntryFromFlog,
@@ -188,6 +185,10 @@ function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
     updatePretext(updatedPretext, flog);
     saveFlogToSource(flog);
   }
+}
+const emit = defineEmits(["FlogList"]);
+function closeFlogHandler() {
+  emit("FlogList");
 }
 </script>
 
