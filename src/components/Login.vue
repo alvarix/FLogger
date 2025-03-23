@@ -1,6 +1,6 @@
 <template>
   <h6 class="vue-files">DropBoxFlogs.vue</h6>
-  <!-- <button id="show-modal" @click="showModal = true">Show Modal</button> -->
+  
   <Teleport to="body">
     <!-- use the modal component, pass in the prop -->
     <Modal :show="showModal" @close="showModal = false">
@@ -24,48 +24,13 @@
       </template>
     </Modal>
   </Teleport>
-  <!-- Example description and UI -->
+
   <section class="container main">
-    <!-- 
-    dev note:
-    Should this intro text live elsewhere?
-    -->
     <div
       id="pre-auth-section"
       :style="{ display: hasConnection ? 'none' : 'block' }"
     >
       <Intro />
-    </div>
-
-    <div
-      id="authed-section"
-      :style="{ display: hasConnection ? 'block' : 'none' }"
-    >
-      <AddFlog
-        @newFlog="handleAddFlog"
-        @openFlog="selectFile"
-        :availableFlogs="availableFlogs"
-      />
-      <div id="files-section">
-        <h3>Flogs</h3>
-        <ul id="files">
-          <li v-for="item in availableFlogs">
-            <a href="#" @click.prevent="() => selectFile(item)">{{
-              item.path_display ?? item.url
-            }}</a>
-          </li>
-        </ul>
-      </div>
-      <div id="repo-files-section">
-        <h3>Flogger</h3>
-        <ul id="files">
-          <li v-for="item in availableRepoFlogs">
-            <a href="#" @click.prevent="() => selectFile(item)">{{
-              item.path_display ?? item.url
-            }}</a>
-          </li>
-        </ul>
-      </div>
     </div>
   </section>
 </template>
