@@ -1,5 +1,5 @@
 <template>
-  <h6 class="vue-file">Intro.vue</h6>
+  <aside class="vue-file">Intro.vue</aside>
   <p>
     Welcome to Flogger!<br />
     A project by

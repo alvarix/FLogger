@@ -41,7 +41,7 @@
  */
 </script>
 <template>
-  <h6 class="vue-file">Flog.vue</h6>
+  <aside class="vue-file">Flog.vue</aside>
   <section class="container main">
     <div v-for="flog in openFlogs" :key="flog.url">
       <h4 class="flog-title">

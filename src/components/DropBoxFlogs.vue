@@ -1,5 +1,5 @@
 <template>
-  <h6 class="vue-files">DropBoxFlogs.vue</h6>
+  <aside class="vue-file">DropBoxFlogs.vue</aside>
   <!-- <button id="show-modal" @click="showModal = true">Show Modal</button> -->
   <Teleport to="body">
     <!-- use the modal component, pass in the prop -->

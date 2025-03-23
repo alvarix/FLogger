@@ -1,6 +1,6 @@
 <template>
   
-  <h6 class="vue-files">AddEntry.vue</h6>
+  <aside class="vue-file">AddEntry.vue</aside>
   <form id="add-entry" @submit.prevent="submitAdd">
     <div class="form-inner">
       <div>
