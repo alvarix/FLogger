@@ -41,7 +41,7 @@
  */
 </script>
 <template>
-  <h6 class="vue-file">OpenFlogs.vue</h6>
+  <h6 class="vue-file">Flog.vue</h6>
   <section class="container main">
     <div v-for="flog in openFlogs" :key="flog.url">
       <h4 class="flog-title">
@@ -67,26 +67,11 @@
         :timestamp="getTimestamp()"
       />
       <div id="spinner">
-        <!-- <PulseLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <GridLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <ClipLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <RiseLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/> -->
         <PacmanLoader
           :loading="flog.status != IFlogStatus.loaded"
           :color="loaderProps.color"
           :size="loaderProps.size"
-        /><br />
-        <!-- <SyncLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <RotateLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <FadeLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <PacmanLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <SquareLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <ScaleLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <SkewLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <MoonLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <RingLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <BounceLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/>
-        <DotLoader :loading="flog.status != IFlogStatus.loaded" :color="loaderProps.color" :size="loaderProps.size" /><br/> -->
+        />
       </div>
       <div v-if="flog.status == IFlogStatus.loaded">
         <EntryList
@@ -114,22 +99,9 @@ import AddEntry from "@/components/AddEntry.vue";
 import EntryList from "@/components/EntryList.vue";
 import Pretext from "@/components/Pretext.vue";
 
-// import PulseLoader from "vue-spinner/src/PulseLoader.vue";
-// import GridLoader from "vue-spinner/src/GridLoader.vue";
-// import ClipLoader from "vue-spinner/src/ClipLoader.vue";
-// import RiseLoader from "vue-spinner/src/RiseLoader.vue";
-// import BeatLoader from "vue-spinner/src/BeatLoader.vue";
-// import SyncLoader from "vue-spinner/src/SyncLoader.vue";
-// import RotateLoader from "vue-spinner/src/RotateLoader.vue";
-// import FadeLoader from "vue-spinner/src/FadeLoader.vue";
+
 import PacmanLoader from "vue-spinner/src/PacmanLoader.vue";
-// import SquareLoader from "vue-spinner/src/SquareLoader.vue";
-// import ScaleLoader from "vue-spinner/src/ScaleLoader.vue";
-// import SkewLoader from "vue-spinner/src/SkewLoader.vue";
-// import MoonLoader from "vue-spinner/src/MoonLoader.vue";
-// import RingLoader from "vue-spinner/src/RingLoader.vue";
-// import BounceLoader from "vue-spinner/src/BounceLoader.vue";
-// import DotLoader from "vue-spinner/src/DotLoader.vue";
+
 
 const {
   openFlogs,
@@ -140,7 +112,6 @@ const {
   editEntryFromFlog,
   saveFlogToSource,
 } = useFlogs();
-// const props = defineProps({});
 
 const addEntryValue = ref(null); // Initialize reactive addEntryValue
 const isEditingFlogEntries = ref(new Map<IFlog, IEntry>()); // Keep a map of [flog, index] pairs to look up index of entry being edit PER flog
