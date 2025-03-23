@@ -1,9 +1,37 @@
 <template>
   
   <form id="add-entry" @submit.prevent="submitAdd">
+    <div class="form-inner">
+      <div>
+        <input
+          :class="['date', { error: hasError }]"
+          id="time"
+          type="text"
+          :placeholder="form.date"
+          v-model="form.date"
+          required
+        />
+        <em class="date-validation hidden" :class="{ error: hasError }"
+          >Please enter valid date</em
+        >
+      </div>
+      <div>
+        <textarea
+          class="auto-resize"
+          autofocus
+          id="entry"
+          name=""
+          v-model="form.entry"
+          required
+        ></textarea>
+      </div>
+    </div>
+    <div><button class="big" type="submit">Add Entry</button></div>
+    <!--
     <div class="flex justify-center md:justify-start">
       <button class="big" type="submit"></button>
     </div>
+  -->
   </form>
 </template>
 
@@ -49,7 +77,7 @@ watch(
       form.value.entry = newVal.entry; // Prepopulate the textarea with the copied entry
       const addEntryForm = document.getElementById("add-entry");
 
-      nextTick(() => autoResizeTextarea("entry")); // Adjust the textarea size after the DOM update
+      // nextTick(() => autoResizeTextarea("entry")); // Adjust the textarea size after the DOM update
 
       if (addEntryForm) {
         addEntryForm.scrollIntoView({ behavior: "smooth" }); // Smooth scroll to the form
@@ -59,9 +87,9 @@ watch(
 );
 </script>
 
-<style lang="styl" scoped>
+<style scoped>
 
-
+/*
 .big
   display: flex
   align-items: center
@@ -95,21 +123,23 @@ watch(
     width: 10%
     height: 50%
 
-input.error 
-	border 1px solid var(--red-color);
+*/
 
 
+input.error {
+	border: 1px solid var(--red-color);
+}
 
-
-.form-inner .date
-	background none
-	margin-left 10px
-
-.form-inner textarea
+.form-inner .date {
+	background: none;
+	margin-left: 10px;
+}
+.form-inner textarea {
     max-width: 600px;
+    height: 50vw;
     border-radius: 14px;
     padding: 20px;
-
+}
 
 input.date {
 	font-weight: bold;
@@ -123,7 +153,7 @@ input, textarea {
 
 textarea {
 	width: 100%;
-	box-sizing border-box
+	box-sizing: border-box;
 }
 
 .date-validation.error {
