@@ -77,7 +77,7 @@ watch(
       form.value.entry = newVal.entry; // Prepopulate the textarea with the copied entry
       const addEntryForm = document.getElementById("add-entry");
 
-      nextTick(() => autoResizeTextarea("entry")); // Adjust the textarea size after the DOM update
+      // nextTick(() => autoResizeTextarea("entry")); // Adjust the textarea size after the DOM update
 
       if (addEntryForm) {
         addEntryForm.scrollIntoView({ behavior: "smooth" }); // Smooth scroll to the form
