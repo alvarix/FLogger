@@ -25,15 +25,12 @@ export const useFlogs = () => {
         }
     }
 
-    /*
-    // leftover from when OpenFlogs was an array
 
     const closeFlog = (flog: IFlog) => {
         if (openFlogs.value.includes(flog)) {
             openFlogs.value = openFlogs.value.filter(flogItem => flog != flogItem)
         }
     }
-    */
 
     const addEntryToFlog = (entry: IEntry, flog: IFlog) => {
         flog.loadedEntries.unshift(entry)
@@ -99,7 +96,7 @@ export const useFlogs = () => {
     return {
         openFlogs,
         openFlog,
-        //closeFlog,
+        closeFlog,
         addEntryToFlog,
         updatePretext,
         saveFlogToSource,

@@ -56,7 +56,7 @@
             "
           />
         </span>
-        <button class="small close-flog" @click.prevent="closeFlogHandler()">
+        <button class="small close-flog" @click.prevent="() => closeFlog(flog)">
           flog list
         </button>
       </h4>
@@ -103,6 +103,7 @@ import PacmanLoader from "vue-spinner/src/PacmanLoader.vue";
 
 const {
   openFlogs,
+  closeFlog,
   addEntryToFlog,
   updatePretext,
   deleteEntryFromFlog,

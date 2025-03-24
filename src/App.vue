@@ -8,14 +8,13 @@
       <Login />
     </Suspense>
 
-    <div v-if=hasConnection>
-      <div v-if="ShowFlogList">
+    <div v-if="openFlogs.length == 0">
+      <Suspense>
         <FlogList />
-      </div>
-      <div v-else>
-        <Flog @FlogList="ShowFlogList = true"  />
-      </div>
+      </Suspense>
     </div>
+    <Flog />
+
 
   </main>
 </template>
@@ -25,14 +24,10 @@ import { ref, watch } from "vue";
 import Login from "@/components/Login.vue";
 import FlogList from "@/components/FlogList.vue";
 import Flog from "@/components/Flog.vue";
+import { useFlogs } from "@/composables/useFlogs.ts";
 import { useDropboxFlogs } from "@/composables/useDropboxFlogs.ts";
 import Head from "@/components/Head.vue";
 const { hasConnection } = useDropboxFlogs();
 const ShowFlogList = ref(false);
-watch(ShowFlogList, (newValue) => {
-  console.log("ShowFlogList toggled:", newValue);
-});
+const { openFlogs } = useFlogs();
 </script>
-
-<style scoped>
-</style>
