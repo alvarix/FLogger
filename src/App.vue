@@ -1,9 +1,7 @@
 <template>
   <main :class="{ connected: hasConnection }">
   <aside class="vue-file">App.vue</aside>
-
     <Head /> 
-
     <Suspense>
       <Login />
     </Suspense>
@@ -13,8 +11,11 @@
         <FlogList />
       </Suspense>
     </div>
-    <Flog />
-
+    <div v-else>
+      <div v-for="flog in openFlogs" :key="flog.url">
+        <Flog :flog="flog" />
+      </div>  
+    </div>
 
   </main>
 </template>
