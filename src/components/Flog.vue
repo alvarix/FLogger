@@ -4,15 +4,13 @@
     <h4 class="flog-title">
       {{ flog.url }}
 
-      <span v-if="flog.pretext?.trim() != ''">
-        <Pretext
-          :pretext="flog.pretext"
-          :readOnly="flog.readOnly"
-          @update-pretext="
-            (updatedPretext) => handleUpdatePretext(flog, updatedPretext)
-          "
-        />
-      </span>
+      <Pretext
+        :pretext="flog.pretext"
+        :readOnly="flog.readOnly"
+        @update-pretext="
+          (updatedPretext) => handleUpdatePretext(flog, updatedPretext)
+        "
+      />
       <button class="small close-flog" @click.prevent="() => closeFlog(flog)">
         flog list
       </button>
@@ -57,7 +55,7 @@ import Pretext from "@/components/Pretext.vue";
 import PacmanLoader from "vue-spinner/src/PacmanLoader.vue";
 
 const props = defineProps<{
-  flog: IFlog // Accept the flog as a prop
+  flog: IFlog; // Accept the flog as a prop
 }>();
 
 const {
