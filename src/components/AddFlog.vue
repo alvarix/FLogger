@@ -1,6 +1,6 @@
 <template>
 
-  <h6 class="vue-file">AddFlog.vue</h6>
+  <aside class="vue-file">AddFlog.vue</aside>
   <div v-if="!showInput">
     <button
       @click="

@@ -1,5 +1,5 @@
 <template>  
-  <h6 class="vue-file">Pretext.vue</h6>
+  <aside class="vue-file">Pretext.vue</aside>
 
   <button class="small popbutton" popovertarget="my-popover">Flog Info</button>
   <div id="my-popover" popover class="popover">

@@ -1,42 +1,6 @@
 <template>
-  <aside class="vue-file">DropBoxFlogs.vue</aside>
-  <!-- <button id="show-modal" @click="showModal = true">Show Modal</button> -->
-  <Teleport to="body">
-    <!-- use the modal component, pass in the prop -->
-    <Modal :show="showModal" @close="showModal = false">
-      <template #header>
-        <h3>Dropbox authorization in progress</h3>
-      </template>
-      <template #body>
-        <p>
-          Complete the Dropbox authorization
-          <a @click="connectionPopupWindow?.focus()">in the pop-up window</a>.
-        </p>
-        <p>
-          If the window doesn't pop-up, <a @click="openPop()">click here</a>.
-        </p>
-      </template>
-      <template #footer
-        ><p></p>
-        <button class="modal-default-button" @click="showModal = false">
-          cancel
-        </button>
-      </template>
-    </Modal>
-  </Teleport>
-  <!-- Example description and UI -->
-  <section class="container main">
-    <!-- 
-    dev note:
-    Should this intro text live elsewhere?
-    -->
-    <div
-      id="pre-auth-section"
-      :style="{ display: hasConnection ? 'none' : 'block' }"
-    >
-      <Intro />
-    </div>
-
+  <section>
+  <aside class="vue-file">FlogList.vue</aside>
     <div
       id="authed-section"
       :style="{ display: hasConnection ? 'block' : 'none' }"
@@ -74,10 +38,7 @@
 import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
 import { useFlogs } from "@/composables/useFlogs";
 import AddFlog from "@/components/AddFlog.vue";
-// const { accountInfo } = useDropboxFiles();
 import { ref, watch } from "vue";
-import Modal from "@/components/Modal.vue";
-import Intro from "@/components/Intro.vue";
 
 const {
   connectionPopupWindow,
@@ -90,7 +51,6 @@ const {
 } = useDropboxFlogs();
 
 const { openFlog } = useFlogs();
-// const props = defineProps({});
 
 const defaultFlogAlreadyOpened = ref(!!window.sessionStorage.getItem("defaultFlogAlreadyOpened"));
 const defaultFlogFilepath = "/default.flogger.txt";

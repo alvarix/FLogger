@@ -19,13 +19,12 @@ const openFlogs = ref<IFlog[]>([])
 
 export const useFlogs = () => {
 
-    const openFlog = (
-        newFlog: IFlog,
-    ) => {
+    const openFlog = ( newFlog: IFlog, ) => {
         if (!openFlogs.value.includes(newFlog)) {
             openFlogs.value.unshift(newFlog)
         }
     }
+
 
     const closeFlog = (flog: IFlog) => {
         if (openFlogs.value.includes(flog)) {

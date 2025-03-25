@@ -1,5 +1,5 @@
 <template>
-  <h6 class="vue-file">EntryList.vue</h6>
+  <aside class="vue-file">EntryList.vue</aside>
   <ul class="entry-list">
     <li v-for="(entry, index) in entries" :key="entry.entry">
       <Entry
