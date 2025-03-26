@@ -1,4 +1,4 @@
-import { ref } from "vue"
+import { ref, watch } from "vue"
 import type { IFlog } from "@/modules/Flog"
 import { IFlogStatus } from "@/modules/Flog"
 import { IEntry } from '@/modules/EntryData'
@@ -10,16 +10,31 @@ export { IFlogStatus as IFlogStatus }
 
 const {
     saveFlogEntries: saveFlogEntries_dropbox,
-    addFlog: addFlog_dropbox
+    addFlog: addFlog_dropbox,
+    availableFlogs: availableFlogs_dropbox
 } = useDropboxFlogs();
+
 
 // Using module-scoped state can cause problems with SSR. See 
 // https://vuejs.org/guide/scaling-up/state-management#simple-state-management-with-reactivity-api
 const openFlogs = ref<IFlog[]>([])
 
+watch(availableFlogs_dropbox, () => {
+    // if availableFlogs changes, filter out any openFlogs 
+    // that are no longer in availableFlogs
+    if (openFlogs.value.length > 0) {
+        const newOpenFlogs = openFlogs.value.filter(flog => {
+            return availableFlogs_dropbox.value.reduce((p, c) => {
+                return p || ((c.sourceType == flog.sourceType) && (c.url == flog.url))
+            }, false);
+        });
+        openFlogs.value = newOpenFlogs;
+    }
+})
+
 export const useFlogs = () => {
 
-    const openFlog = ( newFlog: IFlog, ) => {
+    const openFlog = (newFlog: IFlog,) => {
         if (!openFlogs.value.includes(newFlog)) {
             openFlogs.value.unshift(newFlog)
         }
