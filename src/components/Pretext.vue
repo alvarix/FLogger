@@ -78,7 +78,7 @@ function save() {
   font-weight: 400;
   padding: 1rem 1.5rem;
   border-radius: 1rem;
-  max-width: 20ch;
+  max-width: 80ch;
   line-height: 1.4;
   border:0
   top: 2rem;
@@ -86,6 +86,10 @@ function save() {
   box-shadow 0 0 6px #999
 
 
+
+.pretext {
+  width: 100%;
+}
 
 .pretext__body {
   background-color: var(--misc-color);
