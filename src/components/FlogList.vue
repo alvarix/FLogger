@@ -42,7 +42,6 @@ import { ref, watch } from "vue";
 
 const {
   connectionPopupWindow,
-  openDbxPopup,
   hasConnection,
   availableFlogs,
   availableRepoFlogs,
@@ -59,11 +58,6 @@ const showModal = ref(false);
 watch(connectionPopupWindow, () => {
   showModal.value = connectionPopupWindow ? true : false;
 });
-
-const openPop = () => {
-  console.log("openPop", openDbxPopup);
-  openDbxPopup();
-};
 
 const selectFile = (file) => {
   console.log("selectFile", file);
