@@ -19,10 +19,10 @@
               />
               Disconnect {{ accountOwner }}
             </button>
-            <form method="dialog" class="text-center mt-8">
+          </div>
+          <form method="dialog" class="text-center mt-8">
               <button formmethod="dialog" class="small">Close</button>
             </form>
-          </div>
         </div>
       </dialog>
 
