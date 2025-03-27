@@ -45,8 +45,7 @@ import { useDropboxFiles } from "@/composables/useDropboxFiles";
 import { useDropboxFlogs } from "@/composables/useDropboxFlogs.ts";
 import ThemeSwitcher from "@/components/ThemeSwitcher.vue";
 import { onMounted, ref } from "vue";
-const { accountOwner } = useDropboxFiles();
-const { hasConnection } = useDropboxFlogs();
+const { hasConnection, accountOwner } = useDropboxFlogs();
 const { clearConnection } = useDropboxFlogs();
 const dialog = ref(null);
 
