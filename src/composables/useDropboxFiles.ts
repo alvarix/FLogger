@@ -104,6 +104,24 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
     const availableRepoFiles = ref<IDropboxFile[]>([]);
 
 
+    // Fetch account information
+    const fetchAccountInfo = () => {
+        console.log('fetchAccountInfo')
+        // @ts-expect-error - Unsure why checkAndRefreshAccessToken is typed to return void but expecting a promise works.
+        dbxAuth.checkAndRefreshAccessToken().then(() => {
+            const dbx = new Dropbox({ auth: dbxAuth });
+            dbx.usersGetCurrentAccount().then(response => {
+                console.log('fetchAccountInfo : usersGetCurrentAccount', response)
+                accountInfo.value = response.result;
+                accountOwner.value = response.result.email;
+            }).catch(error => {
+                console.log("Error fetching account info:", error);
+                clearConnection();
+            });
+        });
+    };
+
+
     // We only want to execute logic for returning from Dropbox once on page load
     // This conditional prevents it from executing every place this composable is used.
     if (!hasInitialized) {
@@ -175,6 +193,12 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
         }
         console.log("accessToken:", accessToken);
         console.log('expiresIn', expiresIn)
+
+        // Call fetchAccountInfo when access token is set
+        if (accessToken) {
+            fetchAccountInfo();
+        }
+
 
         // // 3.c. Set interval to refresh token
         // // This interval needs to be cleared, but unsure where
@@ -396,7 +420,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                     })
                     .catch((error) => {
                         console.log(
-                            `Error downloading file ${file.path} :`, file, 
+                            `Error downloading file ${file.path} :`, file,
                             error?.message || error
                         );
                         // clearConnection();
@@ -491,26 +515,6 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
 
     const accountOwner = ref<string | null>(null);
     const accountInfo = ref(null);
-
-    // Fetch account information
-    const fetchAccountInfo = () => {
-        // @ts-expect-error - Unsure why checkAndRefreshAccessToken is typed to return void but expecting a promise works.
-        dbxAuth.checkAndRefreshAccessToken().then(() => {
-            const dbx = new Dropbox({ auth: dbxAuth });
-            dbx.usersGetCurrentAccount().then(response => {
-                accountInfo.value = response.result;
-                accountOwner.value = response.result.email;
-            }).catch(error => {
-                console.log("Error fetching account info:", error);
-                clearConnection();
-            });
-        });
-    };
-
-    // Call fetchAccountInfo when access token is set
-    if (accessToken) {
-        fetchAccountInfo();
-    }
 
 
 
