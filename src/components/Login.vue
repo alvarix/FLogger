@@ -37,7 +37,7 @@
 
 <script setup>
 import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
-import { useFlogs } from "@/composables/useFlogs";
+import { useOpenFlogs } from "@/composables/useOpenFlogs";
 import AddFlog from "@/components/AddFlog.vue";
 // const { accountInfo } = useDropboxFiles();
 import { ref, watch } from "vue";
@@ -54,7 +54,7 @@ const {
   addFlog,
 } = useDropboxFlogs();
 
-const { openFlog } = useFlogs();
+const { openFlog } = useOpenFlogs();
 // const props = defineProps({});
 
 const defaultFlogAlreadyOpened = ref(!!window.sessionStorage.getItem("defaultFlogAlreadyOpened"));
