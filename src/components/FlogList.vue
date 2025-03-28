@@ -36,13 +36,12 @@
 
 <script setup>
 import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
-import { useFlogs } from "@/composables/useFlogs";
+import { useOpenFlogs } from "@/composables/useOpenFlogs";
 import AddFlog from "@/components/AddFlog.vue";
 import { ref, watch } from "vue";
 
 const {
   connectionPopupWindow,
-  openDbxPopup,
   hasConnection,
   availableFlogs,
   availableRepoFlogs,
@@ -50,7 +49,7 @@ const {
   addFlog,
 } = useDropboxFlogs();
 
-const { openFlog } = useFlogs();
+const { openFlog } = useOpenFlogs();
 
 const defaultFlogAlreadyOpened = ref(!!window.sessionStorage.getItem("defaultFlogAlreadyOpened"));
 const defaultFlogFilepath = "/default.flogger.txt";
@@ -59,11 +58,6 @@ const showModal = ref(false);
 watch(connectionPopupWindow, () => {
   showModal.value = connectionPopupWindow ? true : false;
 });
-
-const openPop = () => {
-  console.log("openPop", openDbxPopup);
-  openDbxPopup();
-};
 
 const selectFile = (file) => {
   console.log("selectFile", file);
