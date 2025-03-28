@@ -1,6 +1,6 @@
 <template>
   <section>
-  <aside class="vue-file">FlogList.vue</aside>
+    <aside class="vue-file">FlogList.vue</aside>
     <div
       id="authed-section"
       :style="{ display: hasConnection ? 'block' : 'none' }"
@@ -8,13 +8,39 @@
       <AddFlog
         @newFlog="handleAddFlog"
         @openFlog="selectFile"
-        :availableFlogs="availableFlogs"
+        :availableFlogs="sortedAvailableFlogs"
       />
       <div id="files-section">
         <h3>Flogs</h3>
+        <div>
+          <button
+            class="incognito-button"
+            @click="showSortOptionSelect = !showSortOptionSelect"
+            @blur="showSortOptionSelect = false"
+          >
+            {{ sortOption }}
+          </button>
+          <button
+            class="incognito-button"
+            @click="sortDescending = !sortDescending"
+          >
+            {{ sortDescending ? "↓" : "↑" }}
+          </button>
+        </div>
+
+        <div class="autoc-select" v-show="showSortOptionSelect">
+          <ul id="sortOptions">
+            <li v-for="item in sortType">
+              <a href="#" @click.prevent="() => selectSortOption(item)">{{
+                item
+              }}</a>
+            </li>
+          </ul>
+        </div>
         <ul id="files">
-          <li v-for="item in availableFlogs">
+          <li v-for="item in sortedAvailableFlogs">
             <a href="#" @click.prevent="() => selectFile(item)">{{
+              // @ts-expect-error
               item.path_display ?? item.url
             }}</a>
           </li>
@@ -25,6 +51,7 @@
         <ul id="files">
           <li v-for="item in availableRepoFlogs">
             <a href="#" @click.prevent="() => selectFile(item)">{{
+              // @ts-expect-error
               item.path_display ?? item.url
             }}</a>
           </li>
@@ -34,11 +61,12 @@
   </section>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
 import { useFlogs } from "@/composables/useFlogs";
 import AddFlog from "@/components/AddFlog.vue";
 import { ref, watch } from "vue";
+import { IDropboxFlog } from "@/composables/useDropboxFlogs";
 
 const {
   connectionPopupWindow,
@@ -52,10 +80,13 @@ const {
 
 const { openFlog } = useFlogs();
 
-const defaultFlogAlreadyOpened = ref(!!window.sessionStorage.getItem("defaultFlogAlreadyOpened"));
+const defaultFlogAlreadyOpened = ref(
+  !!window.sessionStorage.getItem("defaultFlogAlreadyOpened")
+);
 const defaultFlogFilepath = "/default.flogger.txt";
 
 const showModal = ref(false);
+// @ts-expect-error
 watch(connectionPopupWindow, () => {
   showModal.value = connectionPopupWindow ? true : false;
 });
@@ -80,7 +111,11 @@ watch(
       )[0];
       if (defaultFlogFile) {
         defaultFlogAlreadyOpened.value = true;
-        window.sessionStorage.setItem("defaultFlogAlreadyOpened", defaultFlogAlreadyOpened.value);
+        window.sessionStorage.setItem(
+          "defaultFlogAlreadyOpened",
+          // @ts-expect-error
+          defaultFlogAlreadyOpened.value
+        );
         selectFile(defaultFlogFile);
       }
     }
@@ -90,11 +125,73 @@ watch(
 
 function handleAddFlog(flogData) {
   console.log("Not implemented yet", flogData.value.filename);
+  // @ts-expect-error
   addFlog({
     url: flogData.value.filename + ".flogger.txt",
     loadedEntries: [],
   });
 }
+
+enum sortType {
+  modified = "modified",
+  name = "name",
+}
+const sortOption = ref<sortType>(sortType.modified);
+const sortDescending = ref<boolean>(true);
+
+const showSortOptionSelect = ref(false);
+function selectSortOption(option: sortType) {
+  sortOption.value = option;
+}
+
+function sortFlogsByFilename(flogList: IDropboxFlog[], descending?: boolean) {
+  return flogList.toSorted((a, b) => {
+    const nameA = a.url.toLowerCase();
+    const nameB = b.url.toLowerCase();
+
+    if (descending) return nameB.localeCompare(nameA);
+    else return nameA.localeCompare(nameB);
+    // // Case sensative sort:
+    // if (a.url < b.url) {
+    //   return -1;
+    // }
+    // if (a.url > b.url) {
+    //   return 1;
+    // }
+    // return 0;
+  });
+}
+function sortFlogsByModified(flogList: IDropboxFlog[], descending?: boolean) {
+  return flogList.toSorted((a, b) => {
+    if (descending) return b.modified.getTime() - a.modified.getTime();
+    else return a.modified.getTime() - b.modified.getTime();
+  });
+}
+
+const sortedAvailableFlogs = ref(
+  sortFlogsByModified(availableFlogs.value, true)
+);
+watch(
+  [availableFlogs, sortOption, sortDescending],
+  () => {
+    switch (sortOption.value) {
+      case sortType.name:
+        sortedAvailableFlogs.value = sortFlogsByFilename(
+          availableFlogs.value,
+          sortDescending.value
+        );
+        break;
+      case sortType.modified:
+      default:
+        sortedAvailableFlogs.value = sortFlogsByModified(
+          availableFlogs.value,
+          sortDescending.value
+        );
+    }
+  },
+  { immediate: true }
+);
+
 </script>
 
 <style scoped lang="stylus">
@@ -124,4 +221,23 @@ ul {
 li {
   margin 5px 0
 }
+
+.autoc-select ul
+  list-style none
+  box-shadow 0 2px 4px rgba(0, 0, 0, 0.1)
+  background-color var(--input-color)
+  margin 0
+  padding 0
+  a
+    padding 10px 15px
+    display block
+    &:hover
+      background-color var(--input-color)
+
+.incognito-button
+  border-radius 0
+  background none
+  font-size small
+  padding 0.4rem
+  margin 0.4rem
 </style>
