@@ -8,7 +8,6 @@ import { timestamp, useTimestamp } from "@vueuse/core";
 // Re-export these for convenience
 export type { IFlog as IFlog }
 export { IFlogStatus as IFlogStatus };
-
 export interface IDropboxFlog extends IFlog {
     rev: string;
 }
@@ -32,6 +31,7 @@ export interface IDropboxFlogs {
     // makes use of ... from useDropboxFiles
     saveFlogEntries: (flog: IDropboxFlog) => void;
     addFlog: (flog: IDropboxFlog) => void;
+    accountOwner: Ref<string | null>;
 }
 
 // const initialReadmeFile = fs.readFileSync('./repo_template/README.flogger.txt').toString("utf-8");
@@ -121,7 +121,8 @@ const {
     availableRepoFiles,
     loadFileContent,
     saveFileContent,
-    addFile
+    addFile,
+    accountOwner
 } = useDropboxFiles(repoFiles.value)
 
 export const useDropboxFlogs = (): IDropboxFlogs => {
@@ -233,5 +234,6 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
         loadFlogEntries,
         saveFlogEntries,
         addFlog,
+        accountOwner: accountOwner
     }
 }

@@ -15,6 +15,7 @@ export interface IDropboxFile {
 export interface IDropboxFiles {
     accountInfo: Ref<string | null>
     launchConnectFlow: () => void
+    openDbxPopup: () => void
     connectionPopupWindow: any
     hasConnection: Ref<boolean>
     clearConnection: () => void
@@ -77,6 +78,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
     };
 
     const dbxAuthCode = ref(getDbxAuthCodeFromUrl());
+    const dbxAuthUrl = ref();
 
     const hasRedirectedFromAuth = ref(!!dbxAuthCode.value);
 
@@ -102,6 +104,24 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
     let accessToken
     const availableFiles = ref<IDropboxFile[]>([]);
     const availableRepoFiles = ref<IDropboxFile[]>([]);
+
+
+    // Fetch account information
+    const fetchAccountInfo = () => {
+        console.log('fetchAccountInfo')
+        // @ts-expect-error - Unsure why checkAndRefreshAccessToken is typed to return void but expecting a promise works.
+        dbxAuth.checkAndRefreshAccessToken().then(() => {
+            const dbx = new Dropbox({ auth: dbxAuth });
+            dbx.usersGetCurrentAccount().then(response => {
+                console.log('fetchAccountInfo : usersGetCurrentAccount', response)
+                accountInfo.value = response.result;
+                accountOwner.value = response.result.email;
+            }).catch(error => {
+                console.log("Error fetching account info:", error);
+                clearConnection();
+            });
+        });
+    };
 
 
     // We only want to execute logic for returning from Dropbox once on page load
@@ -175,6 +195,12 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
         }
         console.log("accessToken:", accessToken);
         console.log('expiresIn', expiresIn)
+
+        // Call fetchAccountInfo when access token is set
+        if (accessToken) {
+            fetchAccountInfo();
+        }
+
 
         // // 3.c. Set interval to refresh token
         // // This interval needs to be cleared, but unsure where
@@ -338,23 +364,38 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                 true
             )
             .then((authUrl) => {
+                dbxAuthUrl.value = authUrl
                 clearConnection();
                 //@ts-expect-error
                 window.sessionStorage.setItem("codeVerifier", dbxAuth.codeVerifier);
                 //@ts-expect-error
                 console.log("dbxAuth.codeVerifier", dbxAuth.codeVerifier);
-                // dbxauth-popup: Replace open popup rather than redirecting to Db in this window
-                const windowFeatures = "popup=true,menubar=false,width=700height=700,innerWidth=700,innerHeight=700,left=100,top=100";
-                //@ts-expect-error
-                connectionPopupWindow.value = window.open(authUrl, 'dbauthPopupWindow', windowFeatures)
-                console.log('connectionPopupWindow.value', connectionPopupWindow.value)
+                // // dbxauth-popup: Replace open popup rather than redirecting to Db in this window
+                // const windowFeatures = "popup=true,menubar=false,width=700height=700,innerWidth=700,innerHeight=700,left=100,top=100";
+                // //@ts-expect-error
+                // connectionPopupWindow.value = window.open(authUrl, 'dbauthPopupWindow', windowFeatures)
+                // console.log('connectionPopupWindow.value', connectionPopupWindow.value)
+                openDbxPopup();
             })
             .catch((error) => {
                 console.error(`Error getting auth URL:`, error?.message || error);
                 clearConnection();
             });
+    }
+
+    const openDbxPopup = () => {
+        try {
+            const windowFeatures = "popup=true,menubar=false,width=700height=700,innerWidth=700,innerHeight=700,left=100,top=100";
+            connectionPopupWindow.value = window.open(dbxAuthUrl.value, 'dbauthPopupWindow', windowFeatures)
+            console.log('connectionPopupWindow.value', connectionPopupWindow.value)
+        }
+        catch (error) {
+            console.error(`Error getting auth URL:`, error?.message || error);
+            clearConnection();
+        };
 
     }
+
 
     const clearConnection = () => {
         console.log("clearConnection");
@@ -396,7 +437,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                     })
                     .catch((error) => {
                         console.log(
-                            `Error downloading file ${file.path} :`, file, 
+                            `Error downloading file ${file.path} :`, file,
                             error?.message || error
                         );
                         // clearConnection();
@@ -492,26 +533,6 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
     const accountOwner = ref<string | null>(null);
     const accountInfo = ref(null);
 
-    // Fetch account information
-    const fetchAccountInfo = () => {
-        // @ts-expect-error - Unsure why checkAndRefreshAccessToken is typed to return void but expecting a promise works.
-        dbxAuth.checkAndRefreshAccessToken().then(() => {
-            const dbx = new Dropbox({ auth: dbxAuth });
-            dbx.usersGetCurrentAccount().then(response => {
-                accountInfo.value = response.result;
-                accountOwner.value = response.result.email;
-            }).catch(error => {
-                console.log("Error fetching account info:", error);
-                clearConnection();
-            });
-        });
-    };
-
-    // Call fetchAccountInfo when access token is set
-    if (accessToken) {
-        fetchAccountInfo();
-    }
-
 
 
 
@@ -521,6 +542,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
         accountOwner,
         launchConnectFlow,
         connectionPopupWindow,
+        openDbxPopup,
         hasConnection,
         clearConnection,
         availableFiles,
