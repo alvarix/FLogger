@@ -541,7 +541,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                     .filesDeleteV2(
                         {
                             // Must add the slash in front of paths. This is relative to the root of the app folder in Dropbox
-                            path: "/" + file.path,
+                            path: file.path,
                             parent_rev: file.rev
                         }
                     )

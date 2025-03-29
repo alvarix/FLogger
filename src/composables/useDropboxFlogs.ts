@@ -9,7 +9,7 @@ import { timestamp, useTimestamp } from "@vueuse/core";
 export type { IFlog as IFlog }
 export { IFlogStatus as IFlogStatus };
 export interface IDropboxFlog extends IFlog {
-    rev: string;
+    rev?: string;
 }
 
 export interface IDropboxFlogs {

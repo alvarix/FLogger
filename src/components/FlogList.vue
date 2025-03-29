@@ -1,6 +1,6 @@
 <template>
   <section>
-  <aside class="vue-file">FlogList.vue</aside>
+    <aside class="vue-file">FlogList.vue</aside>
     <div
       id="authed-section"
       :style="{ display: hasConnection ? 'block' : 'none' }"
@@ -15,8 +15,15 @@
         <ul id="files">
           <li v-for="item in availableFlogs">
             <a href="#" @click.prevent="() => selectFile(item)">{{
+              // @ts-expect-error
               item.path_display ?? item.url
             }}</a>
+            <button
+              class="small delete-flog"
+              @click="() => handleDeleteFlog(item)"
+            >
+              delete
+            </button>
           </li>
         </ul>
       </div>
@@ -25,6 +32,7 @@
         <ul id="files">
           <li v-for="item in availableRepoFlogs">
             <a href="#" @click.prevent="() => selectFile(item)">{{
+              // @ts-expect-error
               item.path_display ?? item.url
             }}</a>
           </li>
@@ -34,11 +42,13 @@
   </section>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
+// @ts-ignore-error
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
 import AddFlog from "@/components/AddFlog.vue";
 import { ref, watch } from "vue";
+import { IFlog } from "@/modules/Flog";
 
 const {
   connectionPopupWindow,
@@ -47,14 +57,18 @@ const {
   availableRepoFlogs,
   loadFlogEntries,
   addFlog,
+  deleteFlog,
 } = useDropboxFlogs();
 
 const { openFlog } = useOpenFlogs();
 
-const defaultFlogAlreadyOpened = ref(!!window.sessionStorage.getItem("defaultFlogAlreadyOpened"));
+const defaultFlogAlreadyOpened = ref(
+  !!window.sessionStorage.getItem("defaultFlogAlreadyOpened")
+);
 const defaultFlogFilepath = "/default.flogger.txt";
 
 const showModal = ref(false);
+// @ts-expect-error
 watch(connectionPopupWindow, () => {
   showModal.value = connectionPopupWindow ? true : false;
 });
@@ -74,7 +88,11 @@ watch(
       )[0];
       if (defaultFlogFile) {
         defaultFlogAlreadyOpened.value = true;
-        window.sessionStorage.setItem("defaultFlogAlreadyOpened", defaultFlogAlreadyOpened.value);
+        window.sessionStorage.setItem(
+          "defaultFlogAlreadyOpened",
+          // @ts-expect-error
+          defaultFlogAlreadyOpened.value
+        );
         selectFile(defaultFlogFile);
       }
     }
@@ -83,15 +101,29 @@ watch(
 );
 
 function handleAddFlog(flogData) {
-  console.log("Not implemented yet", flogData.value.filename);
   addFlog({
     url: flogData.value.filename + ".flogger.txt",
     loadedEntries: [],
+    rev: null,
+    sourceType: "dropbox",
   });
+}
+
+function handleDeleteFlog(flog: IFlog) {
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this flog?"
+  );
+  // If the user confirms deletion, proceed with removing the flog
+  if (confirmDelete) {
+    deleteFlog(flog);
+    console.log("Entry deleted successfully");
+  } else {
+    console.log("Entry deletion canceled");
+  }
 }
 </script>
 
-<style scoped lang="stylus">
+<style scoped>
 #add-entry *:not(.date-validation) {
   display: block;
 }
@@ -112,10 +144,14 @@ input.error {
 ul {
   border-radius: 14px;
   list-style: disc;
-  margin 20px 0 0 20px
+  margin: 20px 0 0 20px;
 }
 
 li {
-  margin 5px 0
+  margin: 5px 0;
+}
+
+.small {
+  margin-left: 1rem;
 }
 </style>
