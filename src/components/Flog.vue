@@ -35,7 +35,7 @@
         :entries="flog.loadedEntries"
         :editingEntry="getFlogEditingEntry(flog)"
         :readOnly="flog.readOnly"
-        @edit-entry="editEntryFromFlog"
+        @edit-entry="editEntry"
         @copy-entry="handleCopyEntry"
         @delete-entry="(entry) => handleDeleteEntry(flog, entry)"
         @update-entry="(entry) => handleUpdateEntry(flog, entry)"
@@ -48,7 +48,8 @@
 
 <script setup lang="ts">
 import { ref, unref, computed } from "vue";
-import { useFlogs, IFlogStatus } from "@/composables/useFlogs";
+import { useOpenFlogs } from "@/composables/useOpenFlogs";
+import { useFlog, IFlogStatus } from "@/composables/useFlog";
 import EntryData, { IEntry } from "@/modules/EntryData";
 import type { IFlog } from "@/modules/Flog";
 import AddEntry from "@/components/AddEntry.vue";
@@ -61,14 +62,16 @@ const props = defineProps<{
 }>();
 
 const {
-  openFlogs,
   closeFlog,
-  addEntryToFlog,
-  updatePretext,
-  deleteEntryFromFlog,
-  editEntryFromFlog,
   saveFlogToSource,
-} = useFlogs();
+} = useOpenFlogs();
+
+const {
+  addEntry,
+  updatePretext,
+  deleteEntry,
+  editEntry,
+} = useFlog(props.flog);
 
 const addEntryValue = ref(null); // Initialize reactive addEntryValue
 const isEditingFlogEntries = ref(new Map<IFlog, IEntry>()); // Keep a map of [flog, index] pairs to look up index of entry being edit PER flog
@@ -77,7 +80,7 @@ const getFlogEditingEntry = (flog: IFlog): IEntry | undefined =>
 
 function addNewEntry(entryData: IEntry, flog: IFlog) {
   const newEntry = new EntryData(new Date(entryData.date), entryData.entry);
-  addEntryToFlog(newEntry, flog);
+  addEntry(newEntry);
   saveFlogToSource(flog);
   isEditingFlogEntries.value.set(flog, newEntry);
   addEntryValue.value = undefined;
@@ -108,7 +111,7 @@ const handleDeleteEntry = (flog: IFlog, entry: IEntry) => {
 
   // If the user confirms deletion, proceed with removing the entry
   if (confirmDelete) {
-    deleteEntryFromFlog(flog, entry); // Delete the entry
+    deleteEntry(entry); // Delete the entry
     console.log("Entry deleted successfully");
   } else {
     console.log("Entry deletion canceled");
@@ -121,7 +124,7 @@ const handleUpdateEntry = (flog: IFlog, updatedEntry: IEntry) => {
   // console.log("Received updated entry:", updatedEntry);
 
   if (flog) {
-    editEntryFromFlog(flog, updatedEntry);
+    editEntry(updatedEntry);
     isEditingFlogEntries.value.delete(flog);
     // console.log("deleting", isEditingFlogEntries.value.delete(flog));
     // = new Map([]); // Create a new map with one entry rather than track multiple entries being edited across flogs at the same time
@@ -142,7 +145,7 @@ function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
   if (flog && !flog.readOnly) {
     // console.log("handleUpdatePretext() called");
     // console.log("new pretext:", updatedPretext);
-    updatePretext(updatedPretext, flog);
+    updatePretext(updatedPretext);
     saveFlogToSource(flog);
   }
 }

@@ -25,10 +25,10 @@ import { ref, watch } from "vue";
 import Login from "@/components/Login.vue";
 import FlogList from "@/components/FlogList.vue";
 import Flog from "@/components/Flog.vue";
-import { useFlogs } from "@/composables/useFlogs.ts";
+import { useOpenFlogs } from "@/composables/useOpenFlogs.ts";
 import { useDropboxFlogs } from "@/composables/useDropboxFlogs.ts";
 import Head from "@/components/Head.vue";
 const { hasConnection } = useDropboxFlogs();
 const ShowFlogList = ref(false);
-const { openFlogs } = useFlogs();
+const { openFlogs } = useOpenFlogs();
 </script>
