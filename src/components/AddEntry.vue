@@ -50,13 +50,15 @@ const newEntry = ref(""); // Initialize newEntry as a reactive variable
 
 let hasError = ref(false);
 
+const datetime = new Date();
 let form = ref(
-  new EntryData(new Date().toLocaleDateString(), props.entryValue || "")
+  new EntryData(`${datetime.toLocaleDateString()} ${datetime.toLocaleTimeString()}`, props.entryValue || "")
 );
 
 const submitAdd = (event) => {
   emit("newEntry", form);
-  form.value = new EntryData(new Date().toLocaleDateString(), props.entryValue || "");
+  const datetime = new Date();
+  form.value = new EntryData(`${datetime.toLocaleDateString()} ${datetime.toLocaleTimeString()}`, props.entryValue || "");
 };
 
 // Function to automatically resize the textarea based on content
