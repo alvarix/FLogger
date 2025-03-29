@@ -24,6 +24,7 @@ export interface IDropboxFiles {
     loadFileContent: (file: IDropboxFile, callback: (result: { rev: string, content: string }) => any) => void,
     saveFileContent: (file: IDropboxFile, callback: (result: any) => any) => void,
     addFile: (file: IDropboxFile, callback: () => any) => void
+    deleteFile: (file: IDropboxFile, callback: () => any) => void
     accountOwner: Ref<string | null>
 }
 
@@ -530,6 +531,43 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
             })
     }
 
+    const deleteFile = async (file: IDropboxFile, callback: (result?: any) => any) => {
+        // console.log('addFile file', file)
+
+        dbxAuth.checkAndRefreshAccessToken()
+            // @ts-expect-error - Unsure why checkAndRefreshAccessToken is typed to return void but expecting a promise works.
+            .then(async () => {
+                await dbx
+                    .filesDeleteV2(
+                        {
+                            // Must add the slash in front of paths. This is relative to the root of the app folder in Dropbox
+                            path: "/" + file.path,
+                            parent_rev: file.rev
+                        }
+                    )
+                    .then((response) => {
+                        console.log("deleteFile response", response)
+                        checkAvailableFiles()
+                        callback(response.result)
+                    })
+                    .catch((error) => {
+                        console.log(
+                            `Error deleting file ${file.path} :`,
+                            error.error.error_summary
+                        );
+                        alert(`Error deleting file ${file.path}:\n\n${error.error.error_summary}`)
+                        // clearConnection();
+                    });
+            })
+            .catch((error) => {
+                console.log(
+                    `Error refreshing access`,
+                    error?.message || error
+                );
+                clearConnection();
+            })
+    }
+
     const accountOwner = ref<string | null>(null);
     const accountInfo = ref(null);
 
@@ -549,6 +587,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
         availableRepoFiles,
         loadFileContent,
         saveFileContent,
+        deleteFile,
         addFile,
     }
 }
