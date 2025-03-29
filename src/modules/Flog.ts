@@ -23,7 +23,7 @@ export function serializeFlog(entriesList: IEntry[], pretext?: string): string {
 export function serializeEntries(entriesList: IEntry[]): string {
     return entriesList.reduce<string>(
         (accumulatedValue, currentEntry, index) => {
-            const entryString = `${currentEntry.date.toLocaleDateString("en-US")} ${currentEntry.date.toLocaleTimeString()}`
+            const entryString = `${currentEntry.date.toLocaleDateString("en-US")} ${currentEntry.date.toLocaleTimeString("en-US")}`
                 + "\n"
                 + `${currentEntry.entry}`
             return accumulatedValue + ((index > 0) ? '\n\n' : '') + entryString
@@ -43,7 +43,7 @@ export function serializeEntries(entriesList: IEntry[]): string {
 // 
 export function deserializeFlog(rawEntryContent: string): IFlogCore {
     const legacyDateRegEx = /([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4}|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2})/
-    const newDateTimeRegEx = /([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4} [0-2]?[0-9]:[0-9]{2}:[0-9]{2} [AP]M|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2} [0-2]?[0-9]:[0-9]{2}:[0-9]{2} [AP]M)/
+    const newDateTimeRegEx = /([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4} 1?[0-9]:[0-9]{2}:[0-9]{2} [AP]M|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2} 1?[0-9]:[0-9]{2}:[0-9]{2} [AP]M)/
     function isValidDate(dateString) {
         // const date = new Date(dateString);
         // return !isNaN(date.getTime());
