@@ -31,6 +31,7 @@ export interface IDropboxFlogs {
     // makes use of ... from useDropboxFiles
     saveFlogEntries: (flog: IDropboxFlog) => void;
     addFlog: (flog: IDropboxFlog) => void;
+    deleteFlog: (flog: IDropboxFlog) => void;
     accountOwner: Ref<string | null>;
 }
 
@@ -122,6 +123,7 @@ const {
     loadFileContent,
     saveFileContent,
     addFile,
+    deleteFile,
     accountOwner
 } = useDropboxFiles(repoFiles.value)
 
@@ -217,6 +219,17 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
         )
     }
 
+    const deleteFlog = (flog: IDropboxFlog) => {
+        // console.log('addFlog flog', flog)
+        deleteFile(
+            {
+                path: flog.url,
+                rev: flog.rev
+            } as IDropboxFile,
+            () => { } // can parameterize so calling app gets notice once delete is complete 
+        )
+    }
+
     const clearConnection = () => {
         clearFileConnection()
         availableFlogs.value = []
@@ -234,6 +247,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
         loadFlogEntries,
         saveFlogEntries,
         addFlog,
+        deleteFlog, 
         accountOwner: accountOwner
     }
 }
