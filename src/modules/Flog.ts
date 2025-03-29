@@ -23,7 +23,7 @@ export function serializeFlog(entriesList: IEntry[], pretext?: string): string {
 export function serializeEntries(entriesList: IEntry[]): string {
     return entriesList.reduce<string>(
         (accumulatedValue, currentEntry, index) => {
-            const entryString = `${currentEntry.date.toLocaleDateString()} ${currentEntry.date.toLocaleTimeString()}`
+            const entryString = `${currentEntry.date.toLocaleDateString("en-US")} ${currentEntry.date.toLocaleTimeString()}`
                 + "\n"
                 + `${currentEntry.entry}`
             return accumulatedValue + ((index > 0) ? '\n\n' : '') + entryString

@@ -52,13 +52,13 @@ let hasError = ref(false);
 
 const datetime = new Date();
 let form = ref(
-  new EntryData(`${datetime.toLocaleDateString()} ${datetime.toLocaleTimeString()}`, props.entryValue || "")
+  new EntryData(`${datetime.toLocaleDateString("en-US")} ${datetime.toLocaleTimeString("en-US")}`, props.entryValue || "")
 );
 
 const submitAdd = (event) => {
   emit("newEntry", form);
   const datetime = new Date();
-  form.value = new EntryData(`${datetime.toLocaleDateString()} ${datetime.toLocaleTimeString()}`, props.entryValue || "");
+  form.value = new EntryData(`${datetime.toLocaleDateString("en-US")} ${datetime.toLocaleTimeString("en-US")}`, props.entryValue || "");
 };
 
 // Function to automatically resize the textarea based on content

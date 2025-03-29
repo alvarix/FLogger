@@ -133,7 +133,7 @@ const handleUpdateEntry = (flog: IFlog, updatedEntry: IEntry) => {
   }
 };
 
-const getTimestamp = () => ref(new Date().toLocaleDateString());
+const getTimestamp = () => ref(new Date().toLocaleDateString("en-US"));
 
 const loaderProps = {
   size: undefined,
