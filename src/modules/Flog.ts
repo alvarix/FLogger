@@ -13,6 +13,7 @@ export interface IFlog extends IFlogCore {
     permissions?: string,
     readOnly?: boolean,
     rawContent?: string,
+    modified?: Date
 }
 
 export function serializeFlog(entriesList: IEntry[], pretext?: string): string {

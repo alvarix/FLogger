@@ -154,7 +154,13 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
             //     .concat(added)
             // // We will just recreate availableFlogs with this...
             availableFlogs.value = availableFiles.value.map<IDropboxFlog>(
-                (file) => ({ sourceType: 'dropbox', url: file.path } as IDropboxFlog)
+                (file) => ({
+                    sourceType: 'dropbox',
+                    url: file.path,
+                    modified: new Date(file.modified),
+                    rev: null,
+                    loadedEntries: null
+                } as IDropboxFlog)
             )
         }
         ,
