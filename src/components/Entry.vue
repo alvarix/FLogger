@@ -1,25 +1,37 @@
 <template>
   <div class="entry">
     <h3>{{ formattedDate }}</h3>
-    <div v-if="!props.isEditing" @click="handleStartEditing" class="entry__body">
+    <div
+      v-if="!props.isEditing"
+      @click="handleStartEditing"
+      class="entry__body"
+    >
       <VueShowdown flavor="github" :markdown="entryText" />
     </div>
 
     <!-- Display a textarea if editing -->
-    <textarea
-      ref="entryTextarea"
-      class="entry__textarea auto-resize"
+    <pre
       v-else
+      id="editEntry"
+      ref="entryEl"
+      class="entry__body"
+      :contenteditable="!isReadOnly"
       @blur="handleBlur"
-      v-model="entryText"
-      :readOnly="isReadOnly"
-    ></textarea>
+      >{{ entryText }}</pre
+    >
+    <!-- 
+      @input="changeEntryText"
+      This will be necessary to enable contenteditable wysiwyg features, 
+      to convert resulting html to md. 
+      Right now you can use command/ctrl-B to bold a word while editing, 
+      but that formatting is lost when saved from innerText.
+    -->
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, nextTick, watch } from "vue";
-import EntryData, { IEntry } from "../modules/EntryData";
+import type { IEntry } from "../modules/EntryData";
 
 const props = defineProps<{
   entry: IEntry;
@@ -48,32 +60,42 @@ const formattedDate = computed(() => formatDate(props.entry.date));
 // we need to make local reactive refs and watch the props
 const entryText = ref<string>(props.entry.entry);
 const isReadOnly = ref<boolean | null>(props.readOnly);
-const entryTextarea = ref(null);
+const entryEl = ref(null);
 
 const handleStartEditing = () => {
-  emit("start-editing", props.entry) // Or { ...props.entry, entry: entryText.value } ??
+  emit("start-editing", props.entry); // Or { ...props.entry, entry: entryText.value } ??
+};
+
+function placeCursorAtEnd(element) {
+  if (element) {
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    range.collapse(false); // Collapse to the end
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
 }
 
 function setupEditing() {
   nextTick(() => {
-    if (entryTextarea.value) {
-      // Adjust the textarea size after the DOM update
-      // entryTextarea.value.style.height = "auto"; // Reset height to shrink if needed
-      entryTextarea.value.style.height = `${entryTextarea.scrollHeight}px`; // Set the height based on scrollHeight
+    console.log("entryEl", entryEl.value);
+    if (entryEl.value && entryEl.value != null) {
       // Set cursor position to the end of the text
-      entryTextarea.value.selectionStart = entryTextarea.value.textLength;
-      entryTextarea.value.selectionEnd = entryTextarea.value.textLength;
+      placeCursorAtEnd(entryEl.value);
       // Smooth scroll to the form
-      entryTextarea.value.scrollIntoView({ behavior: "smooth" });
-      // alert("wait for it");
-      entryTextarea.value.focus();
+      entryEl.value.scrollIntoView({ behavior: "smooth" });
+      entryEl.value.focus();
     }
   });
 }
 
 // Function to emit the update when blur occurs
-function handleBlur(thisEntry) {
-  // console.log("handleBlur triggered", thisEntry.srcElement.value, entryText.value);
+function handleBlur(event) {
+  // console.log("handleBlur triggered", event.srcElement.value, entryText.value);
+  // Could use either of these:
+  // entryText.value = event.target.innerText;
+  entryText.value = entryEl.value.innerText;
   // Pass back same entry prop with new entry text overwritten
   emit("update-entry", { ...props.entry, entry: entryText.value });
   // // This doesn't work right now because Entry doesn't have its own index to pass back.
@@ -105,7 +127,6 @@ watch(
     isReadOnly.value = newValue;
   }
 );
-
 </script>
 
 <style lang="styl">
@@ -125,10 +146,11 @@ h3
 .entry__body
   background-color: var(--misc-color)
 
+pre.entry__body
+  white-space: pre-wrap; /* Enables wrapping of text, preserving spaces and line breaks */
+  word-wrap: break-word; /* Breaks long words to prevent overflow */
 
-.entry__pre {
-  white-space: pre-wrap;
-}
+
 .entry__body,
 .entry__textarea {
   font-size: 16px;
