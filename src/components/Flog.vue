@@ -19,7 +19,6 @@
     <AddEntry
       @newEntry="(entryData) => addNewEntry(unref(entryData), flog)"
       :entryValue="addEntryValue"
-      :timestamp="getTimestamp()"
     />
     <div id="spinner">
       <PacmanLoader
