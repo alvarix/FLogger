@@ -1,32 +1,37 @@
-<template>  
+<template>
   <aside class="vue-file">Pretext.vue</aside>
 
   <button class="small popbutton" popovertarget="my-popover">Flog Info</button>
   <div id="my-popover" popover class="popover">
     <div class="pretext">
-      <button class="small popbutton" popovertarget="my-popover" popovertargetactin="hide">
+      <button
+        class="small popbutton"
+        popovertarget="my-popover"
+        popovertargetactin="hide"
+      >
         close
       </button>
 
-      <div v-if="!isEditing" @click="edit" class="pretext__body">
-        <pre class="pretext__pre">{{ props.pretext }}</pre>
-      </div>
+      <pre v-if="!isEditing" class="pretext__body" @click="edit">{{
+        props.pretext
+      }}</pre>
 
-      <!-- Display a textarea if editing -->
-      <textarea
+      <!-- Display a pre if editing -->
+      <pre
         v-else
-        ref="pretextTextarea"
-        class="pretext__textarea auto-resize"
+        id="editPretext"
+        ref="pretextEl"
+        class="pretext__body"
+        :contenteditable="!readOnly"
         @blur="save"
-        v-model="pretextValue"
-        :readOnly="readOnly"
-      ></textarea>
+        >{{ pretextValue }}</pre
+      >
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, toRef, nextTick } from "vue";
+import { ref, watch, nextTick } from "vue";
 
 const props = defineProps<{
   pretext?: string;
@@ -36,34 +41,60 @@ const props = defineProps<{
 // Emits an event to the parent
 const emit = defineEmits(["update-pretext"]);
 
-let isEditing = ref(false);
-const pretextTextarea = ref(null);
-const pretextValue = ref(props.pretext);
-// console.log('pretextValue', pretextValue)
+const isEditing = ref(false);
+const pretextEl = ref(null);
+const pretextValue = ref<string>(props.pretext);
+console.log('pretextValue.value', pretextValue.value)
 
 function edit() {
   isEditing.value = true;
-  pretextValue.value = props.pretext;
-  // textarea isnt in dom yet, so next click needed
+}
+
+function placeCursorAtEnd(element) {
+  if (element) {
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    range.collapse(false); // Collapse to the end
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+}
+
+function setupEditing() {
   nextTick(() => {
-    if (pretextTextarea.value) {
-      pretextTextarea.value.focus({ preventScroll: true });
-      // auto resize
-      pretextTextarea.value.style.height =
-        pretextTextarea.value.scrollHeight + "px";
-      // Set cursor position to the start of the text
-      pretextTextarea.value.selectionStart = 0;
-      pretextTextarea.value.selectionEnd = 0;
-      // scroll to
-      pretextTextarea.value.scrollIntoView({ behavior: "smooth" });
+    console.log("pretextEl", pretextEl.value);
+    if (pretextEl.value && pretextEl.value != null) {
+      // Set cursor position to the end of the text
+      placeCursorAtEnd(pretextEl.value);
+      pretextEl.value.focus();
     }
   });
 }
 
+watch(
+  () => props.pretext,
+  (newValue) => {
+    // console.log('watch props.entry')
+    pretextValue.value = newValue;
+  },
+  { immediate: true }
+);
+watch(
+  isEditing,
+  (newValue) => {
+    if (!!newValue) setupEditing();
+  },
+  { immediate: true }
+);
+
 // Function to emit the update when blur occurs
-function save() {
+function save(event) {
   // console.log('save pretextValue', pretextValue)
-  emit("update-pretext", pretextValue);
+  // Could use either of these:
+  // entryText.value = event.target.innerText;
+  pretextValue.value = pretextEl.value.innerText;
+  emit("update-pretext", pretextValue.value);
   isEditing.value = false;
 }
 </script>
@@ -78,7 +109,7 @@ function save() {
   font-weight: 400;
   padding: 1rem 1.5rem;
   border-radius: 1rem;
-  max-width: 20ch;
+  max-width: 80ch;
   line-height: 1.4;
   border:0
   top: 2rem;
@@ -91,11 +122,12 @@ function save() {
   background-color: var(--misc-color);
 }
 
-.pretext__pre
-  white-space: pre-wrap;
+pre.pretext__body {
+  white-space: pre-wrap; /* Enables wrapping of text, preserving spaces and line breaks */
+  word-wrap: break-word; /* Breaks long words to prevent overflow */
+}
 
-.pretext__body,
-.pretext__textarea {
+.pretext__body {
   font-size: 16px;
   font-family: var(--font);
   width 100%
@@ -103,18 +135,12 @@ function save() {
 }
 
 .pretext__body,
-.pretext textarea,
 .pretext input {
   text-align: left;
   max-width: 600px;
   border-radius: 14px;
   padding: 20px;
   padding: 10px 20px ;
-}
-
-.pretext__textarea {
-  background-color: var(--input-color);
-  max-width: 95%;
 }
 
 .pretext__body:hover {

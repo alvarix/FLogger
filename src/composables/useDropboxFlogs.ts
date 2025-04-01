@@ -8,9 +8,8 @@ import { timestamp, useTimestamp } from "@vueuse/core";
 // Re-export these for convenience
 export type { IFlog as IFlog }
 export { IFlogStatus as IFlogStatus };
-
 export interface IDropboxFlog extends IFlog {
-    rev: string;
+    rev?: string;
 }
 
 export interface IDropboxFlogs {
@@ -32,6 +31,8 @@ export interface IDropboxFlogs {
     // makes use of ... from useDropboxFiles
     saveFlogEntries: (flog: IDropboxFlog) => void;
     addFlog: (flog: IDropboxFlog) => void;
+    deleteFlog: (flog: IDropboxFlog) => void;
+    accountOwner: Ref<string | null>;
 }
 
 // const initialReadmeFile = fs.readFileSync('./repo_template/README.flogger.txt').toString("utf-8");
@@ -121,7 +122,9 @@ const {
     availableRepoFiles,
     loadFileContent,
     saveFileContent,
-    addFile
+    addFile,
+    deleteFile,
+    accountOwner
 } = useDropboxFiles(repoFiles.value)
 
 export const useDropboxFlogs = (): IDropboxFlogs => {
@@ -151,7 +154,13 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
             //     .concat(added)
             // // We will just recreate availableFlogs with this...
             availableFlogs.value = availableFiles.value.map<IDropboxFlog>(
-                (file) => ({ sourceType: 'dropbox', url: file.path } as IDropboxFlog)
+                (file) => ({
+                    sourceType: 'dropbox',
+                    url: file.path,
+                    modified: new Date(file.modified),
+                    rev: null,
+                    loadedEntries: null
+                } as IDropboxFlog)
             )
         }
         ,
@@ -216,6 +225,17 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
         )
     }
 
+    const deleteFlog = (flog: IDropboxFlog) => {
+        // console.log('addFlog flog', flog)
+        deleteFile(
+            {
+                path: flog.url,
+                rev: flog.rev
+            } as IDropboxFile,
+            () => { } // can parameterize so calling app gets notice once delete is complete 
+        )
+    }
+
     const clearConnection = () => {
         clearFileConnection()
         availableFlogs.value = []
@@ -233,5 +253,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
         loadFlogEntries,
         saveFlogEntries,
         addFlog,
+        deleteFlog, 
+        accountOwner: accountOwner
     }
 }

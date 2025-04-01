@@ -13,6 +13,7 @@ export interface IFlog extends IFlogCore {
     permissions?: string,
     readOnly?: boolean,
     rawContent?: string,
+    modified?: Date
 }
 
 export function serializeFlog(entriesList: IEntry[], pretext?: string): string {
@@ -23,7 +24,7 @@ export function serializeFlog(entriesList: IEntry[], pretext?: string): string {
 export function serializeEntries(entriesList: IEntry[]): string {
     return entriesList.reduce<string>(
         (accumulatedValue, currentEntry, index) => {
-            const entryString = `${currentEntry.date.toLocaleDateString()}`
+            const entryString = `${currentEntry.date.toLocaleDateString("en-US")} ${currentEntry.date.toLocaleTimeString("en-US")}`
                 + "\n"
                 + `${currentEntry.entry}`
             return accumulatedValue + ((index > 0) ? '\n\n' : '') + entryString
@@ -42,26 +43,48 @@ export function serializeEntries(entriesList: IEntry[]): string {
 // Entry text
 // 
 export function deserializeFlog(rawEntryContent: string): IFlogCore {
+    const legacyDateRegEx = /([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4}|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2})/
+    const newDateTimeRegEx = /([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4} 1?[0-9]:[0-9]{2}:[0-9]{2} [AP]M|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2} 1?[0-9]:[0-9]{2}:[0-9]{2} [AP]M)/
     function isValidDate(dateString) {
         // const date = new Date(dateString);
         // return !isNaN(date.getTime());
-        return /^([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4}|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2})$/.test(
+        return (new RegExp("^" + legacyDateRegEx.source + "$")).test(
             dateString
+        );
+    }
+    function isValidDateTime(datetimeString) {
+        // const date = new Date(dateString);
+        // return !isNaN(date.getTime());
+        return (new RegExp("^" + newDateTimeRegEx.source + "$")).test(
+            datetimeString
         );
     }
     let filteredEntries, pretext, status;
     let splitItems, filteredItems, itemsMappedToEntries;
     try {
+        let legacyDateOnly = false
         splitItems = rawEntryContent.split(
-            /(?:\n\n|^)([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4}|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2})\n/
+            new RegExp("(?:\n\n|^)" + newDateTimeRegEx.source + "\n")
         );
+        if (splitItems.length == 0 || (splitItems.length == 1 && !isValidDateTime(splitItems[0]))) {
+            // No entries found splitting on date+time format. 
+            // Try splitting on legacy date-only format.
+            legacyDateOnly = true;
+            console.log("No entries found splitting on date+time format. Try splitting on legacy date-only format.", splitItems)
+            splitItems = rawEntryContent.split(
+                new RegExp("(?:\n\n|^)" + legacyDateRegEx.source + "\n")
+            );
+        }
         // The following few steps convert array of
         //    [date,entry,date,entry,...]
         // into an array of objects with date and entry properties:
         //    [{date, entry},{date, entry},...]
         filteredItems = splitItems.filter((item) => !!item);
         itemsMappedToEntries = filteredItems.map((item, index, arr) => {
-            if (isValidDate(item) && arr[index + 1]) {
+            if (legacyDateOnly && isValidDate(item) && arr[index + 1]) {
+                return { date: new Date(arr[index]), entry: arr[index + 1] };
+            }
+            if (!legacyDateOnly && isValidDateTime(item) && arr[index + 1]) {
                 return { date: new Date(arr[index]), entry: arr[index + 1] };
             }
         });
@@ -71,7 +94,11 @@ export function deserializeFlog(rawEntryContent: string): IFlogCore {
         // But this is how it can be parsed out here, after already splitting by date:
         let firstEntryFound;
         pretext = splitItems.reduce((prev, item, index, arr) => {
-            if (!firstEntryFound && isValidDate(item)) {
+            if (legacyDateOnly && !firstEntryFound && isValidDate(item)) {
+                firstEntryFound = index;
+                return prev;
+            }
+            if (!legacyDateOnly && !firstEntryFound && isValidDateTime(item)) {
                 firstEntryFound = index;
                 return prev;
             }
