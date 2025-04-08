@@ -17,6 +17,7 @@
       class="entry__body"
       :contenteditable="!isReadOnly"
       @blur="handleBlur"
+      @keydown="handleKeyDown"
       >{{ entryText }}</pre
     >
     <!-- 
@@ -103,6 +104,18 @@ function handleBlur(event) {
   emit("stop-editing");
   // // This is not necessary and triggers a re-render on focus
 }
+
+// keydown handler: if Shift+Enter is pressed, trigger handleBlur
+function handleKeyDown(event: KeyboardEvent) {
+  if (event.shiftKey && event.key === "Enter") {
+    event.preventDefault();
+    handleBlur(event);
+    // Optionally, remove focus after handling Shift+Enter.
+    entryEl.value?.blur();
+  }
+}
+
+// what do these watches do?
 
 watch(
   () => props.entry,
