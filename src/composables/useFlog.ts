@@ -18,6 +18,17 @@ interface IUseFlog {
 
 const { saveFlogToSource } = useOpenFlogs();
 
+export function useKeyDownHandler(blurCallback: (event: KeyboardEvent) => void) {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.shiftKey && event.key === "Enter") {
+        event.preventDefault();
+        blurCallback(event);
+        (event.target as HTMLElement)?.blur();
+      }
+    }
+    return { handleKeyDown };
+  }
+
 export const useFlog = (inFlog: IFlog | Ref<IFlog>): IUseFlog => {
 
     // Use toValue here to make sure we're not chaining a ref
@@ -85,5 +96,6 @@ export const useFlog = (inFlog: IFlog | Ref<IFlog>): IUseFlog => {
         updatePretext,
         deleteEntry,
         editEntry,
+        useKeyDownHandler
     }
 }

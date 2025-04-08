@@ -33,6 +33,9 @@
 <script setup lang="ts">
 import { ref, computed, nextTick, watch } from "vue";
 import type { IEntry } from "../modules/EntryData";
+import { useKeyDownHandler } from "@/composables/useFlog.ts";
+
+const { handleKeyDown } = useKeyDownHandler(handleBlur);
 
 const props = defineProps<{
   entry: IEntry;
@@ -105,15 +108,7 @@ function handleBlur(event) {
   // // This is not necessary and triggers a re-render on focus
 }
 
-// keydown handler: if Shift+Enter is pressed, trigger handleBlur
-function handleKeyDown(event: KeyboardEvent) {
-  if (event.shiftKey && event.key === "Enter") {
-    event.preventDefault();
-    handleBlur(event);
-    // Optionally, remove focus after handling Shift+Enter.
-    entryEl.value?.blur();
-  }
-}
+
 
 // what do these watches do?
 
