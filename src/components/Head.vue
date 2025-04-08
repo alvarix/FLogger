@@ -19,10 +19,14 @@
               />
               Disconnect {{ accountOwner }}
             </button>
+
+           <button class="small" @click="fileView">
+            {{ fileViewOn ? 'Turn off File view' : 'Turn on File view' }}
+          </button>
           </div>
           <form method="dialog" class="text-center mt-8">
               <button formmethod="dialog" class="small">Close</button>
-            </form>
+          </form>
         </div>
       </dialog>
 
@@ -48,6 +52,7 @@ import { onMounted, ref } from "vue";
 const { hasConnection, accountOwner } = useDropboxFlogs();
 const { clearConnection } = useDropboxFlogs();
 const dialog = ref(null);
+const fileViewOn = ref(false);
 
 onMounted(() => {
   const modalBtn = document.querySelector(".btn-prefs");
@@ -64,7 +69,16 @@ const disconnect = () => {
   dialog.value.close();
 }
 
-
+const fileView = () => {
+  fileViewOn.value = !fileViewOn.value;
+  const fileElements = document.querySelectorAll(".vue-file");
+  fileElements.forEach(el => {
+    const element = el;
+    // Toggle display between "none" and "block"
+    const currentDisplay = window.getComputedStyle(element).display;
+    element.style.display = currentDisplay === "none" ? "block" : "none";
+  });
+}
 </script>
 
 <style scoped > 
