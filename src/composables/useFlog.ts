@@ -32,6 +32,16 @@ export const useFlog = (inFlog: IFlog | Ref<IFlog>): IUseFlog => {
         flog.value.pretext = pretext
     }
 
+
+    const showMessage = (msg) => {
+        let el = document.querySelector('.message') as HTMLDivElement;
+        el.textContent = msg;
+        el.style.opacity = '1';
+        setTimeout(() => {
+            el.style.opacity = '0';
+        }, 3000);
+    };
+
     const deleteEntry = (entry: IEntry) => {
         if (!flog || !Array.isArray(flog.value.loadedEntries)) {
             console.error('Flog or flog.value.loadedEntries is undefined or not an array');
@@ -62,6 +72,8 @@ export const useFlog = (inFlog: IFlog | Ref<IFlog>): IUseFlog => {
             flog.value.loadedEntries[editEntryIndex] = { ...flog.value.loadedEntries[editEntryIndex], ...entry };
             // Save the updated flog to the source to persist the changes
             saveFlogToSource(flog.value);
+            showMessage('Saved');
+
         } else {
             console.error('Entry not found in flog.value.loadedEntries');
         }

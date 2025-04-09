@@ -28,11 +28,6 @@
       </div>
     </div>
     <div><button class="big" type="submit">Add Entry</button></div>
-    <!--
-    <div class="flex justify-center md:justify-start">
-      <button class="big" type="submit"></button>
-    </div>
-  -->
   </form>
 </template>
 
