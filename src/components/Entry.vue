@@ -17,6 +17,7 @@
       class="entry__body"
       :contenteditable="!isReadOnly"
       @blur="handleBlur"
+      @keydown="handleKeyDown"
       >{{ entryText }}</pre
     >
     <!-- 
@@ -32,6 +33,9 @@
 <script setup lang="ts">
 import { ref, computed, nextTick, watch } from "vue";
 import type { IEntry } from "../modules/EntryData";
+import { useKeyDownHandler } from "@/composables/useFlog.ts";
+
+const { handleKeyDown } = useKeyDownHandler(handleBlur);
 
 const props = defineProps<{
   entry: IEntry;
@@ -103,6 +107,10 @@ function handleBlur(event) {
   emit("stop-editing");
   // // This is not necessary and triggers a re-render on focus
 }
+
+
+
+// what do these watches do?
 
 watch(
   () => props.entry,
