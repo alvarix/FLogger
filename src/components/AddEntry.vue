@@ -1,5 +1,4 @@
 <template>
-  
   <aside class="vue-file">AddEntry.vue</aside>
   <form id="add-entry" @submit.prevent="submitAdd">
     <div class="form-inner">
@@ -8,8 +7,8 @@
           :class="['date', { error: hasError }]"
           id="time"
           type="text"
-          :placeholder="form.date"
-          v-model="form.date"
+          :placeholder="defaultFormEntry.date"
+          v-model="entryDate"
           required
         />
         <em class="date-validation hidden" :class="{ error: hasError }"
@@ -17,14 +16,24 @@
         >
       </div>
       <div>
-        <textarea
+        <pre
+          id="entry"
+          name=""
+          ref="entryEl"
+          class="entry__body"
+          contenteditable
+          >{{ defaultFormEntry.entry }}</pre
+        >
+        <!-- @blur="handleBlur"
+          @keydown="handleKeyDown" -->
+        <!-- <textarea
           class="auto-resize"
           autofocus
           id="entry"
           name=""
-          v-model="form.entry"
+          v-model="entryBody"
           required
-        ></textarea>
+        ></textarea> -->
       </div>
     </div>
     <div><button class="big" type="submit">Add Entry</button></div>
@@ -41,28 +50,30 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["newEntry"]);
-const newEntry = ref(""); // Initialize newEntry as a reactive variable
-
-let hasError = ref(false);
 
 const datetime = new Date();
-let form = ref(
-  new EntryData(`${datetime.toLocaleDateString("en-US")} ${datetime.toLocaleTimeString("en-US")}`, props.entryValue || "")
+
+const defaultFormEntry = new EntryData(
+  `${datetime.toLocaleDateString("en-US")} ${datetime.toLocaleTimeString(
+    "en-US"
+  )}`,
+  props.entryValue || ""
 );
 
-const submitAdd = (event) => {
-  emit("newEntry", form);
-  const datetime = new Date();
-  form.value = new EntryData(`${datetime.toLocaleDateString("en-US")} ${datetime.toLocaleTimeString("en-US")}`, props.entryValue || "");
-};
+const entryDate = ref(defaultFormEntry.date);
+const entryEl = ref(null); // Element ref for the contenteditable
 
-// Function to automatically resize the textarea based on content
-const autoResizeTextarea = (el_id) => {
-  const textarea = document.getElementById(el_id);
-  if (textarea) {
-    textarea.style.height = "auto"; // Reset height to shrink if needed
-    textarea.style.height = `${textarea.scrollHeight}px`; // Set the height based on scrollHeight
-  }
+const hasError = ref(false);
+
+const submitAdd = (event) => {
+  // emit the event with a
+  emit(
+    "newEntry",
+    new EntryData(entryDate.value, entryEl.value.innerText || "")
+  );
+  // Reset the form data
+  entryDate.value = defaultFormEntry.date;
+  entryEl.value.innerText = defaultFormEntry.entry;
 };
 
 // this watch is triggered when copying an entry
@@ -70,23 +81,25 @@ watch(
   () => props.entryValue,
   (newVal) => {
     if (!newVal || !newVal?.entry) {
-      form.value.entry = "";
+      entryEl.value.innerText = "";
     } else if (newVal?.entry) {
-      form.value.entry = newVal.entry; // Prepopulate the textarea with the copied entry
-      const addEntryForm = document.getElementById("add-entry");
+      entryEl.value.innerText = newVal.entry; // Prepopulate the textarea with the copied entry
 
-      // nextTick(() => autoResizeTextarea("entry")); // Adjust the textarea size after the DOM update
-
-      if (addEntryForm) {
-        addEntryForm.scrollIntoView({ behavior: "smooth" }); // Smooth scroll to the form
-      }
-	}
+      nextTick(() => {
+        if (entryEl.value && entryEl.value != null) {
+          // Set cursor position to the end of the text
+          placeCursorAtEnd(entryEl.value);
+          // Smooth scroll to the entryEl
+          entryEl.value.scrollIntoView({ behavior: "smooth" }); // Smooth scroll to the entryEl
+          entryEl.value.focus();
+        }
+      });
+    }
   }
 );
 </script>
 
 <style scoped>
-
 /*
 .big
   display: flex
@@ -123,50 +136,81 @@ watch(
 
 */
 
-
 input.error {
-	border: 1px solid var(--red-color);
+  border: 1px solid var(--red-color);
 }
 
 .form-inner .date {
-	background: none;
-	margin-left: 10px;
-}
-.form-inner textarea {
-    max-width: 600px;
-    height: 50vw;
-    border-radius: 14px;
-    padding: 20px;
+  background: none;
+  margin-left: 10px;
 }
 
 input.date {
-	font-weight: bold;
-	border: none;
+  font-weight: bold;
+  border: none;
 }
 
-input, textarea {
-	padding: 5px;
-	font-size: 16px;
-}
-
-textarea {
-	width: 100%;
-	box-sizing: border-box;
+input {
+  padding: 5px;
+  font-size: 16px;
 }
 
 .date-validation.error {
-	display:block;
-	color:var(--red-color);
+  display: block;
+  color: var(--red-color);
 }
 
-input[type=submit] {
-	border-radius: 10px;
-	padding: 6px 10px;
-	margin-top: 10px;
-	cursor: pointer;
+input[type="submit"] {
+  border-radius: 10px;
+  padding: 6px 10px;
+  margin-top: 10px;
+  cursor: pointer;
 }
 
 #add-entry label {
-	margin-top: 20px;
+  margin-top: 20px;
+}
+</style>
+<style lang="styl" scoped>
+
+h3
+  font-weight 700
+  font-size 14px
+  margin 50px 0 20px 20px
+
+.entry__body
+  background-color: var(--misc-color)
+  max-width: 600px;
+  height: 50vw;
+  border-radius: 14px;
+  padding: 20px;
+
+pre.entry__body
+  white-space: pre-wrap; /* Enables wrapping of text, preserving spaces and line breaks */
+  word-wrap: break-word; /* Breaks long words to prevent overflow */
+
+
+.entry__body {
+  font-size: 16px;
+  font-family: var(--font);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.entry__body {
+  text-align: left;
+  max-width: 600px;
+  border-radius: 14px;
+  padding: 20px;
+  padding: 10px 20px ;
+}
+
+.entry__textarea {
+  background-color: var(--input-color);
+  max-width: 95%;
+}
+
+.entry__body:hover {
+  background-color: var(--input-color);
 }
 </style>

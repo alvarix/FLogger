@@ -12,17 +12,13 @@
         close
       </button>
 
-      <pre v-if="!isEditing" class="pretext__body" @click="edit">{{
-        props.pretext
-      }}</pre>
-
-      <!-- Display a pre if editing -->
+      <!-- Display a pre, contenteditable if editing -->
       <pre
-        v-else
         id="editPretext"
         ref="pretextEl"
         class="pretext__body"
-        :contenteditable="!readOnly"
+        :contenteditable="isEditing && !readOnly"
+        @click="edit"
         @blur="save"
         >{{ pretextValue }}</pre
       >
@@ -44,7 +40,7 @@ const emit = defineEmits(["update-pretext"]);
 const isEditing = ref(false);
 const pretextEl = ref(null);
 const pretextValue = ref<string>(props.pretext);
-console.log('pretextValue.value', pretextValue.value)
+console.log("pretextValue.value", pretextValue.value);
 
 function edit() {
   isEditing.value = true;
