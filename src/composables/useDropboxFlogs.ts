@@ -1,6 +1,6 @@
 import { ref, Ref, watch, onUpdated, onActivated } from "vue"
 import type { IFlog } from "@/modules/Flog"
-import { IFlogStatus, deserializeFlog, serializeFlog } from "@/modules/Flog"
+import { IFlogStatus, IFlogSourceType, deserializeFlog, serializeFlog } from "@/modules/Flog"
 import { useDropboxFiles } from "@/composables/useDropboxFiles"
 import { IDropboxFile } from "@/composables/useDropboxFiles";
 import { timestamp, useTimestamp } from "@vueuse/core";
@@ -140,10 +140,10 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
             // // Rather than merging the old and new values with this...
             // const removed = !oldValue ? [] : oldValue
             //     .filter((file) => newValue && !newValue.includes(file))
-            //     .map<IDropboxFlog>((file) => ({ sourceType: 'dropbox', url: file.path } as IDropboxFlog))
+            //     .map<IDropboxFlog>((file) => ({ sourceType: IFlogSourceType.dropbox, url: file.path } as IDropboxFlog))
             // const added = !newValue ? [] : newValue
             //     .filter((file) => oldValue && !oldValue.includes(file))
-            //     .map<IDropboxFlog>((file) => ({ sourceType: 'dropbox', url: file.path } as IDropboxFlog))
+            //     .map<IDropboxFlog>((file) => ({ sourceType: IFlogSourceType.dropbox, url: file.path } as IDropboxFlog))
             // // console.log('watching newValue', removed, added, availableFlogs)
             // const comparableAvailableFlogs = availableFlogs.value.map((flog) => ({ sourceType: flog.sourceType, url: flog.url } as IDropboxFlog))
             // availableFlogs.value = comparableAvailableFlogs
@@ -155,7 +155,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
             // // We will just recreate availableFlogs with this...
             availableFlogs.value = availableFiles.value.map<IDropboxFlog>(
                 (file) => ({
-                    sourceType: 'dropbox',
+                    sourceType: IFlogSourceType.dropbox,
                     url: file.path,
                     modified: new Date(file.modified),
                     rev: null,
@@ -172,7 +172,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
         (newValue, oldValue) => {
             // console.log('watch availableRepoFiles (useDropboxFlogs)', availableRepoFlogs.value, availableRepoFiles, newValue, oldValue)
             availableRepoFlogs.value = availableRepoFiles.value.map<IDropboxFlog>(
-                (file) => ({ sourceType: 'dropbox', url: file.path, readOnly: file.readOnly } as IDropboxFlog)
+                (file) => ({ sourceType: IFlogSourceType.dropbox, url: file.path, readOnly: file.readOnly } as IDropboxFlog)
             )
         }
         ,
@@ -253,7 +253,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
         loadFlogEntries,
         saveFlogEntries,
         addFlog,
-        deleteFlog, 
+        deleteFlog,
         accountOwner: accountOwner
     }
 }

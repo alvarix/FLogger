@@ -1,5 +1,6 @@
 import { ref, Ref, watch } from "vue"
 import type { IFlog } from "@/modules/Flog"
+import { IFlogSourceType } from "@/modules/Flog"
 import { useDropboxFlogs, IDropboxFlog } from "@/composables/useDropboxFlogs";
 
 
@@ -55,7 +56,7 @@ export const useOpenFlogs = () => {
 
     const saveFlogToSource = (flog: IFlog) => {
         switch (flog.sourceType) {
-            case 'dropbox':
+            case IFlogSourceType.dropbox:
                 saveFlogEntries_dropbox(flog as IDropboxFlog)
                 break;
             default:
@@ -64,7 +65,7 @@ export const useOpenFlogs = () => {
 
     const addFlogToSource = (flog: IFlog) => {
         switch (flog.sourceType) {
-            case 'dropbox':
+            case IFlogSourceType.dropbox:
                 addFlog_dropbox(flog as IDropboxFlog)
                 break;
             default:

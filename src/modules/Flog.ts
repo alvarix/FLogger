@@ -2,13 +2,16 @@ import type { IEntry } from './EntryData'
 
 export enum IFlogStatus { loaded, error };
 
+
+export enum IFlogSourceType { "dropbox", "local file" };
+
 interface IFlogCore {
     loadedEntries: IEntry[],
     pretext?: string,
     status?: IFlogStatus
 }
 export interface IFlog extends IFlogCore {
-    sourceType: "dropbox" | "local file",
+    sourceType: IFlogSourceType,
     url: string,
     permissions?: string,
     readOnly?: boolean,

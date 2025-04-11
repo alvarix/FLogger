@@ -73,7 +73,7 @@ import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
 import AddFlog from "@/components/AddFlog.vue";
 import { ref, watch } from "vue";
-import { IFlog } from "@/modules/Flog";
+import { IFlog, IFlogSourceType } from "@/modules/Flog";
 
 const {
   connectionPopupWindow,
@@ -130,7 +130,7 @@ function handleAddFlog(flogData) {
     url: flogData.value.filename + ".flogger.txt",
     loadedEntries: [],
     rev: null,
-    sourceType: "dropbox",
+    sourceType: IFlogSourceType.dropbox,
   });
 }
 
