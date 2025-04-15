@@ -3,7 +3,9 @@
     <aside class="vue-file">FlogList.vue</aside>
     <div
       id="authed-section"
-      :style="{ display: hasConnection ? 'block' : 'none' }"
+      :style="{
+        display: hasConnection.get(IFlogSourceType.dropbox) ? 'block' : 'none',
+      }"
     >
       <AddFlog
         @newFlog="handleAddFlog"
@@ -68,22 +70,21 @@
 </template>
 
 <script setup lang="ts">
-import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
+import { useFlogs, IFlog, IFlogSourceType } from "@/composables/useFlogs";
 // @ts-ignore-error
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
 import AddFlog from "@/components/AddFlog.vue";
 import { ref, watch } from "vue";
-import { IFlog, IFlogSourceType } from "@/modules/Flog";
 
 const {
-  connectionPopupWindow,
   hasConnection,
+  connectionPopupWindow,
   availableFlogs,
   availableRepoFlogs,
-  loadFlogEntries,
-  addFlog,
-  deleteFlog,
-} = useDropboxFlogs();
+  loadFlogEntriesFromSource,
+  addFlogToSource,
+  deleteFlogFromSource,
+} = useFlogs();
 
 const { openFlog } = useOpenFlogs();
 
@@ -93,23 +94,23 @@ const defaultFlogAlreadyOpened = ref(
 const defaultFlogFilepath = "/default.flogger.txt";
 
 const showModal = ref(false);
-// @ts-expect-error
-watch(connectionPopupWindow, () => {
-  showModal.value = connectionPopupWindow ? true : false;
+watch([() => [...connectionPopupWindow.value]], () => {
+  showModal.value = connectionPopupWindow.value.get(IFlogSourceType.dropbox)
+    ? true
+    : false;
 });
 
-const selectFile = (file) => {
-  console.log("selectFile", file);
-  loadFlogEntries(file);
-  openFlog(file);
-};
-
 watch(
-  [hasConnection, availableFlogs],
+  [() => [...hasConnection.value], () => [...availableFlogs.value]],
   () => {
-    if (hasConnection.value && !defaultFlogAlreadyOpened.value) {
+    if (
+      hasConnection.value.get(IFlogSourceType.dropbox) &&
+      !defaultFlogAlreadyOpened.value
+    ) {
       const defaultFlogFile = availableFlogs.value.filter(
-        (file) => file.url == defaultFlogFilepath
+        (flog) =>
+          flog.sourceType == IFlogSourceType.dropbox &&
+          flog.url == defaultFlogFilepath
       )[0];
       if (defaultFlogFile) {
         defaultFlogAlreadyOpened.value = true;
@@ -125,10 +126,17 @@ watch(
   { immediate: true }
 );
 
+function selectFile(file) {
+  console.log("selectFile", file);
+  loadFlogEntriesFromSource(file);
+  openFlog(file);
+}
+
 function handleAddFlog(flogData) {
-  addFlog({
+  addFlogToSource({
     url: flogData.value.filename + ".flogger.txt",
     loadedEntries: [],
+    // @ts-expect-error
     rev: null,
     sourceType: IFlogSourceType.dropbox,
   });
@@ -140,7 +148,7 @@ function handleDeleteFlog(flog: IFlog) {
   );
   // If the user confirms deletion, proceed with removing the flog
   if (confirmDelete) {
-    deleteFlog(flog);
+    deleteFlogFromSource(flog);
     console.log("Entry deleted successfully");
   } else {
     console.log("Entry deletion canceled");
@@ -156,39 +164,45 @@ const sortDescending = ref<boolean>(true);
 
 const showSortOptionSelect = ref(false);
 function selectSortOption(option: sortType) {
+  console.log('selectSortOption',option)
   sortOption.value = option;
 }
 
 function sortFlogsByFilename(flogList: IFlog[], descending?: boolean) {
-  return flogList.toSorted((a, b) => {
-    const nameA = a.url.toLowerCase();
-    const nameB = b.url.toLowerCase();
+  return (
+    flogList.toSorted((a, b) => {
+      const nameA = a.url.toLowerCase();
+      const nameB = b.url.toLowerCase();
 
-    if (descending) return nameB.localeCompare(nameA);
-    else return nameA.localeCompare(nameB);
-    // // Case sensative sort:
-    // if (a.url < b.url) {
-    //   return -1;
-    // }
-    // if (a.url > b.url) {
-    //   return 1;
-    // }
-    // return 0;
-  });
+      if (descending) return nameB.localeCompare(nameA);
+      else return nameA.localeCompare(nameB);
+      // // Case sensative sort:
+      // if (a.url < b.url) {
+      //   return -1;
+      // }
+      // if (a.url > b.url) {
+      //   return 1;
+      // }
+      // return 0;
+    }) || []
+  );
 }
 function sortFlogsByModified(flogList: IFlog[], descending?: boolean) {
-  return flogList.toSorted((a, b) => {
-    if (descending) return b.modified.getTime() - a.modified.getTime();
-    else return a.modified.getTime() - b.modified.getTime();
-  });
+  return (
+    flogList?.toSorted((a, b) => {
+      if (descending) return b.modified.getTime() - a.modified.getTime();
+      else return a.modified.getTime() - b.modified.getTime();
+    }) || []
+  );
 }
 
 const sortedAvailableFlogs = ref(
   sortFlogsByModified(availableFlogs.value, true)
 );
 watch(
-  [availableFlogs, sortOption, sortDescending],
+  [() => [...availableFlogs.value], sortOption, sortDescending],
   () => {
+    console.log('sortOption.value', sortOption.value)
     switch (sortOption.value) {
       case sortType.name:
         sortedAvailableFlogs.value = sortFlogsByFilename(

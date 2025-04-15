@@ -16,7 +16,7 @@ export interface IDropboxFlogs {
     // pass through from useDropboxFiles
     launchConnectFlow: () => void;
     // pass through from useDropboxFiles
-    connectionPopupWindow: boolean;
+    connectionPopupWindow: Ref<any>;
     openDbxPopup: () => void;
     // pass through from useDropboxFiles
     hasConnection: Ref<boolean>;

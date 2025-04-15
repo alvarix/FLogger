@@ -3,7 +3,7 @@ import type { IEntry } from './EntryData'
 export enum IFlogStatus { loaded, error };
 
 
-export enum IFlogSourceType { "dropbox", "local file" };
+export enum IFlogSourceType { "dropbox", "localFile" };
 
 interface IFlogCore {
     loadedEntries: IEntry[],

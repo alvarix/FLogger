@@ -16,7 +16,7 @@ export interface IDropboxFiles {
     accountInfo: Ref<string | null>
     launchConnectFlow: () => void
     openDbxPopup: () => void
-    connectionPopupWindow: any
+    connectionPopupWindow: Ref<any>
     hasConnection: Ref<boolean>
     clearConnection: () => void
     availableFiles: Ref<IDropboxFile[]>

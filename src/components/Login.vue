@@ -1,5 +1,4 @@
 <template>
-  
   <aside class="vue-file">Login.vue</aside>
   <Teleport to="body">
     <!-- use the modal component, pass in the prop -->
@@ -10,7 +9,10 @@
       <template #body>
         <p>
           Complete the Dropbox authorization
-          <a @click="connectionPopupWindow?.focus()">in the pop-up window</a>.
+          <a
+            @click="connectionPopupWindow.get(IFlogSourceType.dropbox)?.focus()"
+            >in the pop-up window</a
+          >.
         </p>
         <p>
           If the window doesn't pop-up, <a @click="openPop()">click here</a>.
@@ -28,7 +30,9 @@
   <section class="container main">
     <div
       id="pre-auth-section"
-      :style="{ display: hasConnection ? 'none' : 'block' }"
+      :style="{
+        display: hasConnection.get(IFlogSourceType.dropbox) ? 'none' : 'block',
+      }"
     >
       <Intro />
     </div>
@@ -36,6 +40,7 @@
 </template>
 
 <script setup>
+import { IFlogSourceType, useFlogs } from "@/composables/useFlogs";
 import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
 import AddFlog from "@/components/AddFlog.vue";
@@ -45,47 +50,60 @@ import Modal from "@/components/Modal.vue";
 import Intro from "@/components/Intro.vue";
 
 const {
-  connectionPopupWindow,
-  openDbxPopup,
+  openPopup,
   hasConnection,
+  connectionPopupWindow,
   availableFlogs,
-  availableRepoFlogs,
-  loadFlogEntries,
+  loadFlogEntriesFromSource,
   addFlog,
-} = useDropboxFlogs();
+} = useFlogs();
 
 const { openFlog } = useOpenFlogs();
 // const props = defineProps({});
 
-const defaultFlogAlreadyOpened = ref(!!window.sessionStorage.getItem("defaultFlogAlreadyOpened"));
+const defaultFlogAlreadyOpened = ref(
+  !!window.sessionStorage.getItem("defaultFlogAlreadyOpened")
+);
 const defaultFlogFilepath = "/default.flogger.txt";
 
 const showModal = ref(false);
-watch(connectionPopupWindow, () => {
-  showModal.value = connectionPopupWindow ? true : false;
-});
+watch(
+  () => [...connectionPopupWindow.value],
+  () => {
+    showModal.value = connectionPopupWindow.value.get(IFlogSourceType.dropbox)
+      ? true
+      : false;
+  },
+  { immediate: true }
+);
 
 const openPop = () => {
-  console.log("openPop", openDbxPopup);
-  openDbxPopup();
+  console.log("openPop", openPopup(IFlogSourceType.dropbox));
+  openPopup(IFlogSourceType.dropbox);
 };
 
 const selectFile = (file) => {
   console.log("selectFile", file);
-  loadFlogEntries(file);
+  loadFlogEntriesFromSource(file);
   openFlog(file);
 };
 
 watch(
-  [hasConnection, availableFlogs],
+  [() => [...hasConnection.value], availableFlogs],
   () => {
-    if (hasConnection.value && !defaultFlogAlreadyOpened.value) {
+    if (
+      hasConnection.value.get(IFlogSourceType.dropbox) &&
+      !defaultFlogAlreadyOpened.value
+    ) {
       const defaultFlogFile = availableFlogs.value.filter(
         (file) => file.url == defaultFlogFilepath
       )[0];
       if (defaultFlogFile) {
         defaultFlogAlreadyOpened.value = true;
-        window.sessionStorage.setItem("defaultFlogAlreadyOpened", defaultFlogAlreadyOpened.value);
+        window.sessionStorage.setItem(
+          "defaultFlogAlreadyOpened",
+          defaultFlogAlreadyOpened.value
+        );
         selectFile(defaultFlogFile);
       }
     }
