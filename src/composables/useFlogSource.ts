@@ -35,15 +35,6 @@ export interface IFlogs {
     saveFlogToSource: (flog: IFlog) => void;
     deleteFlogFromSource: (flog: IFlog) => void;
 
-    // *************
-    // FLOG CONTENTS
-    // *************
-
-    updatePretext: (pretext: string, flog: IFlog) => void;
-    addEntryToFlog: (entry: IEntry, flog: IFlog) => void;
-    editEntryFromFlog: (flog: IFlog, entry: IEntry) => void;
-    deleteEntryFromFlog: (flog: IFlog, entry: IEntry) => void;
-
     // **************
     // SOURCE ACCOUNT
     // **************
@@ -55,7 +46,7 @@ export interface IFlogs {
     accountOwner: Ref<string | null>;
 
     // *****************
-    // SOURCE OPERATIONS
+    // SOURCE CONNECTION OPERATIONS
     // *****************
 
     // useFlogSource provides the following source operations
@@ -168,49 +159,6 @@ export const useFlogSource = (sourceType: IFlogSourceType): IFlogs => {
         }
     }
 
-    const updatePretext = (pretext: string, flog: IFlog) => {
-        flog.pretext = pretext
-    }
-
-    const addEntryToFlog = (entry: IEntry, flog: IFlog) => {
-        flog.loadedEntries.unshift(entry)
-    }
-
-    const editEntryFromFlog = (flog: IFlog, entry: IEntry) => {
-        if (!flog || !Array.isArray(flog.loadedEntries)) {
-            console.error(`Flog or flog.loadedEntries is undefined or not an array: ${flog}`);
-            return;
-        }
-        // Find the index of the entry to delete
-        const editEntryIndex = flog.loadedEntries.findIndex(flogEntry => flogEntry.id === entry.id);
-        if (editEntryIndex !== -1) {
-            // Update the entry at the found index
-            flog.loadedEntries[editEntryIndex] = { ...flog.loadedEntries[editEntryIndex], ...entry };
-            // Save the updated flog to the source to persist the changes
-            saveFlogToSource(flog);
-        } else {
-            console.error('Entry not found in flog.loadedEntries');
-        }
-    }
-
-    const deleteEntryFromFlog = (flog: IFlog, entry: IEntry) => {
-        if (!flog || !Array.isArray(flog.loadedEntries)) {
-            console.error('Flog or flog.loadedEntries is undefined or not an array');
-            return;
-        }
-        // Find the index of the entry to delete
-        const deleteEntryIndex = flog.loadedEntries.findIndex(flogEntry => flogEntry.id === entry.id);
-        if (deleteEntryIndex !== -1) {
-            // Remove the entry
-            flog.loadedEntries.splice(deleteEntryIndex, 1);
-
-            // Save the updated flog to the source to persist the changes
-            saveFlogToSource(flog);
-        } else {
-            console.error('Entry not found in flog.loadedEntries');
-        }
-    };
-
     const accountOwner = ref<string | null>(null);
     watch(accountOwner_dropbox,
         () => {
@@ -273,11 +221,6 @@ export const useFlogSource = (sourceType: IFlogSourceType): IFlogs => {
         loadFlogEntriesFromSource,
         saveFlogToSource,
         deleteFlogFromSource,
-
-        addEntryToFlog,
-        updatePretext,
-        editEntryFromFlog,
-        deleteEntryFromFlog,
 
         accountOwner,
 

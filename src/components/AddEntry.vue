@@ -78,7 +78,7 @@ const submitAdd = (event) => {
 
 // this watch is triggered when copying an entry
 watch(
-  props.entryValue,
+  () => props.entryValue,
   (newVal) => {
     if (!newVal || !newVal?.entry) {
       entryEl.value.innerText = "";
