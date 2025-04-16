@@ -1,58 +1,71 @@
 <template>
-    <header>
-      <input class="btn-prefs" type="image" src="/icon-gear.svg" />
-      <dialog ref="dialog">
-        <div class="theme-controls">
+  <header>
+    <input class="btn-prefs" type="image" src="/icon-gear.svg" />
+    <dialog ref="dialog">
+      <div class="theme-controls">
+        <ThemeSwitcher />
 
-          <ThemeSwitcher />
-          
-          <div
-            id="authed-section"
-            :style="{ display: hasConnection ? 'block' : 'none' }"
-          >
-            <button class="dbx__btn small" @click="disconnect">
-              <img
-                alt="Dropbox account"
-                src="/Dropbox_Icon.svg"
-                width="16"
-                height="16"
-              />
-              Disconnect {{ accountOwner }}
-            </button>
-
-           <button class="small" @click="fileView">
-            {{ fileViewOn ? 'Turn off File view' : 'Turn on File view' }}
+        <div
+          id="authed-section"
+          :style="{
+            display: hasConnection ? 'block' : 'none',
+          }"
+        >
+          <button class="dbx__btn small" @click="disconnect">
+            <img
+              alt="Dropbox account"
+              src="/Dropbox_Icon.svg"
+              width="16"
+              height="16"
+            />
+            Disconnect {{ accountOwnerValue }}
           </button>
-          </div>
-          <form method="dialog" class="text-center mt-8">
-              <button formmethod="dialog" class="small">Close</button>
-          </form>
-        </div>
-      </dialog>
 
-      <h1 id="logo">
-        <pre>
+          <button class="small" @click="fileView">
+            {{ fileViewOn ? "Turn off File view" : "Turn on File view" }}
+          </button>
+        </div>
+        <form method="dialog" class="text-center mt-8">
+          <button formmethod="dialog" class="small">Close</button>
+        </form>
+      </div>
+    </dialog>
+
+    <h1 id="logo">
+      <pre>
 ███████╗██╗      ██████╗  ██████╗  ██████╗ ███████╗██████╗ 
 ██╔════╝██║     ██╔═══██╗██╔════╝ ██╔════╝ ██╔════╝██╔══██╗
 █████╗  ██║     ██║   ██║██║  ███╗██║  ███╗█████╗  ██████╔╝
 ██╔══╝  ██║     ██║   ██║██║   ██║██║   ██║██╔══╝  ██╔══██╗
 ██║     ███████╗╚██████╔╝╚██████╔╝╚██████╔╝███████╗██║  ██║
 ╚═╝     ╚══════╝ ╚═════╝  ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝
-        </pre>
-      </h1>
-    </header>
-
+        </pre
+      >
+    </h1>
+  </header>
 </template>
 
 <script setup>
-import { useDropboxFiles } from "@/composables/useDropboxFiles";
-import { useDropboxFlogs } from "@/composables/useDropboxFlogs.ts";
+import { onMounted, ref, watch } from "vue";
+import { useFlogSource } from "@/composables/useFlogSource";
 import ThemeSwitcher from "@/components/ThemeSwitcher.vue";
-import { onMounted, ref } from "vue";
-const { hasConnection, accountOwner } = useDropboxFlogs();
-const { clearConnection } = useDropboxFlogs();
+import { IFlogSourceType } from "@/modules/Flog";
+
+const { hasConnection, accountOwner, clearConnection } = useFlogSource(
+  IFlogSourceType.dropbox
+);
 const dialog = ref(null);
 const fileViewOn = ref(false);
+
+const accountOwnerValue = ref(accountOwner.value);
+
+watch(
+  accountOwner,
+  () => {
+    accountOwnerValue.value = accountOwner.value;
+  },
+  { immediate: true }
+);
 
 onMounted(() => {
   const modalBtn = document.querySelector(".btn-prefs");
@@ -67,21 +80,21 @@ onMounted(() => {
 const disconnect = () => {
   clearConnection();
   dialog.value.close();
-}
+};
 
 const fileView = () => {
   fileViewOn.value = !fileViewOn.value;
   const fileElements = document.querySelectorAll(".vue-file");
-  fileElements.forEach(el => {
+  fileElements.forEach((el) => {
     const element = el;
     // Toggle display between "none" and "block"
     const currentDisplay = window.getComputedStyle(element).display;
     element.style.display = currentDisplay === "none" ? "block" : "none";
   });
-}
+};
 </script>
 
-<style scoped > 
+<style scoped>
 .btn-prefs {
   background-color: transparent;
   width: 20px;
@@ -110,7 +123,7 @@ dialog {
   background: var(--bg-color);
 }
 dialog::backdrop {
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(2px);
 }
 </style>

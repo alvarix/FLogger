@@ -1,5 +1,4 @@
 <template>
-
   <aside class="vue-file">AddFlog.vue</aside>
   <div v-if="!showInput">
     <button
@@ -12,34 +11,40 @@
       add new flog
     </button>
   </div>
-  <form v-else id="add-flog" @submit.prevent="submitAdd" @mouseleave="hideDropdown" @keydown="handleKeydown">
-      <div class="filename-controls">
-        <input
-          autofocus
-          autocomplete="off"
-          :class="['filename', { error: hasError }]"
-          id="filename"
-          type="text"
-          placeholder="search or create new flog"
-          v-model="typedFilename"
-          @focus="showDropdown = true"
-          @input="showDropdown = true"
-        />
-        <!-- required
+  <form
+    v-else
+    id="add-flog"
+    @submit.prevent="submitAdd"
+    @mouseleave="hideDropdown"
+    @keydown="handleKeydown"
+  >
+    <div class="filename-controls">
+      <input
+        autofocus
+        autocomplete="off"
+        :class="['filename', { error: hasError }]"
+        id="filename"
+        type="text"
+        placeholder="search or create new flog"
+        v-model="typedFilename"
+        @focus="showDropdown = true"
+        @input="showDropdown = true"
+      />
+      <!-- required
           @change="change" -->
-        <div class="autoc-select" v-show="showDropdown">
-          <ul id="files">
-            <li v-for="item in matchedFlogs">
-              <a href="#" @click.prevent="() => selectFlog(item)">{{
-                item.path_display ?? item.url
-              }}</a>
-            </li>
-          </ul>
-        </div>
-        <em class="date-validation hidden" :class="{ error: hasError }"
-          >Please enter valid file name</em
-        >
+      <div class="autoc-select" v-show="showDropdown">
+        <ul id="files">
+          <li v-for="item in matchedFlogs">
+            <a href="#" @click.prevent="() => selectFlog(item)">{{
+              item.path_display ?? item.url
+            }}</a>
+          </li>
+        </ul>
       </div>
+      <em class="date-validation hidden" :class="{ error: hasError }"
+        >Please enter valid file name</em
+      >
+    </div>
   </form>
 </template>
 
@@ -102,7 +107,7 @@ const hideDropdown = () => {
 };
 
 const handleKeydown = (e) => {
-  if (e.key === 'Escape') {
+  if (e.key === "Escape") {
     showDropdown.value = false;
   }
 };
@@ -110,20 +115,20 @@ const handleKeydown = (e) => {
 
 <style scoped lang="stylus">
 
-.autoc-select ul 
+.autoc-select ul
   list-style none
   box-shadow 0 2px 4px rgba(0, 0, 0, 0.1)
   background-color var(--input-color)
   margin 0
   padding 0
-  a 
-    padding 10px 15px    
+  a
+    padding 10px 15px
     display block
-    &:hover 
+    &:hover
       background-color var(--input-color)
-    
 
-input.error 
+
+input.error
   border: 1px solid red;
 
 
@@ -137,15 +142,15 @@ input[type="button"] {
   cursor: pointer;
 }
 
-.filename-controls 
+.filename-controls
     position: relative;
-  
-.filename 
+
+.filename
   background-color: var(--input-color);
   padding 20px
   border-radius: 14px
   font-weight: bold;
-  border-color: lightsteelblue 
+  border-color: lightsteelblue
   border-style solid
   font-size: 16px;
   outline-color: var(--input-color)
@@ -155,10 +160,10 @@ input[type="button"] {
   @media screen and (min-width: 600px)
     max-width: 600px
 
-  &:focus 
+  &:focus
     Xbox-shadow: 0 0 10px rgba(0, 0, 0, 0.5)
     Xborder-color transparent
-    
+
 
 .autoc-select {
   position: absolute;

@@ -2,11 +2,16 @@ import { ref, Ref, toValue } from "vue"
 import type { IFlog } from "@/modules/Flog"
 import { IFlogStatus } from "@/modules/Flog"
 import { IEntry } from '@/modules/EntryData'
-import { useOpenFlogs } from "@/composables/useOpenFlogs"
+import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource"
 
 // Re-export these for convenience
 export type { IFlog as IFlog }
 export { IFlogStatus as IFlogStatus }
+
+// useFlog returns the refs and operations defined in IFlog 
+// It includes:
+//  - a refs for the flog
+//  - operations for updating the parts of the flog ref (add, udpate, delete entries, and update pretext)
 
 interface IUseFlog {
     flog: Ref<IFlog>;
@@ -14,20 +19,21 @@ interface IUseFlog {
     updatePretext: (pretext: string) => void;
     deleteEntry: (entry: IEntry) => void;
     editEntry: (entry: IEntry) => void;
+    useKeyDownHandler: (blurCallback: (event: KeyboardEvent) => void) => { handleKeyDown: (event: KeyboardEvent) => void };
 }
 
-const { saveFlogToSource } = useOpenFlogs();
+const { saveFlogToSource } = useFlogSource(IFlogSourceType.dropbox);
 
 export function useKeyDownHandler(blurCallback: (event: KeyboardEvent) => void) {
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.shiftKey && event.key === "Enter") {
-        event.preventDefault();
-        blurCallback(event);
-        (event.target as HTMLElement)?.blur();
-      }
+        if (event.shiftKey && event.key === "Enter") {
+            event.preventDefault();
+            blurCallback(event);
+            (event.target as HTMLElement)?.blur();
+        }
     }
     return { handleKeyDown };
-  }
+}
 
 export const useFlog = (inFlog: IFlog | Ref<IFlog>): IUseFlog => {
 

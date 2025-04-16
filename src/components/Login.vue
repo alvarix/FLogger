@@ -1,5 +1,4 @@
 <template>
-  
   <aside class="vue-file">Login.vue</aside>
   <Teleport to="body">
     <!-- use the modal component, pass in the prop -->
@@ -28,7 +27,9 @@
   <section class="container main">
     <div
       id="pre-auth-section"
-      :style="{ display: hasConnection ? 'none' : 'block' }"
+      :style="{
+        display: hasConnection ? 'none' : 'block',
+      }"
     >
       <Intro />
     </div>
@@ -36,43 +37,46 @@
 </template>
 
 <script setup>
-import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
+import { IFlogSourceType, useFlogSource } from "@/composables/useFlogSource";
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
-import AddFlog from "@/components/AddFlog.vue";
-// const { accountInfo } = useDropboxFiles();
 import { ref, watch } from "vue";
 import Modal from "@/components/Modal.vue";
 import Intro from "@/components/Intro.vue";
 
 const {
-  connectionPopupWindow,
-  openDbxPopup,
+  openPopup,
   hasConnection,
+  connectionPopupWindow,
   availableFlogs,
-  availableRepoFlogs,
-  loadFlogEntries,
+  loadFlogEntriesFromSource,
   addFlog,
-} = useDropboxFlogs();
+} = useFlogSource(IFlogSourceType.dropbox);
 
 const { openFlog } = useOpenFlogs();
 // const props = defineProps({});
 
-const defaultFlogAlreadyOpened = ref(!!window.sessionStorage.getItem("defaultFlogAlreadyOpened"));
+const defaultFlogAlreadyOpened = ref(
+  !!window.sessionStorage.getItem("defaultFlogAlreadyOpened")
+);
 const defaultFlogFilepath = "/default.flogger.txt";
 
 const showModal = ref(false);
-watch(connectionPopupWindow, () => {
-  showModal.value = connectionPopupWindow ? true : false;
-});
+watch(
+  connectionPopupWindow,
+  () => {
+    showModal.value = connectionPopupWindow.value ? true : false;
+  },
+  { immediate: true }
+);
 
 const openPop = () => {
-  console.log("openPop", openDbxPopup);
-  openDbxPopup();
+  console.log("openPop", openPopup());
+  openPopup();
 };
 
 const selectFile = (file) => {
   console.log("selectFile", file);
-  loadFlogEntries(file);
+  loadFlogEntriesFromSource(file);
   openFlog(file);
 };
 
@@ -85,7 +89,10 @@ watch(
       )[0];
       if (defaultFlogFile) {
         defaultFlogAlreadyOpened.value = true;
-        window.sessionStorage.setItem("defaultFlogAlreadyOpened", defaultFlogAlreadyOpened.value);
+        window.sessionStorage.setItem(
+          "defaultFlogAlreadyOpened",
+          defaultFlogAlreadyOpened.value
+        );
         selectFile(defaultFlogFile);
       }
     }

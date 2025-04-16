@@ -17,6 +17,6 @@
 </template>
 
 <script setup>
-import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
-const { launchConnectFlow } = useDropboxFlogs();
+import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource.ts";
+const { launchConnectFlow } = useFlogSource(IFlogSourceType.dropbox);
 </script>

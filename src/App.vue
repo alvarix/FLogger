@@ -1,7 +1,7 @@
 <template>
   <main :class="{ connected: hasConnection }">
-  <aside class="vue-file">App.vue</aside>
-    <Head /> 
+    <aside class="vue-file">App.vue</aside>
+    <Head />
 
     <Suspense>
       <Login />
@@ -15,9 +15,9 @@
     <div v-else>
       <div v-for="flog in openFlogs" :key="flog.url">
         <Flog :flog="flog" />
-      </div>  
+      </div>
     </div>
-    
+
     <div class="message"></div>
   </main>
 </template>
@@ -28,15 +28,12 @@ import Login from "@/components/Login.vue";
 import FlogList from "@/components/FlogList.vue";
 import Flog from "@/components/Flog.vue";
 import { useOpenFlogs } from "@/composables/useOpenFlogs.ts";
-import { useDropboxFlogs } from "@/composables/useDropboxFlogs.ts";
+import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource.ts";
 import Head from "@/components/Head.vue";
-const { hasConnection } = useDropboxFlogs();
+const { hasConnection } = useFlogSource(IFlogSourceType.dropbox);
 const ShowFlogList = ref(false);
 const { openFlogs } = useOpenFlogs();
-
-
 </script>
-
 
 <style>
 .message {
