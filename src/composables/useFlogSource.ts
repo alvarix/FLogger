@@ -9,7 +9,14 @@ export type { IFlog as IFlog }
 export { IFlogStatus as IFlogStatus }
 export { IFlogSourceType as IFlogSourceType }
 
-export interface IFlogs {
+// useFlogSource returns the refs and operations defined in IFlogSource
+// It includes:
+//  - refs for available flogs
+//  - operations for flogs at the source (add, load, save, delete)
+//  - a ref for the accountOwner
+//  - refs and operations for the connection to the source
+
+export interface IFlogSource {
 
     // ***************
     // AVAILABLE FLOGS
@@ -21,6 +28,10 @@ export interface IFlogs {
     // useFlogSource provides and manages one array for all available repo flogs 
     // from all sources.
     availableRepoFlogs: Ref<IFlog[]>;
+
+    // ***************
+    // FLOG OPERATIONS
+    // ***************
 
     // useFlogSource provides the following flog operations
     //      add, delete
@@ -45,9 +56,9 @@ export interface IFlogs {
     // useSourceType(sourceType).
     accountOwner: Ref<string | null>;
 
-    // *****************
+    // ****************************
     // SOURCE CONNECTION OPERATIONS
-    // *****************
+    // ****************************
 
     // useFlogSource provides the following source operations
     //      launchConnectFlow, openPopup, clearConnection
@@ -92,7 +103,7 @@ const {
 } = useDropboxFlogs();
 
 
-export const useFlogSource = (sourceType: IFlogSourceType): IFlogs => {
+export const useFlogSource = (sourceType: IFlogSourceType): IFlogSource => {
 
     const availableFlogs = ref<IFlog[]>([]);
     watch(
