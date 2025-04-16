@@ -8,6 +8,11 @@ import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource"
 export type { IFlog as IFlog }
 export { IFlogStatus as IFlogStatus }
 
+// useFlog returns the refs and operations defined in IFlog 
+// It includes:
+//  - a refs for the flog
+//  - operations for updating the parts of the flog ref (add, udpate, delete entries, and update pretext)
+
 interface IUseFlog {
     flog: Ref<IFlog>;
     addEntry: (entry: IEntry) => void;
