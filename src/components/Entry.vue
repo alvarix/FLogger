@@ -1,6 +1,8 @@
 <template>
   <div class="entry">
     <h3>{{ formattedDate }}</h3>
+
+    <!-- If not editing, display rendered markdown with VueShowdown -->
     <div
       v-if="!props.isEditing"
       @click="handleStartEditing"
@@ -9,7 +11,7 @@
       <VueShowdown flavor="github" :markdown="entryText" />
     </div>
 
-    <!-- Display a textarea if editing -->
+    <!-- Display a contenteditable textarea if editing -->
     <pre
       v-else
       id="editEntry"
