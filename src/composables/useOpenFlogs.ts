@@ -42,6 +42,8 @@ const {
 // See https://vuejs.org/guide/scaling-up/state-management#simple-state-management-with-reactivity-api
 const openFlogs = ref<IFlog[]>([])
 
+// Ref variables that are passed through from a specific use[Source]Flogs composable
+// need watchers on source variables
 watch(availableFlogs, () => {
     // if availableFlogs changes, filter out any openFlogs 
     // that are no longer in availableFlogs
