@@ -103,36 +103,73 @@ const {
 } = useDropboxFlogs();
 
 
-export const useFlogSource = (sourceType: IFlogSourceType): IFlogSource => {
+// Defining all ref variables at the module scope 
+// (meaning at the root of this module file, 
+// outside of the useComposable function that gets called by the importer),
+// Creating ref variables at module scope makes them singletons shared by all composable importers.
+// Otherwise, each composable importer gets its own instances of each ref variable.
+// See https://vuejs.org/guide/scaling-up/state-management#simple-state-management-with-reactivity-api
+// Using module-scoped state requires special handling with SSR, if we ever want SSR.
+// See https://vuejs.org/guide/scaling-up/state-management#simple-state-management-with-reactivity-api
+const availableFlogs = ref<IFlog[]>([]);
+const availableRepoFlogs = ref<IFlog[]>([]);
+const accountOwner = ref<string | null>(null);
+const hasConnection = ref<boolean>(false);
+const connectionPopupWindow = ref<any>();
 
-    const availableFlogs = ref<IFlog[]>([]);
-    watch(
-        availableFlogs_dropbox,
-        () => {
-            // replace dropbox flogs...
-            availableFlogs.value = availableFlogs.value
-                // first filtering existing out, 
-                .filter((flog) => flog.sourceType != IFlogSourceType.dropbox)
-                // then adding latest.
-                .concat(availableFlogs_dropbox.value)
-        }
-        ,
-        { immediate: true }
-    )
-    const availableRepoFlogs = ref<IFlog[]>([]);
-    watch(
-        availableRepoFlogs_dropbox,
-        () => {
-            // replace dropbox flogs...
-            availableRepoFlogs.value = availableRepoFlogs.value
-                // first filtering existing out, 
-                .filter((flog) => flog.sourceType != IFlogSourceType.dropbox)
-                // then adding latest.
-                .concat(availableRepoFlogs_dropbox.value)
-        }
-        ,
-        { immediate: true }
-    )
+// Ref variables that are passed through from a specific use[Source]Flogs composable
+// need watchers on source variables
+watch(
+    availableFlogs_dropbox,
+    () => {
+        // replace dropbox flogs...
+        availableFlogs.value = availableFlogs.value
+            // first filtering existing out, 
+            .filter((flog) => flog.sourceType != IFlogSourceType.dropbox)
+            // then adding latest.
+            .concat(availableFlogs_dropbox.value)
+    }
+    ,
+    { immediate: true }
+)
+watch(
+    availableRepoFlogs_dropbox,
+    () => {
+        // replace dropbox flogs...
+        availableRepoFlogs.value = availableRepoFlogs.value
+            // first filtering existing out, 
+            .filter((flog) => flog.sourceType != IFlogSourceType.dropbox)
+            // then adding latest.
+            .concat(availableRepoFlogs_dropbox.value)
+    }
+    ,
+    { immediate: true }
+)
+watch(accountOwner_dropbox,
+    () => {
+        console.log('watch accountOwner_dropbox', accountOwner_dropbox)
+        accountOwner.value = accountOwner_dropbox.value
+    },
+    { immediate: true }
+)
+watch(hasConnection_dropbox,
+    () => {
+        console.log('watch hasConnection_dropbox', hasConnection_dropbox)
+        hasConnection.value = hasConnection_dropbox.value
+    },
+    { immediate: true }
+)
+watch(connectionPopupWindow_dropbox,
+    () => {
+        console.log('watch connectionPopupWindow_dropbox', connectionPopupWindow_dropbox)
+        connectionPopupWindow.value = connectionPopupWindow_dropbox.value
+    },
+    { immediate: true }
+)
+
+
+
+export const useFlogSource = (sourceType: IFlogSourceType): IFlogSource => {
 
     const addFlogToSource = (flog: IFlog) => {
         switch (flog.sourceType) {
@@ -170,18 +207,10 @@ export const useFlogSource = (sourceType: IFlogSourceType): IFlogSource => {
         }
     }
 
-    const accountOwner = ref<string | null>(null);
-    watch(accountOwner_dropbox,
-        () => {
-            console.log('watch accountOwner_dropbox', accountOwner_dropbox)
-            accountOwner.value = accountOwner_dropbox.value
-        },
-        { immediate: true }
-    )
-
     const launchConnectFlow = () => {
         switch (sourceType) {
             case IFlogSourceType.dropbox:
+                launchConnectFlow_dropbox();
                 break;
             default:
         }
@@ -204,25 +233,6 @@ export const useFlogSource = (sourceType: IFlogSourceType): IFlogSource => {
             default:
         }
     }
-
-    const hasConnection = ref<boolean>(false);
-    watch(hasConnection_dropbox,
-        () => {
-            console.log('watch hasConnection_dropbox', hasConnection_dropbox)
-            hasConnection.value = hasConnection_dropbox.value
-        },
-        { immediate: true }
-    )
-
-    const connectionPopupWindow = ref<any>();
-    watch(connectionPopupWindow_dropbox,
-        () => {
-            console.log('watch connectionPopupWindow_dropbox', connectionPopupWindow_dropbox)
-            connectionPopupWindow.value = connectionPopupWindow_dropbox.value
-        },
-        { immediate: true }
-    )
-
 
     return {
         availableFlogs,

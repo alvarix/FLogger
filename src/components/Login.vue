@@ -38,10 +38,7 @@
 
 <script setup>
 import { IFlogSourceType, useFlogSource } from "@/composables/useFlogSource";
-import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
-import AddFlog from "@/components/AddFlog.vue";
-// const { accountInfo } = useDropboxFiles();
 import { ref, watch } from "vue";
 import Modal from "@/components/Modal.vue";
 import Intro from "@/components/Intro.vue";

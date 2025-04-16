@@ -6,12 +6,12 @@
 </template>
 
 <script setup>
-import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
+import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource.ts";
 
-// Calling useDropboxFlogs to handle the auth flow,
+// Calling useFlogSource to handle the flow to check authentication,
 // but don't need to use any vars or functions from it,
 // so just calling it without the usual const destructuring assignments
-useDropboxFlogs();
+useFlogSource(IFlogSourceType.dropbox);
 
 </script>
 
