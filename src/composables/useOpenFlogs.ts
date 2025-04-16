@@ -1,6 +1,6 @@
 import { ref, Ref, watch } from "vue"
 import type { IFlog } from "@/composables/useFlogSource"
-import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource.ts";
+import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource";
 
 
 // Re-export these for convenience
