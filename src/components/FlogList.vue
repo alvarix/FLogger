@@ -4,7 +4,7 @@
     <div
       id="authed-section"
       :style="{
-        display: hasConnection.get(IFlogSourceType.dropbox) ? 'block' : 'none',
+        display: hasConnection ? 'block' : 'none',
       }"
     >
       <AddFlog
@@ -70,7 +70,11 @@
 </template>
 
 <script setup lang="ts">
-import { useFlogs, IFlog, IFlogSourceType } from "@/composables/useFlogs";
+import {
+  useFlogSource,
+  IFlog,
+  IFlogSourceType,
+} from "@/composables/useFlogSource";
 // @ts-ignore-error
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
 import AddFlog from "@/components/AddFlog.vue";
@@ -84,7 +88,7 @@ const {
   loadFlogEntriesFromSource,
   addFlogToSource,
   deleteFlogFromSource,
-} = useFlogs();
+} = useFlogSource(IFlogSourceType.dropbox);
 
 const { openFlog } = useOpenFlogs();
 
@@ -94,19 +98,17 @@ const defaultFlogAlreadyOpened = ref(
 const defaultFlogFilepath = "/default.flogger.txt";
 
 const showModal = ref(false);
-watch([() => [...connectionPopupWindow.value]], () => {
-  showModal.value = connectionPopupWindow.value.get(IFlogSourceType.dropbox)
-    ? true
-    : false;
-});
+watch(
+  connectionPopupWindow,
+  () => {
+    showModal.value = connectionPopupWindow.value ? true : false;
+  }
+);
 
 watch(
-  [() => [...hasConnection.value], () => [...availableFlogs.value]],
+  [hasConnection, availableFlogs],
   () => {
-    if (
-      hasConnection.value.get(IFlogSourceType.dropbox) &&
-      !defaultFlogAlreadyOpened.value
-    ) {
+    if (hasConnection.value && !defaultFlogAlreadyOpened.value) {
       const defaultFlogFile = availableFlogs.value.filter(
         (flog) =>
           flog.sourceType == IFlogSourceType.dropbox &&
@@ -164,7 +166,7 @@ const sortDescending = ref<boolean>(true);
 
 const showSortOptionSelect = ref(false);
 function selectSortOption(option: sortType) {
-  console.log('selectSortOption',option)
+  console.log("selectSortOption", option);
   sortOption.value = option;
 }
 
@@ -200,9 +202,9 @@ const sortedAvailableFlogs = ref(
   sortFlogsByModified(availableFlogs.value, true)
 );
 watch(
-  [() => [...availableFlogs.value], sortOption, sortDescending],
+  [availableFlogs, sortOption, sortDescending],
   () => {
-    console.log('sortOption.value', sortOption.value)
+    console.log("sortOption.value", sortOption.value);
     switch (sortOption.value) {
       case sortType.name:
         sortedAvailableFlogs.value = sortFlogsByFilename(

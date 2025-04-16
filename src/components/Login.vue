@@ -9,10 +9,7 @@
       <template #body>
         <p>
           Complete the Dropbox authorization
-          <a
-            @click="connectionPopupWindow.get(IFlogSourceType.dropbox)?.focus()"
-            >in the pop-up window</a
-          >.
+          <a @click="connectionPopupWindow?.focus()">in the pop-up window</a>.
         </p>
         <p>
           If the window doesn't pop-up, <a @click="openPop()">click here</a>.
@@ -31,7 +28,7 @@
     <div
       id="pre-auth-section"
       :style="{
-        display: hasConnection.get(IFlogSourceType.dropbox) ? 'none' : 'block',
+        display: hasConnection ? 'none' : 'block',
       }"
     >
       <Intro />
@@ -40,7 +37,7 @@
 </template>
 
 <script setup>
-import { IFlogSourceType, useFlogs } from "@/composables/useFlogs";
+import { IFlogSourceType, useFlogSource } from "@/composables/useFlogSource";
 import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
 import AddFlog from "@/components/AddFlog.vue";
@@ -56,7 +53,7 @@ const {
   availableFlogs,
   loadFlogEntriesFromSource,
   addFlog,
-} = useFlogs();
+} = useFlogSource(IFlogSourceType.dropbox);
 
 const { openFlog } = useOpenFlogs();
 // const props = defineProps({});
@@ -68,18 +65,16 @@ const defaultFlogFilepath = "/default.flogger.txt";
 
 const showModal = ref(false);
 watch(
-  () => [...connectionPopupWindow.value],
+  connectionPopupWindow,
   () => {
-    showModal.value = connectionPopupWindow.value.get(IFlogSourceType.dropbox)
-      ? true
-      : false;
+    showModal.value = connectionPopupWindow.value ? true : false;
   },
   { immediate: true }
 );
 
 const openPop = () => {
-  console.log("openPop", openPopup(IFlogSourceType.dropbox));
-  openPopup(IFlogSourceType.dropbox);
+  console.log("openPop", openPopup());
+  openPopup();
 };
 
 const selectFile = (file) => {
@@ -89,12 +84,9 @@ const selectFile = (file) => {
 };
 
 watch(
-  [() => [...hasConnection.value], availableFlogs],
+  [hasConnection, availableFlogs],
   () => {
-    if (
-      hasConnection.value.get(IFlogSourceType.dropbox) &&
-      !defaultFlogAlreadyOpened.value
-    ) {
+    if (hasConnection.value && !defaultFlogAlreadyOpened.value) {
       const defaultFlogFile = availableFlogs.value.filter(
         (file) => file.url == defaultFlogFilepath
       )[0];

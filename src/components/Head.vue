@@ -8,9 +8,7 @@
         <div
           id="authed-section"
           :style="{
-            display: hasConnection.get(IFlogSourceType.dropbox)
-              ? 'block'
-              : 'none',
+            display: hasConnection ? 'block' : 'none',
           }"
         >
           <button class="dbx__btn small" @click="disconnect">
@@ -49,21 +47,22 @@
 
 <script setup>
 import { onMounted, ref, watch } from "vue";
-import { useFlogs } from "@/composables/useFlogs.ts";
+import { useFlogSource } from "@/composables/useFlogSource";
 import ThemeSwitcher from "@/components/ThemeSwitcher.vue";
 import { IFlogSourceType } from "@/modules/Flog";
 
-const { hasConnection, accountOwner } = useFlogs();
-const { clearConnection } = useFlogs();
+const { hasConnection, accountOwner, clearConnection } = useFlogSource(
+  IFlogSourceType.dropbox
+);
 const dialog = ref(null);
 const fileViewOn = ref(false);
 
-const accountOwnerValue = ref(null);
+const accountOwnerValue = ref(accountOwner.value);
 
 watch(
-  [() => [...accountOwner.value]],
+  accountOwner,
   () => {
-    accountOwnerValue.value = accountOwner.value.get(IFlogSourceType.dropbox);
+    accountOwnerValue.value = accountOwner.value;
   },
   { immediate: true }
 );
@@ -79,7 +78,7 @@ onMounted(() => {
 });
 
 const disconnect = () => {
-  clearConnection(IFlogSourceType.dropbox);
+  clearConnection();
   dialog.value.close();
 };
 

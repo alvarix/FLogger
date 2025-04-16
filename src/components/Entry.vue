@@ -110,8 +110,6 @@ function handleBlur(event) {
   // // This is not necessary and triggers a re-render on focus
 }
 
-
-
 // what do these watches do?
 
 watch(

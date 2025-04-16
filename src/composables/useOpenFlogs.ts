@@ -8,11 +8,24 @@ import { useDropboxFlogs, IDropboxFlog } from "@/composables/useDropboxFlogs";
 export type { IFlog as IFlog }
 
 interface IUseFlogs {
+    // ***************
+    // OPEN FLOGS
+    // ***************
+
+    // useOpenFlogs provides and manages one array for all open flogs 
+    // from all sources.
     openFlogs: Ref<IFlog[]>;
-    openFlog: (newFlog: IFlog) => void;
+
+    // useOpenFlogs provides the following flog operations
+    //      add, delete
+    // These map the operation to correct operation 
+    // for the flog's source
+    // 
+    // The following are functions that take a flog
+    // and call the appropriate pass through function
+    // from use[flog.sourceType]Flogs
+    openFlog: (flog: IFlog) => void;
     closeFlog: (flog: IFlog) => void;
-    saveFlogToSource: (flog: IFlog) => void;
-    addFlogToSource: (flog: IFlog) => void;
 }
 
 const {
@@ -54,29 +67,9 @@ export const useOpenFlogs = () => {
         }
     }
 
-    const saveFlogToSource = (flog: IFlog) => {
-        switch (flog.sourceType) {
-            case IFlogSourceType.dropbox:
-                saveFlogEntries_dropbox(flog as IDropboxFlog)
-                break;
-            default:
-        }
-    }
-
-    const addFlogToSource = (flog: IFlog) => {
-        switch (flog.sourceType) {
-            case IFlogSourceType.dropbox:
-                addFlog_dropbox(flog as IDropboxFlog)
-                break;
-            default:
-        }
-    }
-
     return {
         openFlogs,
         openFlog,
         closeFlog,
-        saveFlogToSource,
-        addFlogToSource
     }
 }

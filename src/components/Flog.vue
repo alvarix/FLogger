@@ -44,11 +44,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, unref, computed } from "vue";
+import { ref, unref } from "vue";
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
+import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource";
 import { useFlog, IFlogStatus } from "@/composables/useFlog";
+import type { IFlog } from "@/composables/useFlog";
 import EntryData, { IEntry } from "@/modules/EntryData";
-import type { IFlog } from "@/modules/Flog";
 import AddEntry from "@/components/AddEntry.vue";
 import EntryList from "@/components/EntryList.vue";
 import Pretext from "@/components/Pretext.vue";
@@ -60,8 +61,11 @@ const props = defineProps<{
 
 const {
   closeFlog,
-  saveFlogToSource,
 } = useOpenFlogs();
+
+const {
+  saveFlogToSource,
+} = useFlogSource(IFlogSourceType.dropbox);
 
 const {
   addEntry,

@@ -2,7 +2,7 @@ import { ref, Ref, toValue } from "vue"
 import type { IFlog } from "@/modules/Flog"
 import { IFlogStatus } from "@/modules/Flog"
 import { IEntry } from '@/modules/EntryData'
-import { useOpenFlogs } from "@/composables/useOpenFlogs"
+import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource"
 
 // Re-export these for convenience
 export type { IFlog as IFlog }
@@ -16,7 +16,7 @@ interface IUseFlog {
     editEntry: (entry: IEntry) => void;
 }
 
-const { saveFlogToSource } = useOpenFlogs();
+const { saveFlogToSource } = useFlogSource(IFlogSourceType.dropbox);
 
 export function useKeyDownHandler(blurCallback: (event: KeyboardEvent) => void) {
     function handleKeyDown(event: KeyboardEvent) {

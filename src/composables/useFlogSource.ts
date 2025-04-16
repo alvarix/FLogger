@@ -15,14 +15,14 @@ export interface IFlogs {
     // AVAILABLE FLOGS
     // ***************
 
-    // useFlogs provides and manages one array for all available non-repo flogs 
+    // useFlogSource provides and manages one array for all available non-repo flogs 
     // from all sources.
     availableFlogs: Ref<IFlog[]>;
-    // useFlogs provides and manages one array for all available repo flogs 
+    // useFlogSource provides and manages one array for all available repo flogs 
     // from all sources.
     availableRepoFlogs: Ref<IFlog[]>;
 
-    // useFlogs provides the following flog operations
+    // useFlogSource provides the following flog operations
     //      add, delete
     // These map the operation to correct operation 
     // for the flog's source
@@ -31,28 +31,9 @@ export interface IFlogs {
     // and call the appropriate pass through function
     // from use[flog.sourceType]Flogs
     addFlogToSource: (flog: IFlog) => void;
-    deleteFlogFromSource: (flog: IFlog) => void;
-
-    // ***************
-    // OPEN FLOGS
-    // ***************
-
-    // useFlogs provides and manages one array for all open flogs 
-    // from all sources.
-    openFlogs: Ref<IFlog[]>;
-
-    // useFlogs provides the following flog operations
-    //      add, delete
-    // These map the operation to correct operation 
-    // for the flog's source
-    // 
-    // The following are functions that take a flog
-    // and call the appropriate pass through function
-    // from use[flog.sourceType]Flogs
-    openFlog: (flog: IFlog) => void;
     loadFlogEntriesFromSource: (flog: IFlog) => void;
     saveFlogToSource: (flog: IFlog) => void;
-    closeFlog: (flog: IFlog) => void;
+    deleteFlogFromSource: (flog: IFlog) => void;
 
     // *************
     // FLOG CONTENTS
@@ -67,31 +48,33 @@ export interface IFlogs {
     // SOURCE ACCOUNT
     // **************
 
-    // useFlogs provides a Map of accountOwners per source.
-    // Each value contains the pass through ref values from its 
-    // corresponding source.
-    accountOwner: Ref<Map<IFlogSourceType, string | null>>;
+    // useFlogSource provides a ref of the source accountOwner.
+    // The value contains the pass through ref the corresponding 
+    // corresponding source based on the sourceType param in
+    // useSourceType(sourceType).
+    accountOwner: Ref<string | null>;
 
     // *****************
     // SOURCE OPERATIONS
     // *****************
 
-    // useFlogs provides the following source operations
+    // useFlogSource provides the following source operations
     //      launchConnectFlow, openPopup, clearConnection
-    // These map the operation to correct operation 
-    // for the input SourceType.
+    // These operations map to the correct source operation based
+    // on the sourceType param in useSourceType(sourceType).
     // The naming of these could be improved, or generalized 
     // to make sense for multiple sources. 
-    launchConnectFlow: (sourceType: IFlogSourceType) => void;
-    openPopup: (sourceType: IFlogSourceType) => void;
-    clearConnection: (sourceType: IFlogSourceType) => void;
+    launchConnectFlow: () => void;
+    openPopup: () => void;
+    clearConnection: () => void;
 
-    // useFlogs provides a Map of hasConnection booleans per source.
-    // Each value contains the pass through ref values from its 
-    // corresponding source.
-    hasConnection: Ref<Map<IFlogSourceType, boolean>>;
+    // useFlogSource provides a hasConnection boolean.
+    // The value contains the pass through ref the corresponding 
+    // corresponding source based on the sourceType param in
+    // useSourceType(sourceType).
+    hasConnection: Ref<boolean>;
 
-    // useFlogs provides a Map of connectionPopupWindows per source.
+    // useFlogSource provides a Map of connectionPopupWindows per source.
     // Each value contains the pass through ref values from its 
     // corresponding source.
     // 
@@ -99,7 +82,7 @@ export interface IFlogs {
     // for that source, when there is one open.
     // Trying to access the window object properties while that window is 
     // at a dropbox URL will throw CORS errors.
-    connectionPopupWindow: Ref<Map<IFlogSourceType, any>>;
+    connectionPopupWindow: Ref<any>;
 }
 
 const {
@@ -118,25 +101,7 @@ const {
 } = useDropboxFlogs();
 
 
-// Using module-scoped state can cause problems with SSR. See 
-// https://vuejs.org/guide/scaling-up/state-management#simple-state-management-with-reactivity-api
-const openFlogs = ref<IFlog[]>([])
-
-watch(availableFlogs_dropbox, () => {
-    // if availableFlogs_dropbox changes, filter out any openFlogs 
-    // that are no longer in availableFlogs_dropbox
-    if (openFlogs.value.length > 0) {
-        const newOpenFlogs = openFlogs.value.filter(flog => {
-            return availableFlogs_dropbox.value.reduce((p, c) => {
-                return p || ((c.sourceType == flog.sourceType) && (c.url == flog.url))
-            }, false);
-        });
-        openFlogs.value = newOpenFlogs;
-    }
-})
-
-
-export const useFlogs = (): IFlogs => {
+export const useFlogSource = (sourceType: IFlogSourceType): IFlogs => {
 
     const availableFlogs = ref<IFlog[]>([]);
     watch(
@@ -185,12 +150,6 @@ export const useFlogs = (): IFlogs => {
         }
     }
 
-    const openFlog = (flog: IFlog,) => {
-        if (!openFlogs.value.includes(flog)) {
-            openFlogs.value.unshift(flog)
-        }
-    }
-
     const loadFlogEntriesFromSource = (flog: IFlog) => {
         switch (flog.sourceType) {
             case IFlogSourceType.dropbox:
@@ -206,12 +165,6 @@ export const useFlogs = (): IFlogs => {
                 saveFlogEntries_dropbox(flog as IDropboxFlog)
                 break;
             default:
-        }
-    }
-
-    const closeFlog = (flog: IFlog) => {
-        if (openFlogs.value.includes(flog)) {
-            openFlogs.value = openFlogs.value.filter(flogItem => flog != flogItem)
         }
     }
 
@@ -258,31 +211,24 @@ export const useFlogs = (): IFlogs => {
         }
     };
 
-    const accountOwner = ref<Map<IFlogSourceType, string | null>>(
-        new Map<IFlogSourceType, string | null>([
-            [IFlogSourceType.dropbox, null],
-            [IFlogSourceType.localFile, null],
-        ])
-    );
+    const accountOwner = ref<string | null>(null);
     watch(accountOwner_dropbox,
         () => {
             console.log('watch accountOwner_dropbox', accountOwner_dropbox)
-            accountOwner.value.set(IFlogSourceType.dropbox, accountOwner_dropbox.value)
-            // accountOwner.value.set(IFlogSourceType.localFile, TBD)
+            accountOwner.value = accountOwner_dropbox.value
         },
         { immediate: true }
     )
 
-    const launchConnectFlow = (sourceType: IFlogSourceType) => {
+    const launchConnectFlow = () => {
         switch (sourceType) {
             case IFlogSourceType.dropbox:
-                launchConnectFlow_dropbox();
                 break;
             default:
         }
     }
 
-    const openPopup = (sourceType: IFlogSourceType) => {
+    const openPopup = () => {
         switch (sourceType) {
             case IFlogSourceType.dropbox:
                 openDbxPopup_dropbox();
@@ -291,7 +237,7 @@ export const useFlogs = (): IFlogs => {
         }
     }
 
-    const clearConnection = (sourceType: IFlogSourceType) => {
+    const clearConnection = () => {
         switch (sourceType) {
             case IFlogSourceType.dropbox:
                 clearConnection_dropbox();
@@ -300,32 +246,20 @@ export const useFlogs = (): IFlogs => {
         }
     }
 
-    const hasConnection = ref<Map<IFlogSourceType, boolean>>(
-        new Map<IFlogSourceType, boolean>([
-            [IFlogSourceType.dropbox, false],
-            [IFlogSourceType.localFile, false],
-        ])
-    );
+    const hasConnection = ref<boolean>(false);
     watch(hasConnection_dropbox,
         () => {
             console.log('watch hasConnection_dropbox', hasConnection_dropbox)
-            hasConnection.value.set(IFlogSourceType.dropbox, hasConnection_dropbox.value)
-            // hasConnection.value.set(IFlogSourceType.localFile, TBD)
+            hasConnection.value = hasConnection_dropbox.value
         },
         { immediate: true }
     )
 
-    const connectionPopupWindow = ref<Map<IFlogSourceType, any>>(
-        new Map<IFlogSourceType, any>([
-            [IFlogSourceType.dropbox, undefined],
-            [IFlogSourceType.localFile, undefined],
-        ])
-    );
+    const connectionPopupWindow = ref<any>();
     watch(connectionPopupWindow_dropbox,
         () => {
             console.log('watch connectionPopupWindow_dropbox', connectionPopupWindow_dropbox)
-            connectionPopupWindow.value.set(IFlogSourceType.dropbox, connectionPopupWindow_dropbox.value)
-            // hasConnection.value.set(IFlogSourceType.localFile, TBD)
+            connectionPopupWindow.value = connectionPopupWindow_dropbox.value
         },
         { immediate: true }
     )
@@ -336,14 +270,9 @@ export const useFlogs = (): IFlogs => {
         availableRepoFlogs,
 
         addFlogToSource,
-        deleteFlogFromSource,
-
-        openFlogs,
-
-        openFlog,
         loadFlogEntriesFromSource,
         saveFlogToSource,
-        closeFlog,
+        deleteFlogFromSource,
 
         addEntryToFlog,
         updatePretext,
