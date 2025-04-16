@@ -19,20 +19,21 @@ interface IUseFlog {
     updatePretext: (pretext: string) => void;
     deleteEntry: (entry: IEntry) => void;
     editEntry: (entry: IEntry) => void;
+    useKeyDownHandler: (blurCallback: (event: KeyboardEvent) => void) => { handleKeyDown: (event: KeyboardEvent) => void };
 }
 
 const { saveFlogToSource } = useFlogSource(IFlogSourceType.dropbox);
 
 export function useKeyDownHandler(blurCallback: (event: KeyboardEvent) => void) {
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.shiftKey && event.key === "Enter") {
-        event.preventDefault();
-        blurCallback(event);
-        (event.target as HTMLElement)?.blur();
-      }
+        if (event.shiftKey && event.key === "Enter") {
+            event.preventDefault();
+            blurCallback(event);
+            (event.target as HTMLElement)?.blur();
+        }
     }
     return { handleKeyDown };
-  }
+}
 
 export const useFlog = (inFlog: IFlog | Ref<IFlog>): IUseFlog => {
 
