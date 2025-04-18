@@ -57,7 +57,7 @@ watch(availableFlogs, () => {
     }
 })
 
-export const useOpenFlogs = () => {
+export const useOpenFlogs = (): IUseFlogs => {
 
     const openFlog = (newFlog: IFlog,) => {
         if (!openFlogs.value.includes(newFlog)) {
