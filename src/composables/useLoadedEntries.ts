@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref } from 'vue'
 import { IEntry } from '../modules/EntryData'
 
 // Global reactivy state, created in module scope, so it's shared by all consumers of this useLoadedEntries composable.
@@ -20,7 +20,7 @@ export function useLoadedEntries() {
   }
   function serializeEntries(entriesList: IEntry[]): string {
     return entriesList.reduce<string>(
-      (accumulatedValue, currentEntry, index) => {
+      (accumulatedValue, currentEntry) => {
         return accumulatedValue + `\n\n${currentEntry.date.toDateString()}\n${currentEntry.entry}`
       }
       , '' //start accumulatedValue with an empty string

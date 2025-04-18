@@ -51,7 +51,7 @@ export const useFlog = (inFlog: IFlog | Ref<IFlog>): IUseFlog => {
 
 
     const showMessage = (msg) => {
-        let el = document.querySelector('.message') as HTMLDivElement;
+        const el = document.querySelector('.message') as HTMLDivElement;
         el.textContent = msg;
         el.style.opacity = '1';
         setTimeout(() => {

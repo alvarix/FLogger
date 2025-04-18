@@ -137,7 +137,7 @@ export function deserializeFlog(rawEntryContent: string): IFlogCore {
         // "pretext" found before the first date is not returned by this deserializeFlog function (... yet?)
         // But this is how it can be parsed out here, after already splitting by date:
         let firstEntryFound;
-        pretext = splitItems.reduce((prev, item, index, arr) => {
+        pretext = splitItems.reduce((prev, item, index) => {
             if (legacyDateOnly && !firstEntryFound && isValidDate(item)) {
                 firstEntryFound = index;
                 return prev;

@@ -3,6 +3,7 @@
  * @public
  */
 export interface IEntry extends EntryData {
+  // eslint-disable-next-line
   id?: any
 }
 

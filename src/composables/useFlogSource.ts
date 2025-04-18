@@ -1,7 +1,6 @@
 import { ref, watch, Ref } from "vue"
 import type { IFlog } from "@/modules/Flog"
 import { IFlogStatus, IFlogSourceType } from "@/modules/Flog"
-import { IEntry } from '@/modules/EntryData'
 import { useDropboxFlogs, IDropboxFlog } from "@/composables/useDropboxFlogs";
 
 // Re-export these for convenience
@@ -84,6 +83,8 @@ export interface IFlogSource {
     // for that source, when there is one open.
     // Trying to access the window object properties while that window is 
     // at a dropbox URL will throw CORS errors.
+
+    // eslint-disable-next-line
     connectionPopupWindow: Ref<any>;
 }
 
@@ -115,6 +116,7 @@ const availableFlogs = ref<IFlog[]>([]);
 const availableRepoFlogs = ref<IFlog[]>([]);
 const accountOwner = ref<string | null>(null);
 const hasConnection = ref<boolean>(false);
+// eslint-disable-next-line
 const connectionPopupWindow = ref<any>();
 
 // Ref variables that are passed through from a specific use[Source]Flogs composable
