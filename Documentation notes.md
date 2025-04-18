@@ -1,31 +1,41 @@
-# Notes
-- DropBoxFlogs.vue 
-  - The main UI window (used to be)
-    - auth
-    - Flogs list
-- useFLogs.ts 
-  - is the workhorse 
-  - and the interface btwn UI and DBX?
+# Components
 
----
 
-# Documentation ideas
-1. List major functions, then minor functions (Arcanca, Assign player roles)
-2. 
-# Refactor ideas
-1. Rename files for their centrality in the app (or include components therein)
-   1. eg: Home (import )
-2. Break up monolith files
-   1. useFlogs
-      1. display
-      2. edit 
-      3. delete 
-      4. ...
-   2. 
+## Routes and route components
 
-3. Remove any mention of Dropbox past the data interface
-4. OpenFlogs = OpenFlog etc down the chain
-5. 
+- **main** : **App** — The main app at the primary route has these components 
+- **dbauthpopup** : **DbAuthPopup** — There's a second route for the Dropbox PKCE authentication and authorization flow.
+
+## Main components
+
+- **main** : **App**
+  - **Head** — Displays the app logo and user settings menu
+  - **Login** — The option to log in if not already.
+  - **FlogList** — If logged in, display either a list of the user's flogs, or...
+  - **Flog** — An open flog. Actually can display multiple, although the app doesn't offer an opportunity to open a second one at present.
+
+- **dbauthpopup** : **DbAuthPopup**
+  - **DropBoxAuth** — A component that shows an in progress spinner and handles the return redirect from Dropbox.
+
+## Main components breakdown
+
+  - **Head**
+    - **ThemeSwitcher** — A light/dark mode toggler.
+
+  - **Login**
+    - **Intro** — Homepage content for unauthenticated users.
+    - **Modal** — A modal is displayed while the Dropbox flow is happening in a popup.
+
+  - **FlogList**
+    - **AddFlog**
+
+  - **Flog**
+    - **Pretext**
+    - **AddEntry**
+    - **EntryList**
+      - **Entry**
+
+
 ---
 
 # App Actions
@@ -45,68 +55,13 @@
    2. Disconnect DBX
    3. Change theme
  
-# App Views
-1. Entry
-2. Flogs
-3. DBX
+# Dependency graph
 
-# Embeds
-1. App.vue
-   1. ThemeSwitcher
-   2. DropBoxFlogs
-      1. useDropboxFlogs
-         1. modules/Flog
-         2. useDropboxFiles
-      2. useFlogs
-         1. modules/EntryData
-         2. modules/Flog
-         3. useDropboxFiles
-      3. AddFlog
-      4. Intro
-         1. useDropboxFlogs
-      5. Modal
-   3. OpenFlogs
-      1. useFlogs
-      2. modules/EntryData
-      3. modules/Flog
-      4. AddEntry
-         1. modules/EntryData
-      5. EntryList
-         1. Entry
-            1. modules/EntryData
-         2. modules/EntryData
-      6. Pretext
+## Without node_modules
+![Dependecy graph](dependencygraph.svg "Dependecy graph")
 
-1. App.vue
-   1. ThemeSwitcher
-   2. DropBoxFlogs
-      3. AddFlog
-      4. Intro
-      5. Modal
-   3. OpenFlogs
-      3. modules/Flog
-      4. AddEntry
-      5. EntryList
-         1. Entry
-      6. Pretext
-
-# Embeds rethought
-1. Login
-   1. Modal
-   2. Intro
-2. Flog
-   1. NewEntry
-   2. EntryList
-      1. Entry
-         1. Pretext
-3. FlogList
-   1. AddFlog
-   2. DeleteFLog
-      
-         
-
-
-
+## With node_modules
+![Dependecy graph](dependencygraph-full.svg "Dependecy graph with node_modules")
 
 
 # Component documentation sample
