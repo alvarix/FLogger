@@ -1,15 +1,11 @@
-import type { IEntry } from './EntryData'
+/**
+ * Interfaces and utility functions for a Flog.
+ */
 
-export enum IFlogStatus { loaded, error };
-
-
-export enum IFlogSourceType { "dropbox", "localFile" };
-
-interface IFlogCore {
-    loadedEntries: IEntry[],
-    pretext?: string,
-    status?: IFlogStatus
-}
+/**
+ * The interface for a Flog
+ * @public
+ */
 export interface IFlog extends IFlogCore {
     sourceType: IFlogSourceType,
     url: string,
@@ -19,11 +15,46 @@ export interface IFlog extends IFlogCore {
     modified?: Date
 }
 
+/**
+ * The core abstract model for a Flog
+ * @private
+ */
+interface IFlogCore {
+    loadedEntries: IEntry[],
+    pretext?: string,
+    status?: IFlogStatus
+}
+
+/**
+ * Uses IEntry to define the entries for a flog.
+ */
+import type { IEntry } from './EntryData'
+
+/**
+ * An enum for flog status values
+ * @public
+ */
+export enum IFlogStatus { loaded, error };
+
+/**
+ * An enum for flog source types
+ * @public
+ */
+export enum IFlogSourceType { "dropbox", "localFile" };
+
+/**
+ * Convert a flog into its string representation.
+ * @public
+ */
 export function serializeFlog(entriesList: IEntry[], pretext?: string): string {
     const sE = serializeEntries(entriesList)
     return (pretext ? pretext + '\n\n' : '') + sE
 }
 
+/**
+ * Convert an array of IEntries into its string representation
+ * @public
+ */
 export function serializeEntries(entriesList: IEntry[]): string {
     return entriesList.reduce<string>(
         (accumulatedValue, currentEntry, index) => {
@@ -36,15 +67,25 @@ export function serializeEntries(entriesList: IEntry[]): string {
     )
 }
 
-// Expects rawEntryContent string in this format:
-// 
-// [Any "pretext" before the first date is optional]
-// 8/22/2024
-// Entry text
-// 
-// 8/22/2024
-// Entry text
-// 
+/**
+ * Convert an array of IEntries into its string representation
+ * @public
+ * 
+ * @param rawEntryContent: string
+ * 
+ * @returns IFlogCore
+ * 
+ * @remarks
+ * Expects rawEntryContent string in this format:
+ * 
+ * @example
+ * [Any "pretext" before the first date is optional]
+ * 8/22/2024
+ * Entry text
+ * 
+ * 8/22/2024
+ * Entry text
+ */
 export function deserializeFlog(rawEntryContent: string): IFlogCore {
     const legacyDateRegEx = /([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4}|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2})/
     const newDateTimeRegEx = /([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4} 1?[0-9]:[0-9]{2}:[0-9]{2} [AP]M|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2} 1?[0-9]:[0-9]{2}:[0-9]{2} [AP]M)/
@@ -122,5 +163,3 @@ export function deserializeFlog(rawEntryContent: string): IFlogCore {
     return { loadedEntries: filteredEntries, pretext, status };
 
 }
-
-export interface IFlogNewParams extends IFlog { }
