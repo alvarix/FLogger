@@ -57,14 +57,46 @@
  
 # Dependency graph
 
+Installed [dependency-cruiser](https://github.com/sverweij/dependency-cruiser) to generate diagrams of import dependencies:
+
 ## Without node_modules
+
+The following diagram is generated with this command: 
+
+```shell
+npx dependency-cruiser  --exclude "^node_modules" --output-type dot src | dot -T svg > dependencygraph.svg
+```
+
 ![Dependecy graph](dependencygraph.svg "Dependecy graph")
 
 ## With node_modules
+
+The following diagram is generated with this command: 
+
+```shell
+npx dependency-cruiser  --output-type dot src | dot -T svg > dependencygraph.svg
+```
+
 ![Dependecy graph](dependencygraph-full.svg "Dependecy graph with node_modules")
 
+# Documentation practice
 
-# Component documentation sample
+## TSDocs
+
+Considering adopting TSDocs format. This allows immediate utility in IDEs and with linting tools.
+
+## Linting
+
+Using eslint and typescript-eslint. Config settings are in ```eslint.config.mjs```.
+
+Releases should pass the linting test:
+
+```shell
+yarn eslint .
+```
+
+
+# Proposed custom component documentation sample
 
 ```
 
