@@ -95,6 +95,22 @@ Releases should pass the linting test:
 yarn eslint .
 ```
 
+Also installed vue-tsc. This will validate ts in vue files. You can run in once, or in watch mode in parallel to the vite dev mode.
+
+Once:
+
+```shell
+yarn vue-tsc --noEmit
+```
+
+In watch mode (in separate shell window from the ```yarn dev``` command):
+
+```shell
+yarn vue-tsc --noEmit --watch
+```
+
+We could also install ```concurrently``` to run both in one package script.
+
 
 # Proposed custom component documentation sample
 
