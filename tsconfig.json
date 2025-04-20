@@ -15,10 +15,14 @@
         "allowJs": true,
         "skipLibCheck": true,
         "allowImportingTsExtensions": true,
+        "allowSyntheticDefaultImports": true,
     },
+    "extends": "@vue/tsconfig/tsconfig.dom.json",
     "include": [
+        "eslint.config.mjs",
         "index.html",
         "src/**/*",
+        "src/**/*.vue",
         "public/**/*",
     ],
     "exclude": [
