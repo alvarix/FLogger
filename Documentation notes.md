@@ -67,7 +67,7 @@ The following diagram is generated with this command:
 npx dependency-cruiser  --exclude "^node_modules" --output-type dot src | dot -T svg > dependencygraph.svg
 ```
 
-![Dependecy graph](dependencygraph.svg "Dependecy graph")
+[Dependecy graph without node_modules](dependencygraph.svg "Dependecy graph without node_modules")
 
 ## With node_modules
 
@@ -77,13 +77,25 @@ The following diagram is generated with this command:
 npx dependency-cruiser  --output-type dot src | dot -T svg > dependencygraph.svg
 ```
 
-![Dependecy graph](dependencygraph-full.svg "Dependecy graph with node_modules")
+[Dependecy graph with node_modules](dependencygraph-full.svg "Dependecy graph with node_modules")
+
+# SFC structure
+
+```vue
+<template> ... </template>
+<script setup lang="ts"> ... </script>
+<style> ... </style>
+```
+
 
 # Documentation practice
 
 ## TSDocs
 
 Considering adopting TSDocs format. This allows immediate utility in IDEs and with linting tools.
+
+ - The comment block should go at the top of the ```<script setup lang="ts">``` tag.
+ - SFC props should be defined with the @param tag
 
 ## Linting
 
@@ -95,22 +107,19 @@ Releases should pass the linting test:
 yarn eslint .
 ```
 
-Also installed vue-tsc. This will validate ts in vue files. You can run in once, or in watch mode in parallel to the vite dev mode.
+Also installed ```vue-tsc``` and ```vite-plugin-checker```. This will validate ts in vue files. You can run in on demand in a shell, or in watch mode (in a separate shell parallel to the vite dev mode). But ```vite-plugin-checker``` runs vue-tsc in a separate worker thread during development from the ```yarn dev``` command.
 
-Once:
+On demand CLI:
 
 ```shell
 yarn vue-tsc --noEmit
 ```
 
-In watch mode (in separate shell window from the ```yarn dev``` command):
+We have a package script to shorten this to:
 
 ```shell
-yarn vue-tsc --noEmit --watch
+yarn vue-tsc
 ```
-
-We could also install ```concurrently``` to run both in one package script.
-
 
 # Proposed custom component documentation sample
 
@@ -169,3 +178,18 @@ We could also install ```concurrently``` to run both in one package script.
  *   @modules
  */
 ```
+
+# TypeScript
+
+Using TS for the standard reasons. With Vite+Vue there is no useful or easy tooling to autogenerate documentation. But the type error checking and type-based auto-completion in IDE are useful.
+
+Best practices for creating Vue SFC files with TS:
+ - Use ```<script setup lang="ts">``` (or ```<script setup lang="tsx">``` for JSX) to enable TypeScript support. 
+ - Use defineProps to declare and type-check component props. 
+ - Use defineEmits to declare and type-check emitted events. 
+ - Use defineOptions (for Options API) or defineComponent (for Composition API) to specify component options and type them. 
+   - Haven't found a use case convincing enough to use defineComponent over ```<script setup>```
+ - Use ref and computed for reactive variables and computed properties, and specify their types. 
+   - Always define ref vars as ```const```!
+
+
