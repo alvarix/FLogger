@@ -9,5 +9,6 @@ import tseslint from "typescript-eslint";
 export default tseslint.config(
   [globalIgnores(["vite.config.js", ".vite/", "public/dropbox-examples/", ".dependency-cruiser.cjs"])],
   eslint.configs.recommended,
-  tseslint.configs.recommended
+  tseslint.configs.strict,
+  tseslint.configs.stylistic,
 );

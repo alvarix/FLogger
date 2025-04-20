@@ -23,13 +23,13 @@ export interface IDropboxFiles {
     availableFiles: Ref<IDropboxFile[]>
     availableRepoFiles: Ref<IDropboxFile[]>
     // eslint-disable-next-line
-    loadFileContent: (file: IDropboxFile, callback: (result: { rev: string, content: string }) => any) => void,
+    loadFileContent: (file: IDropboxFile, callback?: (result: { rev: string, content: string }) => any) => void,
     // eslint-disable-next-line
-    saveFileContent: (file: IDropboxFile, callback: (result: any) => any) => void,
+    saveFileContent: (file: IDropboxFile, callback?: (result: any) => any) => void,
     // eslint-disable-next-line
-    addFile: (file: IDropboxFile, callback: () => any) => void
+    addFile: (file: IDropboxFile, callback?: () => any) => void
     // eslint-disable-next-line
-    deleteFile: (file: IDropboxFile, callback: () => any) => void
+    deleteFile: (file: IDropboxFile, callback?: () => any) => void
     accountOwner: Ref<string | null>
 }
 
@@ -416,7 +416,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
     }
 
     // eslint-disable-next-line
-    const loadFileContent = async (file: IDropboxFile, callback: (result: { rev: string, content: string }) => any) => {
+    const loadFileContent = async (file: IDropboxFile, callback?: (result: { rev: string, content: string }) => any) => {
         // console.log('loadFileContent file', file)
 
         // dbxAuth.checkAndRefreshAccessToken();
@@ -457,7 +457,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
     }
 
     // eslint-disable-next-line
-    const saveFileContent = async (file: IDropboxFile, callback: (result: any) => any) => {
+    const saveFileContent = async (file: IDropboxFile, callback?: (result: any) => any) => {
         // console.log('saveFileContent file', file)
 
         dbxAuth.checkAndRefreshAccessToken()
@@ -493,7 +493,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
     }
 
     // eslint-disable-next-line
-    const addFile = async (file: IDropboxFile, callback: (result?: any) => any) => {
+    const addFile = async (file: IDropboxFile, callback?: (result?: any) => any) => {
         // console.log('addFile file', file)
 
         // function addToAvailable(file) {
@@ -537,7 +537,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
     }
 
     // eslint-disable-next-line
-    const deleteFile = async (file: IDropboxFile, callback: (result?: any) => any) => {
+    const deleteFile = async (file: IDropboxFile, callback?: (result?: any) => any) => {
         // console.log('addFile file', file)
 
         dbxAuth.checkAndRefreshAccessToken()

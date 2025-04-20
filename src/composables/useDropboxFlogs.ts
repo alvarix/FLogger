@@ -221,7 +221,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
                 // rev: flog.rev, 
                 content: serializeFlog(flog.loadedEntries)
             } as IDropboxFile,
-            () => { } // can parameterize so calling app gets notice once save is complete 
+            // () => { } // can parameterize so calling app gets notice once save is complete 
         )
     }
 
@@ -232,7 +232,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
                 path: flog.url,
                 rev: flog.rev
             } as IDropboxFile,
-            () => { } // can parameterize so calling app gets notice once delete is complete 
+            // () => { } // can parameterize so calling app gets notice once delete is complete 
         )
     }
 
