@@ -57,15 +57,15 @@
 const emit = defineEmits(["newFlog", "openFlog"]);
 const newFlog = ref({ filename: "" }); // Initialize newFlog as a reactive variable
 
-let typedFilename = ref("");
+const typedFilename = ref("");
 
-let showInput = ref(true);
+const showInput = ref(true);
 
-let hasError = ref(false);
+const hasError = ref(false);
 
 const props = defineProps({
   availableFlogs: {
-    type: Array,
+    type: Array<IFlog>,
     required: true,
   },
 });
@@ -77,9 +77,9 @@ watch(
   [() => props.availableFlogs as IFlog[], typedFilename],
   ([newItems, newFilename = ""]) => {
     matchedFlogs.value = newItems.filter((item) => {
-      let filterTerm = newFilename.toLowerCase() || "";
-      let matchTerm = item.url.toLowerCase().replace(/.flogger.txt$/g, "");
-      let isMatch =
+      const filterTerm = newFilename.toLowerCase() || "";
+      const matchTerm = item.url.toLowerCase().replace(/.flogger.txt$/g, "");
+      const isMatch =
         (filterTerm != "" && matchTerm.includes(filterTerm)) || false;
       // To show all flogs in drop-down when search term is empty, change the above line to "filterTerm == "" || ..."
       return isMatch;
@@ -90,7 +90,7 @@ watch(
 const selectFlog = (flog) => {
   typedFilename.value = flog.url;
   // Could skip selectedFlog and just emit flog without any checks?
-  let selectedFlog = props.availableFlogs.filter((item) => item === flog);
+  const selectedFlog = props.availableFlogs.filter((item) => item === flog);
   emit("openFlog", selectedFlog.length > 0 && selectedFlog[0]);
 };
 
