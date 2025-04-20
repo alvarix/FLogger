@@ -188,7 +188,7 @@ Best practices for creating Vue SFC files with TS:
  - Use defineProps to declare and type-check component props. 
  - Use defineEmits to declare and type-check emitted events. 
  - Use defineOptions (for Options API) or defineComponent (for Composition API) to specify component options and type them. 
-   - Haven't found a use case convincing enough to use defineComponent over ```<script setup>```
+   - Haven't found a use case convincing enough to use defineComponent over ```<script setup>```. Except perhaps the explicit code organization into props, data, watchers, etc.
  - Use ref and computed for reactive variables and computed properties, and specify their types. 
    - Always define ref vars as ```const```!
 
