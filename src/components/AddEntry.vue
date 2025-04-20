@@ -4,11 +4,11 @@
     <div class="form-inner">
       <div>
         <input
-          :class="['date', { error: hasError }]"
           id="time"
+          v-model="entryDate"
+          :class="['date', { error: hasError }]"
           type="text"
           :placeholder="defaultFormEntry.date"
-          v-model="entryDate"
           required
         />
         <em class="date-validation hidden" :class="{ error: hasError }"
@@ -18,8 +18,8 @@
       <div>
         <pre
           id="entry"
-          name=""
           ref="entryEl"
+          name=""
           class="entry__body"
           contenteditable
           >{{ defaultFormEntry.entry }}</pre
@@ -41,12 +41,19 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, nextTick } from "vue";
-import EntryData from "@/modules/EntryData.ts";
+import { ref, watch, nextTick } from "vue";
+import EntryData from "@/modules/EntryData";
 import { defineEmits } from "vue";
+import { placeCursorAtEnd } from "@/modules/utilities";
 
 const props = defineProps({
-  entryValue: EntryData | undefined, // Accept the copied entry as a prop
+  entryValue: {
+    type: EntryData,
+    required: false,
+    default: function () {
+      return undefined;
+    },
+  }, // Accept the copied entry as a prop
 });
 
 const emit = defineEmits(["newEntry"]);
@@ -65,7 +72,7 @@ const entryEl = ref(null); // Element ref for the contenteditable
 
 const hasError = ref(false);
 
-const submitAdd = (event) => {
+const submitAdd = () => {
   // emit the event with a
   emit(
     "newEntry",

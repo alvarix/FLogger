@@ -36,6 +36,7 @@
 import { ref, computed, nextTick, watch } from "vue";
 import type { IEntry } from "../modules/EntryData";
 import { useKeyDownHandler } from "@/composables/useFlog.ts";
+import { placeCursorAtEnd } from "@/modules/utilities";
 
 const { handleKeyDown } = useKeyDownHandler(handleBlur);
 
@@ -71,17 +72,6 @@ const entryEl = ref(null);
 const handleStartEditing = () => {
   emit("start-editing", props.entry); // Or { ...props.entry, entry: entryText.value } ??
 };
-
-function placeCursorAtEnd(element) {
-  if (element) {
-    const range = document.createRange();
-    range.selectNodeContents(element);
-    range.collapse(false); // Collapse to the end
-    const selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
-  }
-}
 
 function setupEditing() {
   nextTick(() => {

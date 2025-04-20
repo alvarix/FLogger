@@ -28,6 +28,7 @@
 
 <script setup lang="ts">
 import { ref, watch, nextTick } from "vue";
+import { placeCursorAtEnd } from "@/modules/utilities";
 
 const props = defineProps<{
   pretext?: string;
@@ -44,17 +45,6 @@ console.log("pretextValue.value", pretextValue.value);
 
 function edit() {
   isEditing.value = true;
-}
-
-function placeCursorAtEnd(element) {
-  if (element) {
-    const range = document.createRange();
-    range.selectNodeContents(element);
-    range.collapse(false); // Collapse to the end
-    const selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
-  }
 }
 
 function setupEditing() {
