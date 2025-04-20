@@ -3,6 +3,7 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
+import checker from "vite-plugin-checker";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -15,7 +16,13 @@ export default defineConfig({
       },
     },
   },
-  plugins: [vue(), tailwindcss()],
+  plugins: [
+    vue(),
+    tailwindcss(),
+    checker({
+      vueTsc: true,
+    }),
+  ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -25,8 +32,11 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       stylus: {
-        additionalData: `@import "${path.resolve(__dirname, 'src/globalcss.styl')}"`
-      }
-    }
+        additionalData: `@import "${path.resolve(
+          __dirname,
+          "src/globalcss.styl"
+        )}"`,
+      },
+    },
   },
 });

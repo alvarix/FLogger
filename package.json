@@ -34,6 +34,7 @@
     "stylus-loader": "^8.1.1",
     "typescript-eslint": "^8.30.1",
     "vite": "^4.3.9",
+    "vite-plugin-checker": "^0.9.1",
     "vue-tsc": "^2.2.8"
   }
 }
