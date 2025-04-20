@@ -11,10 +11,19 @@
         "moduleResolution": "node",
         "importHelpers": true,
         "isolatedModules": true,
-        "noEmit": true
+        "noEmit": true,
+        "allowJs": true,
+        "skipLibCheck": true,
+        "allowImportingTsExtensions": true,
     },
+    "include": [
+        "index.html",
+        "src/**/*",
+        "public/**/*",
+    ],
     "exclude": [
         "node_modules",
-        "dist"
+        "dist",
+        "public/dropbox-examples",
     ]
 }

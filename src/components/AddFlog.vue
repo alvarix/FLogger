@@ -48,8 +48,9 @@
   </form>
 </template>
 
-<script setup>
-import { ref, watch, onMounted, nextTick } from "vue";
+<script setup lang="ts">
+ import { ref, watch } from "vue";
+ import type { IFlog } from "@/modules/Flog";
 // as per compiler: [@vue/compiler-sfc] `defineEmits` is a compiler macro and no longer needs to be imported.
 // import { defineEmits } from "vue";
 
@@ -73,7 +74,7 @@ const matchedFlogs = ref([]);
 // To show all flogs in drop-down when search term is empty, set this ref to [...props.availableFlogs]
 
 watch(
-  [() => props.availableFlogs, typedFilename],
+  [() => props.availableFlogs as IFlog[], typedFilename],
   ([newItems, newFilename = ""]) => {
     matchedFlogs.value = newItems.filter((item) => {
       let filterTerm = newFilename.toLowerCase() || "";
