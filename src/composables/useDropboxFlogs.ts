@@ -1,8 +1,9 @@
-import { ref, Ref, watch } from "vue"
+import { ref, watch } from "vue"
+import type { Ref } from "vue"
 import type { IFlog } from "@/modules/Flog"
 import { IFlogStatus, IFlogSourceType, deserializeFlog, serializeFlog } from "@/modules/Flog"
 import { useDropboxFiles } from "@/composables/useDropboxFiles"
-import { IDropboxFile } from "@/composables/useDropboxFiles";
+import type { IDropboxFile } from "@/composables/useDropboxFiles";
 
 // Re-export these for convenience
 export type { IFlog as IFlog }
@@ -128,8 +129,8 @@ const {
 // See https://vuejs.org/guide/scaling-up/state-management#simple-state-management-with-reactivity-api
 // Using module-scoped state requires special handling with SSR, if we ever want SSR.
 // See https://vuejs.org/guide/scaling-up/state-management#simple-state-management-with-reactivity-api
-const availableFlogs = ref([]);
-const availableRepoFlogs = ref([]);
+const availableFlogs = ref<IDropboxFlog[]>([]);
+const availableRepoFlogs = ref<IDropboxFlog[]>([]);
 
 // Ref variables that are passed through from a specific use[SourceFilesSDK] composable
 // need watchers on source variables
@@ -157,9 +158,9 @@ watch(
             (file) => ({
                 sourceType: IFlogSourceType.dropbox,
                 url: file.path,
-                modified: new Date(file.modified),
-                rev: null,
-                loadedEntries: null
+                modified: file.modified ? new Date(file.modified) : new Date(),
+                rev: undefined,
+                loadedEntries: []
             } as IDropboxFlog)
         )
     }

@@ -49,10 +49,12 @@ import { useOpenFlogs } from "@/composables/useOpenFlogs";
 import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource";
 import { useFlog, IFlogStatus } from "@/composables/useFlog";
 import type { IFlog } from "@/composables/useFlog";
-import EntryData, { IEntry } from "@/modules/EntryData";
+import EntryData from "@/modules/EntryData";
+import type { IEntry } from "@/modules/EntryData";
 import AddEntry from "@/components/AddEntry.vue";
 import EntryList from "@/components/EntryList.vue";
 import Pretext from "@/components/Pretext.vue";
+// @ts-expect-error - vue-spinner typing issue
 import PacmanLoader from "vue-spinner/src/PacmanLoader.vue";
 
 const props = defineProps<{
@@ -74,7 +76,7 @@ const {
   editEntry,
 } = useFlog(props.flog);
 
-const addEntryValue = ref(null); // Initialize reactive addEntryValue
+const addEntryValue = ref<IEntry | undefined>(); // Initialize reactive addEntryValue
 const isEditingFlogEntries = ref(new Map<IFlog, IEntry>()); // Keep a map of [flog, index] pairs to look up index of entry being edit PER flog
 const getFlogEditingEntry = (flog: IFlog): IEntry | undefined =>
   isEditingFlogEntries.value.get(flog);
@@ -95,7 +97,6 @@ const handleStartEditingEntry = (flog: IFlog, entry: IEntry) => {
 
 const handleStopEditingEntry = (flog: IFlog) => {
   // console.log('handleStopEditingEntry')
-  isEditingFlogEntries.value.set(flog, undefined);
   isEditingFlogEntries.value.delete(flog);
 };
 

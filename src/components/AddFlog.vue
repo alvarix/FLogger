@@ -36,7 +36,7 @@
         <ul id="files">
           <li v-for="item in matchedFlogs">
             <a href="#" @click.prevent="() => selectFlog(item)">{{
-              item.path_display ?? item.url
+              item.url
             }}</a>
           </li>
         </ul>
@@ -49,13 +49,12 @@
 </template>
 
 <script setup lang="ts">
- import { ref, watch } from "vue";
- import type { IFlog } from "@/modules/Flog";
+import { ref, watch } from "vue";
+import type { IFlog } from "@/modules/Flog";
 // as per compiler: [@vue/compiler-sfc] `defineEmits` is a compiler macro and no longer needs to be imported.
 // import { defineEmits } from "vue";
 
 const emit = defineEmits(["newFlog", "openFlog"]);
-const newFlog = ref({ filename: "" }); // Initialize newFlog as a reactive variable
 
 const typedFilename = ref("");
 
@@ -70,7 +69,7 @@ const props = defineProps({
   },
 });
 
-const matchedFlogs = ref([]);
+const matchedFlogs = ref<IFlog[]>([]);
 // To show all flogs in drop-down when search term is empty, set this ref to [...props.availableFlogs]
 
 watch(
@@ -87,7 +86,7 @@ watch(
   }
 );
 
-const selectFlog = (flog) => {
+const selectFlog = (flog: IFlog) => {
   typedFilename.value = flog.url;
   // Could skip selectedFlog and just emit flog without any checks?
   const selectedFlog = props.availableFlogs.filter((item) => item === flog);
@@ -95,8 +94,7 @@ const selectFlog = (flog) => {
 };
 
 const submitAdd = () => {
-  newFlog.value.filename = typedFilename.value;
-  emit("newFlog", newFlog);
+  emit("newFlog", typedFilename.value + ".flogger.txt");
 };
 
 // Add new ref to control dropdown visibility
@@ -107,7 +105,7 @@ const hideDropdown = () => {
   showDropdown.value = false;
 };
 
-const handleKeydown = (e) => {
+const handleKeydown = (e: KeyboardEvent) => {
   if (e.key === "Escape") {
     showDropdown.value = false;
   }

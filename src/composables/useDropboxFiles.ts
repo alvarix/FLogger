@@ -1,6 +1,8 @@
-import { ref, Ref, watch } from "vue"
+import { ref, watch } from "vue"
+import type { Ref } from "vue"
 import fetch from "cross-fetch";
-import { Dropbox, DropboxAuth, Timestamp as DropboxTimestamp } from "dropbox";
+import { Dropbox, DropboxAuth } from "dropbox";
+import type { Timestamp as DropboxTimestamp, users as DropboxUsers } from "dropbox";
 // See https://dropbox.github.io/dropbox-sdk-js/Dropbox.html
 
 export interface IDropboxFile {
@@ -13,7 +15,7 @@ export interface IDropboxFile {
 }
 
 export interface IDropboxFiles {
-    accountInfo: Ref<string | null>
+    accountInfo: Ref<DropboxUsers.FullAccount | null>
     launchConnectFlow: () => void
     openDbxPopup: () => void
     // eslint-disable-next-line
@@ -74,7 +76,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
     // Parses the url and gets the access token if it is in the urls hash
     const getDbxAuthCodeFromUrl = () => {
         const params = new URL(window.location.href).searchParams;
-        const code = params.get("code");
+        const code = params.get("code") ?? undefined;
         return code;
     };
 
@@ -132,7 +134,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
         if (hasRedirectedFromAuth.value) {
 
             const codeVerifier = window.sessionStorage.getItem("codeVerifier");
-            dbxAuth.setCodeVerifier(codeVerifier);
+            dbxAuth.setCodeVerifier(codeVerifier || '');
 
             // dbxauth-popup: Not needed because code is in URL of popup, which gets closed. Opener window is simply reloaded.
             // const reloadUrl = removeAuthCodeFromUrl(window.location.href);
@@ -140,7 +142,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
             console.log("step 1");
             dbxAuth
                 // 1. Get token
-                .getAccessTokenFromCode(dbxAuthReturnUri, dbxAuthCode.value)
+                .getAccessTokenFromCode(dbxAuthReturnUri, dbxAuthCode.value || '')
                 // 2. Save token and reload
                 .then((response) => {
                     console.log("step 2");
@@ -178,7 +180,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
         hasConnection.value = (accessToken && accessToken != "") ? true : false
         if (hasConnection.value) {
             console.log("step 3a from sessionStorage");
-            dbxAuth.setAccessToken(accessToken);
+            dbxAuth.setAccessToken(accessToken || '');
         } else {
             console.log("step 3b check from dbxAuth");
             window.sessionStorage.removeItem("accessToken");
@@ -244,7 +246,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                         // Use lowercase to avoid mixed case possibilities, because 
                         // Dropbox supports cased filenames but enforces case insensative uniqueness
                         const repoTemplateFilesMap = new Map<string, boolean>()
-                        repoTemplateFiles.forEach(item => repoTemplateFilesMap.set('/' + item.path.toLowerCase(), true))
+                        repoTemplateFiles?.forEach(item => repoTemplateFilesMap.set('/' + item.path.toLowerCase(), true))
 
                         // Support for repo template/default files
                         // * Var to easily check if a template file exists in the filesListFolder response
@@ -256,13 +258,13 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                         // Set availableFiles from filesListFolder response 
                         // Filtering out files that match the repoTemplateFiles
                         availableFiles.value = response.result.entries
-                            .filter((item) => (item.path_lower.endsWith(".flogger") || item.path_lower.endsWith(".flogger.txt")))
-                            .filter(item => !repoTemplateFilesMap.get(item.path_lower))
+                            .filter((item) => (item.path_lower?.endsWith(".flogger") || item.path_lower?.endsWith(".flogger.txt")))
+                            .filter(item => !repoTemplateFilesMap.get(item.path_lower || ''))
                             .map((item) => {
                                 // Support for default flog
                                 if (item.path_display == "/" + defaultFlogFilename) foundDefaultFlog = true;
                                 const newFile: IDropboxFile = {
-                                    path: item.path_display,
+                                    path: item.path_display || '',
                                     // @ts-expect-error - Unsure how to get item typed correctly
                                     rev: item.rev,
                                     tag: item[".tag"],
@@ -288,11 +290,11 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                         // Filtering out files that DON'T match the repoTemplateFiles
                         // And set the keys in repoFilePathsFound
                         availableRepoFiles.value = response.result.entries
-                            .filter((item) => (item.path_lower.endsWith(".flogger") || item.path_lower.endsWith(".flogger.txt")))
-                            .filter(item => repoTemplateFilesMap.get(item.path_lower))
+                            .filter((item) => (item.path_lower?.endsWith(".flogger") || item.path_lower?.endsWith(".flogger.txt")))
+                            .filter(item => repoTemplateFilesMap.get(item.path_lower || ''))
                             .map((item) => {
                                 const newFile: IDropboxFile = {
-                                    path: item.path_display,
+                                    path: item.path_display || '',
                                     // @ts-expect-error - Unsure how to get item typed correctly
                                     rev: item.rev,
                                     tag: item[".tag"],
@@ -303,7 +305,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                                 // * Var to easily check if a template file exists in the filesListFolder response
                                 // Use lowercase to avoid mixed case possibilities, because 
                                 // Dropbox supports cased filenames but enforces case insensative uniqueness
-                                repoFilePathsFound.set(item.path_lower, true);
+                                repoFilePathsFound.set(item.path_lower || '', true);
                                 return newFile;
                             });
 
@@ -311,7 +313,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                         // Otherwise need to create the file in Dropbox.
                         // console.log('repoTemplateFiles', repoTemplateFiles)
                         // console.log('repoFilePathsFound', repoFilePathsFound)
-                        repoTemplateFiles.forEach(file => {
+                        repoTemplateFiles?.forEach(file => {
                             const pathLower = file.path.toLowerCase();
                             if (!repoFilePathsFound.get('/' + pathLower)) {
                                 console.log(`Initializing ${file.path}`, file)
@@ -329,10 +331,10 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                         clearConnection();
                     });
             })
-            .catch((error) => {
+            .catch((error: unknown) => {
                 console.log(
                     `Error refreshing access`,
-                    error?.message || error
+                    (error instanceof Error && error?.message) || error
                 );
                 clearConnection();
             })
@@ -392,8 +394,8 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
             connectionPopupWindow.value = window.open(dbxAuthUrl.value, 'dbauthPopupWindow', windowFeatures)
             console.log('connectionPopupWindow.value', connectionPopupWindow.value)
         }
-        catch (error) {
-            console.error(`Error getting auth URL:`, error?.message || error);
+        catch (error: unknown) {
+            console.error(`Error getting auth URL:`, (error instanceof Error && error?.message) || error);
             clearConnection();
         };
 
@@ -428,8 +430,8 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                     .then((response) => {
                         const reader = new FileReader();
                         reader.onload = (e) => {
-                            const fileData = e.target.result;
-                            callback(
+                            const fileData = e.target != null ? e.target.result : null;
+                            callback && callback(
                                 {
                                     rev: response.result.rev,
                                     content: fileData as string
@@ -447,10 +449,10 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                         // clearConnection();
                     });
             })
-            .catch((error) => {
+            .catch((error: unknown) => {
                 console.log(
                     `Error refreshing access`,
-                    error?.message || error
+                    (error instanceof Error && error?.message) || error
                 );
                 clearConnection();
             })
@@ -468,11 +470,11 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                         {
                             path: file.path,
                             contents: file.content,
-                            mode: { ".tag": "update", "update": file.rev }
+                            mode: { ".tag": "update", "update": file.rev || '' }
                         }
                     )
                     .then((response) => {
-                        callback(response.result)
+                        callback && callback(response.result)
                     })
                     .catch((error) => {
                         console.log(
@@ -483,10 +485,10 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                         // clearConnection();
                     });
             })
-            .catch((error) => {
+            .catch((error: unknown) => {
                 console.log(
                     `Error refreshing access`,
-                    error?.message || error
+                    (error instanceof Error && error?.message) || error
                 );
                 clearConnection();
             })
@@ -516,7 +518,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                         console.log(response)
                         // addToAvailable(file)
                         checkAvailableFiles()
-                        callback(response.result)
+                        callback && callback(response.result)
                     })
                     .catch((error) => {
                         console.log(
@@ -527,10 +529,10 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                         // clearConnection();
                     });
             })
-            .catch((error) => {
+            .catch((error: unknown) => {
                 console.log(
                     `Error refreshing access`,
-                    error?.message || error
+                    (error instanceof Error && error?.message) || error
                 );
                 clearConnection();
             })
@@ -554,7 +556,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                     .then((response) => {
                         console.log("deleteFile response", response)
                         checkAvailableFiles()
-                        callback(response.result)
+                        callback && callback(response.result)
                     })
                     .catch((error) => {
                         console.log(
@@ -565,17 +567,17 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                         // clearConnection();
                     });
             })
-            .catch((error) => {
+            .catch((error:unknown) => {
                 console.log(
                     `Error refreshing access`,
-                    error?.message || error
+                    (error instanceof Error && error?.message) || error
                 );
                 clearConnection();
             })
     }
 
     const accountOwner = ref<string | null>(null);
-    const accountInfo = ref(null);
+    const accountInfo = ref<DropboxUsers.FullAccount | null>(null);
 
 
 

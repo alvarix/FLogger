@@ -39,8 +39,8 @@ const props = defineProps<{
 const emit = defineEmits(["update-pretext"]);
 
 const isEditing = ref(false);
-const pretextEl = ref(null);
-const pretextValue = ref<string>(props.pretext);
+const pretextEl = ref<HTMLElement | null>(null);
+const pretextValue = ref<string>(props.pretext || "");
 console.log("pretextValue.value", pretextValue.value);
 
 function edit() {
@@ -61,8 +61,7 @@ function setupEditing() {
 watch(
   () => props.pretext,
   (newValue) => {
-    // console.log('watch props.entry')
-    pretextValue.value = newValue;
+    pretextValue.value = newValue || '';
   },
   { immediate: true }
 );
@@ -75,11 +74,11 @@ watch(
 );
 
 // Function to emit the update when blur occurs
-function save(event) {
+function save(event:FocusEvent) {
   // console.log('save pretextValue', pretextValue)
   // Could use either of these:
   // entryText.value = event.target.innerText;
-  pretextValue.value = pretextEl.value.innerText;
+  pretextValue.value = pretextEl.value!=null ? pretextEl.value.innerText : '';
   emit("update-pretext", pretextValue.value);
   isEditing.value = false;
 }

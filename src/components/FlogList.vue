@@ -42,8 +42,7 @@
         <ul id="files">
           <li v-for="item in sortedAvailableFlogs">
             <a href="#" @click.prevent="() => selectFile(item)">{{
-              // @ts-expect-error
-              item.path_display ?? item.url
+              item.url
             }}</a>
             <button
               class="small delete-flog"
@@ -59,8 +58,7 @@
         <ul id="files">
           <li v-for="item in availableRepoFlogs">
             <a href="#" @click.prevent="() => selectFile(item)">{{
-              // @ts-expect-error
-              item.path_display ?? item.url
+              item.url
             }}</a>
           </li>
         </ul>
@@ -70,15 +68,13 @@
 </template>
 
 <script setup lang="ts">
-import {
-  useFlogSource,
-  IFlog,
-  IFlogSourceType,
-} from "@/composables/useFlogSource";
+import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource";
+import type { IFlog } from "@/composables/useFlogSource";
 // @ts-ignore-error
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
 import AddFlog from "@/components/AddFlog.vue";
 import { ref, watch } from "vue";
+import type { Ref } from "vue";
 
 const {
   hasConnection,
@@ -98,12 +94,9 @@ const defaultFlogAlreadyOpened = ref(
 const defaultFlogFilepath = "/default.flogger.txt";
 
 const showModal = ref(false);
-watch(
-  connectionPopupWindow,
-  () => {
-    showModal.value = connectionPopupWindow.value ? true : false;
-  }
-);
+watch(connectionPopupWindow, () => {
+  showModal.value = connectionPopupWindow.value ? true : false;
+});
 
 watch(
   [hasConnection, availableFlogs],
@@ -128,19 +121,19 @@ watch(
   { immediate: true }
 );
 
-function selectFile(file) {
+function selectFile(file: IFlog) {
   console.log("selectFile", file);
   loadFlogEntriesFromSource(file);
   openFlog(file);
 }
 
-function handleAddFlog(flogData) {
+function handleAddFlog(flogFilename: string) {
   addFlogToSource({
-    url: flogData.value.filename + ".flogger.txt",
+    url: flogFilename,
     loadedEntries: [],
+    sourceType: IFlogSourceType.dropbox,
     // @ts-expect-error
     rev: null,
-    sourceType: IFlogSourceType.dropbox,
   });
 }
 
@@ -189,16 +182,18 @@ function sortFlogsByFilename(flogList: IFlog[], descending?: boolean) {
     }) || []
   );
 }
-function sortFlogsByModified(flogList: IFlog[], descending?: boolean) {
+function sortFlogsByModified(flogList: IFlog[], descending?: boolean): IFlog[] {
   return (
-    flogList?.toSorted((a, b) => {
-      if (descending) return b.modified.getTime() - a.modified.getTime();
-      else return a.modified.getTime() - b.modified.getTime();
+    flogList.toSorted((a, b) => {
+      const aVal = a.modified ? a.modified.getTime() : 0;
+      const bVal = b.modified ? b.modified.getTime() : 0;
+      if (descending) return bVal - aVal;
+      else return aVal - bVal;
     }) || []
   );
 }
 
-const sortedAvailableFlogs = ref(
+const sortedAvailableFlogs = ref<IFlog[]>(
   sortFlogsByModified(availableFlogs.value, true)
 );
 watch(

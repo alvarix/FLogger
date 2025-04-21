@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { IEntry } from '../modules/EntryData'
+import type { IEntry } from '../modules/EntryData'
 
 // Global reactivy state, created in module scope, so it's shared by all consumers of this useLoadedEntries composable.
 const loadedEntries = ref<IEntry[]>([])

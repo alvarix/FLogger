@@ -23,7 +23,6 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
 import Login from "@/components/Login.vue";
 import FlogList from "@/components/FlogList.vue";
 import Flog from "@/components/Flog.vue";
@@ -31,7 +30,6 @@ import { useOpenFlogs } from "@/composables/useOpenFlogs.ts";
 import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource.ts";
 import Head from "@/components/Head.vue";
 const { hasConnection } = useFlogSource(IFlogSourceType.dropbox);
-const ShowFlogList = ref(false);
 const { openFlogs } = useOpenFlogs();
 </script>
 

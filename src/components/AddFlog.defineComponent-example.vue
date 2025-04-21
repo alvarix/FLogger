@@ -36,7 +36,7 @@
         <ul id="files">
           <li v-for="item in matchedFlogs">
             <a href="#" @click.prevent="() => selectFlog(item)">{{
-              item.path_display ?? item.url
+              item.url
             }}</a>
           </li>
         </ul>
@@ -56,11 +56,11 @@ import type { IFlog } from "@/modules/Flog";
 
 export default defineComponent({
   props: {
-      availableFlogs: {
-        type: Array<IFlog>,
-        required: true,
-      },
+    availableFlogs: {
+      type: Array<IFlog>,
+      required: true,
     },
+  },
   emits: ["newFlog", "openFlog"],
   setup(props, { emit }) {
     // const emit = defineEmits(["newFlog", "openFlog"]);
@@ -79,7 +79,7 @@ export default defineComponent({
     //   },
     // });
 
-    const matchedFlogs = ref([]);
+    const matchedFlogs = ref<IFlog[]>([]);
     // To show all flogs in drop-down when search term is empty, set this ref to [...props.availableFlogs]
 
     watch(
@@ -96,7 +96,7 @@ export default defineComponent({
       }
     );
 
-    const selectFlog = (flog) => {
+    const selectFlog = (flog: IFlog) => {
       typedFilename.value = flog.url;
       // Could skip selectedFlog and just emit flog without any checks?
       let selectedFlog = props.availableFlogs.filter((item) => item === flog);
@@ -116,7 +116,7 @@ export default defineComponent({
       showDropdown.value = false;
     };
 
-    const handleKeydown = (e) => {
+    const handleKeydown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         showDropdown.value = false;
       }
@@ -132,7 +132,7 @@ export default defineComponent({
       selectFlog,
       submitAdd,
       hideDropdown,
-      handleKeydown
+      handleKeydown,
     };
   },
 });

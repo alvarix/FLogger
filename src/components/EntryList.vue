@@ -8,7 +8,7 @@
         :readOnly="readOnly"
         :isEditing="editingEntry == entry"
         @start-editing="() => handleStartEditingEntry(entry)"
-        @stop-editing="() => handleStopEditingEntry(entry)"
+        @stop-editing="() => handleStopEditingEntry()"
         @update-entry="updateEntry"
       />
       <div v-if="editingEntry == entry" class="entry__btns">
@@ -48,7 +48,7 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import Entry from "@/components/Entry.vue";
-import { IEntry } from "@/modules/EntryData";
+import type { IEntry } from "@/modules/EntryData";
 
 const props = defineProps<{
   entries?: Array<IEntry>;
@@ -83,12 +83,10 @@ function updateEntry(updatedEntry: IEntry) {
 }
 
 // Track the currently editing entry ID
-// console.log("props.editingEntry", props.editingEntry);
-const editingEntry = ref<IEntry | undefined>(props.editingEntry || null);
+const editingEntry = ref<IEntry | undefined>(props.editingEntry);
 watch(
   () => props.editingEntry,
   (newValue) => {
-    // console.log("watch props.editingEntry", newValue);
     editingEntry.value = newValue;
   },
   { immediate: true }
@@ -96,19 +94,12 @@ watch(
 
 const editButtonText = ref("Edit");
 
-const handleStartEditingEntry = (entry) => {
+const handleStartEditingEntry = (entry: IEntry) => {
   emit("start-editing", entry);
 };
 
 // Handle stop-editing event from the child component
-const handleStopEditingEntry = (entry) => {
-  // console.log(
-  //   `handleStopEditingEntry(...)`,
-  //   entry,
-  //   editingEntry.value,
-  //   entry == editingEntry.value,
-  //   entry === editingEntry.value
-  // );
+const handleStopEditingEntry = () => {
   emit("stop-editing");
 };
 

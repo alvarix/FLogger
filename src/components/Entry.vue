@@ -67,7 +67,7 @@ const formattedDate = computed(() => formatDate(props.entry.date));
 // we need to make local reactive refs and watch the props
 const entryText = ref<string>(props.entry.entry);
 const isReadOnly = ref<boolean | null>(props.readOnly);
-const entryEl = ref(null);
+const entryEl = ref<HTMLElement | null>(null);
 
 const handleStartEditing = () => {
   emit("start-editing", props.entry); // Or { ...props.entry, entry: entryText.value } ??
@@ -87,11 +87,11 @@ function setupEditing() {
 }
 
 // Function to emit the update when blur occurs
-function handleBlur(event) {
+function handleBlur(event: Event) {
   // console.log("handleBlur triggered", event.srcElement.value, entryText.value);
   // Could use either of these:
   // entryText.value = event.target.innerText;
-  entryText.value = entryEl.value.innerText;
+  entryText.value = entryEl.value != null ? entryEl.value.innerText : "";
   // Pass back same entry prop with new entry text overwritten
   emit("update-entry", { ...props.entry, entry: entryText.value });
   // // This doesn't work right now because Entry doesn't have its own index to pass back.

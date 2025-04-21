@@ -1,7 +1,9 @@
-import { ref, watch, Ref } from "vue"
+import { ref, watch } from "vue"
+import type { Ref } from "vue"
 import type { IFlog } from "@/modules/Flog"
 import { IFlogStatus, IFlogSourceType } from "@/modules/Flog"
-import { useDropboxFlogs, IDropboxFlog } from "@/composables/useDropboxFlogs";
+import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
+import type { IDropboxFlog } from "@/composables/useDropboxFlogs";
 
 // Re-export these for convenience
 export type { IFlog as IFlog }

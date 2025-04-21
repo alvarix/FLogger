@@ -1,7 +1,8 @@
-import { ref, Ref, toValue } from "vue"
+import { ref, toValue } from "vue"
+import type { Ref } from "vue"
 import type { IFlog } from "@/modules/Flog"
 import { IFlogStatus } from "@/modules/Flog"
-import { IEntry } from '@/modules/EntryData'
+import type { IEntry } from '@/modules/EntryData'
 import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource"
 
 // Re-export these for convenience
@@ -19,12 +20,12 @@ interface IUseFlog {
     updatePretext: (pretext: string) => void;
     deleteEntry: (entry: IEntry) => void;
     editEntry: (entry: IEntry) => void;
-    useKeyDownHandler: (blurCallback: (event: KeyboardEvent) => void) => { handleKeyDown: (event: KeyboardEvent) => void };
+    useKeyDownHandler: (blurCallback: (event: Event) => void) => { handleKeyDown: (event: KeyboardEvent) => void };
 }
 
 const { saveFlogToSource } = useFlogSource(IFlogSourceType.dropbox);
 
-export function useKeyDownHandler(blurCallback: (event: KeyboardEvent) => void) {
+export function useKeyDownHandler(blurCallback: (event: Event) => void) {
     function handleKeyDown(event: KeyboardEvent) {
         if (event.shiftKey && event.key === "Enter") {
             event.preventDefault();
@@ -50,7 +51,7 @@ export const useFlog = (inFlog: IFlog | Ref<IFlog>): IUseFlog => {
     }
 
 
-    const showMessage = (msg) => {
+    const showMessage = (msg: string) => {
         const el = document.querySelector('.message') as HTMLDivElement;
         el.textContent = msg;
         el.style.opacity = '1';
