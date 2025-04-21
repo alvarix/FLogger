@@ -1,4 +1,4 @@
-import { ref, Ref, watch, onBeforeUnmount } from "vue"
+import { ref, Ref, watch } from "vue"
 import fetch from "cross-fetch";
 import { Dropbox, DropboxAuth, Timestamp as DropboxTimestamp } from "dropbox";
 // See https://dropbox.github.io/dropbox-sdk-js/Dropbox.html
@@ -16,14 +16,19 @@ export interface IDropboxFiles {
     accountInfo: Ref<string | null>
     launchConnectFlow: () => void
     openDbxPopup: () => void
+    // eslint-disable-next-line
     connectionPopupWindow: Ref<any>
     hasConnection: Ref<boolean>
     clearConnection: () => void
     availableFiles: Ref<IDropboxFile[]>
     availableRepoFiles: Ref<IDropboxFile[]>
+    // eslint-disable-next-line
     loadFileContent: (file: IDropboxFile, callback: (result: { rev: string, content: string }) => any) => void,
+    // eslint-disable-next-line
     saveFileContent: (file: IDropboxFile, callback: (result: any) => any) => void,
+    // eslint-disable-next-line
     addFile: (file: IDropboxFile, callback: () => any) => void
+    // eslint-disable-next-line
     deleteFile: (file: IDropboxFile, callback: () => any) => void
     accountOwner: Ref<string | null>
 }
@@ -72,11 +77,6 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
         const code = params.get("code");
         return code;
     };
-    const removeAuthCodeFromUrl = (urlString) => {
-        let url = new URL(urlString);
-        url.searchParams.delete("code");
-        return url.toString();
-    };
 
     const dbxAuthCode = ref(getDbxAuthCodeFromUrl());
     const dbxAuthUrl = ref();
@@ -87,7 +87,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
     // // Commenting out for now.
     // const settingsFile = ref<{}>();
 
-    var CLIENT_ID = "85vbmd9vlyyb5kp" //Flogger data
+    const CLIENT_ID = "85vbmd9vlyyb5kp" //Flogger data
     //"irjhf3obwytvv53"; //flogger-ccc4
     //"lsu851xgok0qryy"; //Flogger Starscream
     //"k2i486lvdpfjyhj"; //"q5qja4ma5qcl0qc"; //flogger-chad: q5qja4ma5qcl0qc //ORIGINAL EXAMPLE: 42zjexze6mfpf7x
@@ -148,13 +148,13 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                     // dbxauth-popup: Set accessToken in sessionStorage of opener instead of current window, reload opener instead of current, and close current.
                     window.opener.sessionStorage.setItem(
                         "accessToken",
-                        // @ts-expect-error
+                        // @ts-expect-error — Unsure how to type Dropbox response.result
                         response.result.access_token
                     );
                     // dbxauth-popup: Set expiresIn in sessionStorage of opener.
                     window.opener.sessionStorage.setItem(
                         "expiresIn",
-                        // @ts-expect-error
+                        // @ts-expect-error — Unsure how to type Dropbox response.result
                         response.result.expires_in
                     );
                     // window.opener.connectionPopupWindow.value = false;
@@ -173,6 +173,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
         // 3. Get token
         // 3.b. Get expires in value
         accessToken = window.sessionStorage.getItem("accessToken");
+        // eslint-disable-next-line
         let expiresIn = window.sessionStorage.getItem("expiresIn") as any || -1;
         hasConnection.value = (accessToken && accessToken != "") ? true : false
         if (hasConnection.value) {
@@ -217,7 +218,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
     }
 
 
-    var dbx = new Dropbox({
+    const dbx = new Dropbox({
         auth: dbxAuth,
     });
 
@@ -247,7 +248,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
 
                         // Support for repo template/default files
                         // * Var to easily check if a template file exists in the filesListFolder response
-                        let repoFilePathsFound = new Map<string, boolean>()
+                        const repoFilePathsFound = new Map<string, boolean>()
 
                         // Support for default flog
                         let foundDefaultFlog = false;
@@ -350,6 +351,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
         immediate: true
     })
 
+    // eslint-disable-next-line
     const connectionPopupWindow = ref<any>()
     const launchConnectFlow = () => {
         // console.log("launchConnectFlow", "dbxAuthReturnUri", dbxAuthReturnUri);
@@ -367,9 +369,9 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
             .then((authUrl) => {
                 dbxAuthUrl.value = authUrl
                 clearConnection();
-                //@ts-expect-error
+                //@ts-expect-error — Unsure why the dbxAuth typing is not recognizing codeVerifier
                 window.sessionStorage.setItem("codeVerifier", dbxAuth.codeVerifier);
-                //@ts-expect-error
+                //@ts-expect-error — Unsure why the dbxAuth typing is not recognizing codeVerifier
                 console.log("dbxAuth.codeVerifier", dbxAuth.codeVerifier);
                 // // dbxauth-popup: Replace open popup rather than redirecting to Db in this window
                 // const windowFeatures = "popup=true,menubar=false,width=700height=700,innerWidth=700,innerHeight=700,left=100,top=100";
@@ -413,6 +415,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
         availableRepoFiles.value = [];
     }
 
+    // eslint-disable-next-line
     const loadFileContent = async (file: IDropboxFile, callback: (result: { rev: string, content: string }) => any) => {
         // console.log('loadFileContent file', file)
 
@@ -453,6 +456,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
             })
     }
 
+    // eslint-disable-next-line
     const saveFileContent = async (file: IDropboxFile, callback: (result: any) => any) => {
         // console.log('saveFileContent file', file)
 
@@ -488,6 +492,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
             })
     }
 
+    // eslint-disable-next-line
     const addFile = async (file: IDropboxFile, callback: (result?: any) => any) => {
         // console.log('addFile file', file)
 
@@ -531,6 +536,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
             })
     }
 
+    // eslint-disable-next-line
     const deleteFile = async (file: IDropboxFile, callback: (result?: any) => any) => {
         // console.log('addFile file', file)
 

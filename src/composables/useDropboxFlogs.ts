@@ -1,9 +1,8 @@
-import { ref, Ref, watch, onUpdated, onActivated } from "vue"
+import { ref, Ref, watch } from "vue"
 import type { IFlog } from "@/modules/Flog"
 import { IFlogStatus, IFlogSourceType, deserializeFlog, serializeFlog } from "@/modules/Flog"
 import { useDropboxFiles } from "@/composables/useDropboxFiles"
 import { IDropboxFile } from "@/composables/useDropboxFiles";
-import { timestamp, useTimestamp } from "@vueuse/core";
 
 // Re-export these for convenience
 export type { IFlog as IFlog }
@@ -16,6 +15,7 @@ export interface IDropboxFlogs {
     // pass through from useDropboxFiles
     launchConnectFlow: () => void;
     // pass through from useDropboxFiles
+    // eslint-disable-next-line
     connectionPopupWindow: Ref<any>;
     openDbxPopup: () => void;
     // pass through from useDropboxFiles
@@ -34,13 +34,6 @@ export interface IDropboxFlogs {
     deleteFlog: (flog: IDropboxFlog) => void;
     accountOwner: Ref<string | null>;
 }
-
-// const initialReadmeFile = fs.readFileSync('./repo_template/README.flogger.txt').toString("utf-8");
-// const response1 = await fetch('./repo_template/README.flogger.txt');
-// const response1Text = await response.text();
-// console.log(response1Text)
-
-const folderContents = ref([])
 
 // Using a list of repoFiles (paths and contents using interface IDropboxFile) 
 // as default files to save to a user's Dropbox app folder.
@@ -74,7 +67,7 @@ const repoFilesGlob = import.meta.glob("../../public/repo_template/**/*"); // ma
 // So when the frontend does fetch calls, it will add the '/repo_template/' part back.
 // 
 for (const propName in repoFilesGlob) {
-    if (repoFilesGlob.hasOwnProperty(propName)) {
+    if (Object.prototype.hasOwnProperty.call(repoFilesGlob, propName)) {
         const globPathValue = propName
         repoFiles.value.push(
             { path: globPathValue.replace("../../public/repo_template/", "") } //IDropboxFlog
@@ -84,7 +77,7 @@ for (const propName in repoFilesGlob) {
 // console.log("repoFiles.value", repoFiles.value);
 
 // Clientside fetches to get file contents for each path
-let repoFilesWithContents: IDropboxFile[] = []
+const repoFilesWithContents: IDropboxFile[] = []
 repoFiles.value.forEach(async repoFile => {
     // console.log(repoFile.path)
 
