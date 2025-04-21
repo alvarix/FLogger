@@ -6,15 +6,21 @@
  -->
 <template>
   <div id="spinner">
-    <PacmanLoader :loading="loading" :color="color" :size="size"></PacmanLoader>  </div>
+    <PacmanLoader :loading="true" :color="loaderProps.color" :size="loaderProps.size"></PacmanLoader>  </div>
   <Suspense>
     <DropBoxAuth />
   </Suspense>
 </template>
 
-<script setup>
-import DropBoxAuth from "@/components/DropBoxAuth.vue";
+<script setup lang="ts">
+import DropBoxAuth from "@components/DropBoxAuth.vue";
+// @ts-expect-error - vue-spinner typing issue
 import PacmanLoader from 'vue-spinner/src/PacmanLoader.vue'
+
+const loaderProps = {
+  size: undefined,
+  color: undefined,
+};
 </script>
 
 <style scoped>

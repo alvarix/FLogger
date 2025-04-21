@@ -8,9 +8,9 @@
       }"
     >
       <AddFlog
-        @newFlog="handleAddFlog"
-        @openFlog="selectFile"
-        :availableFlogs="sortedAvailableFlogs"
+        :available-flogs="sortedAvailableFlogs"
+        @new-flog="handleAddFlog"
+        @open-flog="selectFile"
       />
       <div id="files-section">
         <h3>Flogs</h3>
@@ -30,9 +30,9 @@
           </button>
         </div>
 
-        <div class="autoc-select" v-show="showSortOptionSelect">
+        <div v-show="showSortOptionSelect" class="autoc-select">
           <ul id="sortOptions">
-            <li v-for="item in sortType">
+            <li v-for="item in sortType" :key="item">
               <a href="#" @click.prevent="() => selectSortOption(item)">{{
                 item
               }}</a>
@@ -40,10 +40,9 @@
           </ul>
         </div>
         <ul id="files">
-          <li v-for="item in sortedAvailableFlogs">
+          <li v-for="item in sortedAvailableFlogs" :key="item.url">
             <a href="#" @click.prevent="() => selectFile(item)">{{
-              // @ts-expect-error
-              item.path_display ?? item.url
+              item.url
             }}</a>
             <button
               class="small delete-flog"
@@ -57,10 +56,9 @@
       <div id="repo-files-section">
         <h3>Flogger</h3>
         <ul id="files">
-          <li v-for="item in availableRepoFlogs">
+          <li v-for="item in availableRepoFlogs" :key="item.url">
             <a href="#" @click.prevent="() => selectFile(item)">{{
-              // @ts-expect-error
-              item.path_display ?? item.url
+              item.url
             }}</a>
           </li>
         </ul>
@@ -70,14 +68,10 @@
 </template>
 
 <script setup lang="ts">
-import {
-  useFlogSource,
-  IFlog,
-  IFlogSourceType,
-} from "@/composables/useFlogSource";
-// @ts-ignore-error
+import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource";
+import type { IFlog } from "@/composables/useFlogSource";
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
-import AddFlog from "@/components/AddFlog.vue";
+import AddFlog from "@components/AddFlog.vue";
 import { ref, watch } from "vue";
 
 const {
@@ -98,12 +92,9 @@ const defaultFlogAlreadyOpened = ref(
 const defaultFlogFilepath = "/default.flogger.txt";
 
 const showModal = ref(false);
-watch(
-  connectionPopupWindow,
-  () => {
-    showModal.value = connectionPopupWindow.value ? true : false;
-  }
-);
+watch(connectionPopupWindow, () => {
+  showModal.value = connectionPopupWindow.value ? true : false;
+});
 
 watch(
   [hasConnection, availableFlogs],
@@ -116,11 +107,7 @@ watch(
       )[0];
       if (defaultFlogFile) {
         defaultFlogAlreadyOpened.value = true;
-        window.sessionStorage.setItem(
-          "defaultFlogAlreadyOpened",
-          // @ts-expect-error
-          defaultFlogAlreadyOpened.value
-        );
+        window.sessionStorage.setItem("defaultFlogAlreadyOpened", "true");
         selectFile(defaultFlogFile);
       }
     }
@@ -128,19 +115,19 @@ watch(
   { immediate: true }
 );
 
-function selectFile(file) {
+function selectFile(file: IFlog) {
   console.log("selectFile", file);
   loadFlogEntriesFromSource(file);
   openFlog(file);
 }
 
-function handleAddFlog(flogData) {
+function handleAddFlog(flogFilename: string) {
   addFlogToSource({
-    url: flogData.value.filename + ".flogger.txt",
+    url: flogFilename,
     loadedEntries: [],
-    // @ts-expect-error
-    rev: null,
     sourceType: IFlogSourceType.dropbox,
+    // @ts-expect-error - Need to figure out proper handling of rev here. Is it needed to add? 
+    rev: null,
   });
 }
 
@@ -189,16 +176,18 @@ function sortFlogsByFilename(flogList: IFlog[], descending?: boolean) {
     }) || []
   );
 }
-function sortFlogsByModified(flogList: IFlog[], descending?: boolean) {
+function sortFlogsByModified(flogList: IFlog[], descending?: boolean): IFlog[] {
   return (
-    flogList?.toSorted((a, b) => {
-      if (descending) return b.modified.getTime() - a.modified.getTime();
-      else return a.modified.getTime() - b.modified.getTime();
+    flogList.toSorted((a, b) => {
+      const aVal = a.modified ? a.modified.getTime() : 0;
+      const bVal = b.modified ? b.modified.getTime() : 0;
+      if (descending) return bVal - aVal;
+      else return aVal - bVal;
     }) || []
   );
 }
 
-const sortedAvailableFlogs = ref(
+const sortedAvailableFlogs = ref<IFlog[]>(
   sortFlogsByModified(availableFlogs.value, true)
 );
 watch(

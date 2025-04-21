@@ -18,7 +18,7 @@ Current features:
 - Editing, copying or deleting of entries
 - Create new Flog on Dropbox
 - Light/dark mode
-- 'Pretext' - Flog metadata that lives before the first entry
+- 'FlogPretext' - Flog metadata that lives before the first entry
 - Omni box to search flogs with autocomplete, or create new Flog if input is not matched (thanks NValt!)
 - Read Only System Flogs that are managed in the repository instead of Dropbox
 

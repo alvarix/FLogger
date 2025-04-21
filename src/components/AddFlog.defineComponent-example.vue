@@ -30,6 +30,8 @@
         @focus="showDropdown = true"
         @input="showDropdown = true"
       />
+      <!-- required
+          @change="change" -->
       <div v-show="showDropdown" class="autoc-select">
         <ul id="files">
           <li v-for="item in matchedFlogs" :key="item.url">
@@ -46,68 +48,83 @@
   </form>
 </template>
 
-<script setup lang="ts">
-import { ref, watch } from "vue";
+<script lang="ts">
+import { ref, watch, defineComponent } from "vue";
 import type { IFlog } from "@/modules/Flog";
 // as per compiler: [@vue/compiler-sfc] `defineEmits` is a compiler macro and no longer needs to be imported.
 // import { defineEmits } from "vue";
 
-const emit = defineEmits(["newFlog", "openFlog"]);
+export default defineComponent({
+  props: {
+    availableFlogs: {
+      type: Array<IFlog>,
+      required: true,
+    },
+  },
+  emits: ["newFlog", "openFlog"],
+  setup(props, { emit }) {
 
-const typedFilename = ref("");
+    let typedFilename = ref("");
 
-const showInput = ref(true);
+    let showInput = ref(true);
 
-const hasError = ref(false);
+    let hasError = ref(false);
 
-const props = defineProps({
-  availableFlogs: {
-    type: Array<IFlog>,
-    required: true,
+    const matchedFlogs = ref<IFlog[]>([]);
+    // To show all flogs in drop-down when search term is empty, set this ref to [...props.availableFlogs]
+
+    watch(
+      [() => props.availableFlogs as IFlog[], typedFilename],
+      ([newItems, newFilename = ""]) => {
+        matchedFlogs.value = newItems.filter((item) => {
+          let filterTerm = newFilename.toLowerCase() || "";
+          let matchTerm = item.url.toLowerCase().replace(/.flogger.txt$/g, "");
+          let isMatch =
+            (filterTerm != "" && matchTerm.includes(filterTerm)) || false;
+          // To show all flogs in drop-down when search term is empty, change the above line to "filterTerm == "" || ..."
+          return isMatch;
+        });
+      }
+    );
+
+    const selectFlog = (flog: IFlog) => {
+      typedFilename.value = flog.url;
+      // Could skip selectedFlog and just emit flog without any checks?
+      let selectedFlog = props.availableFlogs.filter((item) => item === flog);
+      emit("openFlog", selectedFlog.length > 0 && selectedFlog[0]);
+    };
+
+    const submitAdd = () => {
+      emit("newFlog", typedFilename.value + ".flogger.txt");
+    };
+
+    // Add new ref to control dropdown visibility
+    const showDropdown = ref(true);
+
+    // Add new methods to handle hiding dropdown
+    const hideDropdown = () => {
+      showDropdown.value = false;
+    };
+
+    const handleKeydown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        showDropdown.value = false;
+      }
+    };
+    return {
+      typedFilename,
+      showInput,
+      hasError,
+      matchedFlogs,
+      showDropdown,
+
+      selectFlog,
+      submitAdd,
+      hideDropdown,
+      handleKeydown,
+    };
   },
 });
-
-const matchedFlogs = ref<IFlog[]>([]);
-// To show all flogs in drop-down when search term is empty, set this ref to [...props.availableFlogs]
-
-watch(
-  [() => props.availableFlogs as IFlog[], typedFilename],
-  ([newItems, newFilename = ""]) => {
-    matchedFlogs.value = newItems.filter((item) => {
-      const filterTerm = newFilename.toLowerCase() || "";
-      const matchTerm = item.url.toLowerCase().replace(/.flogger.txt$/g, "");
-      const isMatch =
-        (filterTerm != "" && matchTerm.includes(filterTerm)) || false;
-      // To show all flogs in drop-down when search term is empty, change the above line to "filterTerm == "" || ..."
-      return isMatch;
-    });
-  }
-);
-
-const selectFlog = (flog: IFlog) => {
-  typedFilename.value = flog.url;
-  // Could skip selectedFlog and just emit flog without any checks?
-  const selectedFlog = props.availableFlogs.filter((item) => item === flog);
-  emit("openFlog", selectedFlog.length > 0 && selectedFlog[0]);
-};
-
-const submitAdd = () => {
-  emit("newFlog", typedFilename.value + ".flogger.txt");
-};
-
-// Add new ref to control dropdown visibility
-const showDropdown = ref(true);
-
-// Add new methods to handle hiding dropdown
-const hideDropdown = () => {
-  showDropdown.value = false;
-};
-
-const handleKeydown = (e: KeyboardEvent) => {
-  if (e.key === "Escape") {
-    showDropdown.value = false;
-  }
-};
 </script>
 
 <style scoped lang="stylus">

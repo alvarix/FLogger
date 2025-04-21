@@ -5,16 +5,48 @@
             "@/*": [
                 "src/*"
             ],
+            "@/components/*": [
+                "src/components/*"
+            ],
+            "@/composables/*": [
+                "src/composables/*"
+            ],
+            "@/modules/*": [
+                "src/modules/*"
+            ],
+            "@components/*": [
+                "src/components/*"
+            ],
+            "@composables/*": [
+                "src/composables/*"
+            ],
+            "@modules/*": [
+                "src/modules/*"
+            ],
         },
         "target": "esnext",
         "module": "esnext",
-        "moduleResolution": "node",
+        "lib": ["ES2023", "dom"],
+        "moduleResolution": "bundler",
         "importHelpers": true,
         "isolatedModules": true,
-        "noEmit": true
+        "noEmit": true,
+        "allowJs": true,
+        "skipLibCheck": true,
+        "allowImportingTsExtensions": true,
+        "allowSyntheticDefaultImports": true,
     },
+    "extends": "@vue/tsconfig/tsconfig.dom.json",
+    "include": [
+        "eslint.config.mjs",
+        "index.html",
+        "src/**/*",
+        "src/**/*.vue",
+        "public/**/*",
+    ],
     "exclude": [
         "node_modules",
-        "dist"
+        "dist",
+        "public/dropbox-examples",
     ]
 }

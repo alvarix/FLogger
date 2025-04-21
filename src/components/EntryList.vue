@@ -1,18 +1,18 @@
 <template>
   <aside class="vue-file">EntryList.vue</aside>
   <ul class="entry-list">
-    <li v-for="(entry, index) in entries" :key="entry.entry">
-      <Entry
+    <li v-for="(entry) in entries" :key="entry.entry">
+      <FlogEntry
         :key="entry.entry"
         :entry="entry"
-        :readOnly="readOnly"
-        :isEditing="editingEntry == entry"
+        :read-only="readOnly"
+        :is-editing="editingEntry == entry"
         @start-editing="() => handleStartEditingEntry(entry)"
-        @stop-editing="() => handleStopEditingEntry(entry)"
+        @stop-editing="() => handleStopEditingEntry()"
         @update-entry="updateEntry"
       />
       <div v-if="editingEntry == entry" class="entry__btns">
-        <button class="entry__btn mr-8" @click="">#</button>
+        <button class="entry__btn mr-8" @click.prevent="">#</button>
 
         <button class="small entry__btn" @click="changeEntry('update', entry)">
           Save
@@ -35,8 +35,8 @@
         <button
           v-if="!readOnly"
           class="small entry__btn entry__btn--warn"
-          @click="changeEntry('delete', entry)"
           :disabled="editingEntry == entry"
+          @click="changeEntry('delete', entry)"
         >
           Delete
         </button>
@@ -47,8 +47,8 @@
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
-import Entry from "@/components/Entry.vue";
-import { IEntry } from "@/modules/EntryData";
+import FlogEntry from "@components/FlogEntry.vue";
+import type { IEntry } from "@/modules/EntryData";
 
 const props = defineProps<{
   entries?: Array<IEntry>;
@@ -83,12 +83,10 @@ function updateEntry(updatedEntry: IEntry) {
 }
 
 // Track the currently editing entry ID
-// console.log("props.editingEntry", props.editingEntry);
-const editingEntry = ref<IEntry | undefined>(props.editingEntry || null);
+const editingEntry = ref<IEntry | undefined>(props.editingEntry);
 watch(
   () => props.editingEntry,
   (newValue) => {
-    // console.log("watch props.editingEntry", newValue);
     editingEntry.value = newValue;
   },
   { immediate: true }
@@ -96,33 +94,15 @@ watch(
 
 const editButtonText = ref("Edit");
 
-const handleStartEditingEntry = (entry) => {
+const handleStartEditingEntry = (entry: IEntry) => {
   emit("start-editing", entry);
 };
 
 // Handle stop-editing event from the child component
-const handleStopEditingEntry = (entry) => {
-  // console.log(
-  //   `handleStopEditingEntry(...)`,
-  //   entry,
-  //   editingEntry.value,
-  //   entry == editingEntry.value,
-  //   entry === editingEntry.value
-  // );
+const handleStopEditingEntry = () => {
   emit("stop-editing");
 };
 
-// not used
-// Toggle function that changes the button text and class
-const toggleButton = () => {
-  if (editButtonText.value === "Edit") {
-    editButtonText.value = "Save";
-    //editButtonClass.value = 'button-clicked';
-  } else {
-    editButtonText.value = "Edit";
-    //editButtonClass.value = 'button-normal';
-  }
-};
 </script>
 
 <style scoped>
