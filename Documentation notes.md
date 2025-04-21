@@ -30,7 +30,7 @@
     - **AddFlog**
 
   - **Flog**
-    - **Pretext**
+    - **FlogPretext**
     - **AddEntry**
     - **EntryList**
       - **Entry**
@@ -88,38 +88,82 @@ npx dependency-cruiser  --output-type dot src | dot -T svg > dependencygraph.svg
 ```
 
 
-# Documentation practice
+# Style conventions
 
-## TSDocs
 
-Considering adopting TSDocs format. This allows immediate utility in IDEs and with linting tools.
+## Documentation practice
+
+Considering adopting JSDocs/TSDocs format. This allows immediate utility in IDEs and with linting tools. Although the doc generation doesn't work with Vite+Vue.
 
  - The comment block should go at the top of the ```<script setup lang="ts">``` tag.
  - SFC props should be defined with the @param tag
 
-## Linting
 
-Using eslint and typescript-eslint. Config settings are in ```eslint.config.mjs```.
+## TypeScript
 
-Releases should pass the linting test:
+Using TS for the standard reasons. With Vite+Vue there is no useful or easy tooling to autogenerate documentation. But the type error checking and type-based auto-completion in IDE are useful.
+
+TypeScript is installed with the node package ```typescript``` and config settings are in the ```tsconfig.json``` file.
+
+
+### Best practices for creating Vue SFC files with TS:
+
+ - Use ```<script setup lang="ts">``` (or ```<script setup lang="tsx">``` for JSX) to enable TypeScript support. 
+ - Use defineProps to declare and type-check component props. 
+ - Use defineEmits to declare and type-check emitted events. 
+ - Use defineOptions (for Options API) or defineComponent (for Composition API) to specify component options and type them. 
+   - Haven't found a use case convincing enough to use defineComponent over ```<script setup>```. Except perhaps the explicit code organization into props, data, watchers, etc.
+ - Use ref and computed for reactive variables and computed properties, and specify their types. 
+   - Always define ref vars as ```const```!
+
+
+## Vue TypeScript checking
+
+Using ```vue-tsc``` for Vue TypeScript checking, along with ```@vue/tsconfig``` for the typescript config, and ```vite-plugin-checker``` to run vue-tsc in a worker thread along with Vite dev mode. This will validate ts in vue SFC files. 
+
+The [Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar) extension shows vue-tsc issues in VS Code. And the ```vite-plugin-checker``` module runs vue-tsc with ```yarn dev``` and shows the issues in that terminal window. But you can also run vue-tsc on-demand in a shell (```yarn vue-tsc --noEmit```), or in watch mode in a separate shell parallel to the vite dev mode (```yarn vue-tsc --noEmit --watch```). 
+
+
+## Linting (including for TypeScript and Vue)
+
+Using ```eslint``` along with ```typescript-eslint``` and ```eslint-plugin-vue```, and dependency ```@eslint/js```. 
+
+ - ```typescript-eslint``` enables ESLint (and Prettier, if we decide to us it) to support TypeScript.
+ - ```eslint-plugin-vue``` enables checking the <template> and <script> of .vue files with ESLint, as well as Vue code in .js files.
+
+Config settings are in ```eslint.config.mjs```. *This is not an easy config to set up.*
+
+The [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) extension shows linting issues in VS Code. But you can also run in it a shell:
 
 ```shell
 yarn eslint .
 ```
 
-Also installed ```vue-tsc``` and ```vite-plugin-checker```. This will validate ts in vue files. You can run in on demand in a shell, or in watch mode (in a separate shell parallel to the vite dev mode). But ```vite-plugin-checker``` runs vue-tsc in a separate worker thread during development from the ```yarn dev``` command.
+***Note:*** All builds will need to pass the linting tests.
 
-On demand CLI:
 
-```shell
-yarn vue-tsc --noEmit
-```
 
-We have a package script to shorten this to:
+## About using ```vue-tsc``` and ```eslint-plugin-vue``` together
 
-```shell
-yarn vue-tsc
-```
+An AI summary...
+
+> Using both tools provides a more comprehensive approach to code quality:
+>
+>  - ```vue-tsc``` focuses on type correctness and preventing runtime errors, while ```eslint-plugin-vue``` focuses on code style, maintainability, and potential bugs.
+>  - ```vue-tsc``` operates during the build process, while ESLint can be configured to run in your editor or as part of your CI/CD pipeline, providing real-time feedback and ensuring consistent code quality throughout the development process.
+>
+> While there might be some overlap in the issues they catch, their primary focuses are different, and using them together provides a more robust and well-rounded approach to code quality in Vue.js projects.
+
+
+## IDE set up
+
+ - VS Code
+ - [Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar) extension ("vue.volar")
+   - This enables in-editor error messaging from vue-tsc.
+ - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) extension ("dbaeumer.vscode-eslint")
+   - This enables in-editor error messaging from eslint.
+
+
 
 # Proposed custom component documentation sample
 
@@ -178,18 +222,4 @@ yarn vue-tsc
  *   @modules
  */
 ```
-
-# TypeScript
-
-Using TS for the standard reasons. With Vite+Vue there is no useful or easy tooling to autogenerate documentation. But the type error checking and type-based auto-completion in IDE are useful.
-
-Best practices for creating Vue SFC files with TS:
- - Use ```<script setup lang="ts">``` (or ```<script setup lang="tsx">``` for JSX) to enable TypeScript support. 
- - Use defineProps to declare and type-check component props. 
- - Use defineEmits to declare and type-check emitted events. 
- - Use defineOptions (for Options API) or defineComponent (for Composition API) to specify component options and type them. 
-   - Haven't found a use case convincing enough to use defineComponent over ```<script setup>```. Except perhaps the explicit code organization into props, data, watchers, etc.
- - Use ref and computed for reactive variables and computed properties, and specify their types. 
-   - Always define ref vars as ```const```!
-
 
