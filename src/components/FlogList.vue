@@ -8,9 +8,9 @@
       }"
     >
       <AddFlog
-        @newFlog="handleAddFlog"
-        @openFlog="selectFile"
-        :availableFlogs="sortedAvailableFlogs"
+        :available-flogs="sortedAvailableFlogs"
+        @new-flog="handleAddFlog"
+        @open-flog="selectFile"
       />
       <div id="files-section">
         <h3>Flogs</h3>
@@ -30,9 +30,9 @@
           </button>
         </div>
 
-        <div class="autoc-select" v-show="showSortOptionSelect">
+        <div v-show="showSortOptionSelect" class="autoc-select">
           <ul id="sortOptions">
-            <li v-for="item in sortType">
+            <li v-for="item in sortType" :key="item">
               <a href="#" @click.prevent="() => selectSortOption(item)">{{
                 item
               }}</a>
@@ -40,7 +40,7 @@
           </ul>
         </div>
         <ul id="files">
-          <li v-for="item in sortedAvailableFlogs">
+          <li v-for="item in sortedAvailableFlogs" :key="item.url">
             <a href="#" @click.prevent="() => selectFile(item)">{{
               item.url
             }}</a>
@@ -56,7 +56,7 @@
       <div id="repo-files-section">
         <h3>Flogger</h3>
         <ul id="files">
-          <li v-for="item in availableRepoFlogs">
+          <li v-for="item in availableRepoFlogs" :key="item.url">
             <a href="#" @click.prevent="() => selectFile(item)">{{
               item.url
             }}</a>
@@ -70,11 +70,9 @@
 <script setup lang="ts">
 import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource";
 import type { IFlog } from "@/composables/useFlogSource";
-// @ts-ignore-error
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
-import AddFlog from "@/components/AddFlog.vue";
+import AddFlog from "@components/AddFlog.vue";
 import { ref, watch } from "vue";
-import type { Ref } from "vue";
 
 const {
   hasConnection,
@@ -109,11 +107,7 @@ watch(
       )[0];
       if (defaultFlogFile) {
         defaultFlogAlreadyOpened.value = true;
-        window.sessionStorage.setItem(
-          "defaultFlogAlreadyOpened",
-          // @ts-expect-error
-          defaultFlogAlreadyOpened.value
-        );
+        window.sessionStorage.setItem("defaultFlogAlreadyOpened", "true");
         selectFile(defaultFlogFile);
       }
     }
@@ -132,7 +126,7 @@ function handleAddFlog(flogFilename: string) {
     url: flogFilename,
     loadedEntries: [],
     sourceType: IFlogSourceType.dropbox,
-    // @ts-expect-error
+    // @ts-expect-error - Need to figure out proper handling of rev here. Is it needed to add? 
     rev: null,
   });
 }

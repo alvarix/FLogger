@@ -126,18 +126,18 @@
 <path fill="none" stroke="#000000" stroke-opacity="0.200000" d="M158.66,-668.28C166.34,-647.27 185.46,-594.37 199.75,-549.54 262.27,-353.39 158.39,-116.54 364.25,-116.54 364.25,-116.54 364.25,-116.54 587.38,-116.54 649.5,-116.54 822.39,-107.85 864.5,-153.54 876.26,-166.3 861.94,-295.76 872.5,-309.54 875.96,-314.05 880.81,-317.23 886.07,-319.46"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-opacity="0.200000" points="885.02,-321.67 891.37,-321.67 886.4,-317.7 885.02,-321.67"/>
 </g>
-<!-- src/components/Flog.vue -->
+<!-- src/components/EditFlog.vue -->
 <g id="node8" class="node">
-<title>src/components/Flog.vue</title>
-<g id="a_node8"><a xlink:href="src/components/Flog.vue" xlink:title="Flog.vue">
+<title>src/components/EditFlog.vue</title>
+<g id="a_node8"><a xlink:href="src/components/EditFlog.vue" xlink:title="EditFlog.vue">
 <path fill="#41f083" stroke="black" d="M280.83,-701.41C280.83,-701.41 238.67,-701.41 238.67,-701.41 235.71,-701.41 232.75,-698.45 232.75,-695.49 232.75,-695.49 232.75,-689.58 232.75,-689.58 232.75,-686.62 235.71,-683.66 238.67,-683.66 238.67,-683.66 280.83,-683.66 280.83,-683.66 283.79,-683.66 286.75,-686.62 286.75,-689.58 286.75,-689.58 286.75,-695.49 286.75,-695.49 286.75,-698.45 283.79,-701.41 280.83,-701.41"/>
-<text text-anchor="start" x="242.12" y="-688.86" font-family="Helvetica,sans-Serif" font-size="9.00">Flog.vue</text>
+<text text-anchor="start" x="242.12" y="-688.86" font-family="Helvetica,sans-Serif" font-size="9.00">EditFlog.vue</text>
 </a>
 </g>
 </g>
-<!-- src/App.vue&#45;&gt;src/components/Flog.vue -->
+<!-- src/App.vue&#45;&gt;src/components/EditFlog.vue -->
 <g id="edge1" class="edge">
-<title>src/App.vue&#45;&gt;src/components/Flog.vue</title>
+<title>src/App.vue&#45;&gt;src/components/EditFlog.vue</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M181.64,-681.36C194.41,-683.21 209.92,-685.46 223.68,-687.45"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="224.17,-689.94 230.41,-688.72 224.78,-685.78 224.17,-689.94"/>
 </g>
@@ -156,33 +156,33 @@
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M181.64,-673.71C192.72,-672.11 205.87,-670.2 218.14,-668.42"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="219.24,-670.09 224.88,-667.16 218.64,-665.94 219.24,-670.09"/>
 </g>
-<!-- src/components/Head.vue -->
+<!-- src/components/FloggerHead.vue -->
 <g id="node10" class="node">
-<title>src/components/Head.vue</title>
-<g id="a_node10"><a xlink:href="src/components/Head.vue" xlink:title="Head.vue">
+<title>src/components/FloggerHead.vue</title>
+<g id="a_node10"><a xlink:href="src/components/FloggerHead.vue" xlink:title="FloggerHead.vue">
 <path fill="#41f083" stroke="black" d="M281.71,-821.41C281.71,-821.41 237.79,-821.41 237.79,-821.41 234.83,-821.41 231.88,-818.45 231.88,-815.49 231.88,-815.49 231.88,-809.58 231.88,-809.58 231.88,-806.62 234.83,-803.66 237.79,-803.66 237.79,-803.66 281.71,-803.66 281.71,-803.66 284.67,-803.66 287.62,-806.62 287.62,-809.58 287.62,-809.58 287.62,-815.49 287.62,-815.49 287.62,-818.45 284.67,-821.41 281.71,-821.41"/>
-<text text-anchor="start" x="239.88" y="-808.86" font-family="Helvetica,sans-Serif" font-size="9.00">Head.vue</text>
+<text text-anchor="start" x="239.88" y="-808.86" font-family="Helvetica,sans-Serif" font-size="9.00">FloggerHead.vue</text>
 </a>
 </g>
 </g>
-<!-- src/App.vue&#45;&gt;src/components/Head.vue -->
+<!-- src/App.vue&#45;&gt;src/components/FloggerHead.vue -->
 <g id="edge3" class="edge">
-<title>src/App.vue&#45;&gt;src/components/Head.vue</title>
+<title>src/App.vue&#45;&gt;src/components/FloggerHead.vue</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M159.44,-686.83C167.39,-703.88 185.81,-740.84 207.75,-767.54 217.04,-778.84 229.29,-789.75 239.45,-797.99"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="238.4,-800.42 244.41,-802.49 241.01,-797.12 238.4,-800.42"/>
 </g>
-<!-- src/components/Login.vue -->
+<!-- src/components/DropboxLogin.vue -->
 <g id="node11" class="node">
-<title>src/components/Login.vue</title>
-<g id="a_node11"><a xlink:href="src/components/Login.vue" xlink:title="Login.vue">
+<title>src/components/DropboxLogin.vue</title>
+<g id="a_node11"><a xlink:href="src/components/DropboxLogin.vue" xlink:title="DropboxLogin.vue">
 <path fill="#41f083" stroke="black" d="M282.08,-761.41C282.08,-761.41 237.42,-761.41 237.42,-761.41 234.46,-761.41 231.5,-758.45 231.5,-755.49 231.5,-755.49 231.5,-749.58 231.5,-749.58 231.5,-746.62 234.46,-743.66 237.42,-743.66 237.42,-743.66 282.08,-743.66 282.08,-743.66 285.04,-743.66 288,-746.62 288,-749.58 288,-749.58 288,-755.49 288,-755.49 288,-758.45 285.04,-761.41 282.08,-761.41"/>
-<text text-anchor="start" x="239.5" y="-748.86" font-family="Helvetica,sans-Serif" font-size="9.00">Login.vue</text>
+<text text-anchor="start" x="239.5" y="-748.86" font-family="Helvetica,sans-Serif" font-size="9.00">DropboxLogin.vue</text>
 </a>
 </g>
 </g>
-<!-- src/App.vue&#45;&gt;src/components/Login.vue -->
+<!-- src/App.vue&#45;&gt;src/components/DropboxLogin.vue -->
 <g id="edge4" class="edge">
-<title>src/App.vue&#45;&gt;src/components/Login.vue</title>
+<title>src/App.vue&#45;&gt;src/components/DropboxLogin.vue</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M167.94,-686.73C185.63,-699.55 217.89,-722.92 238.81,-738.08"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="237.86,-740.44 243.96,-742.26 240.33,-737.04 237.86,-740.44"/>
 </g>
@@ -216,27 +216,27 @@
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M164.97,-668.27C188.87,-645.99 253.17,-588.93 316.75,-557.54 360.27,-536.05 374.95,-540.38 421.75,-527.54 425.79,-526.43 430,-525.29 434.22,-524.16"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="435.58,-525.44 440.84,-521.86 434.5,-521.38 435.58,-525.44"/>
 </g>
-<!-- src/components/Flog.vue&#45;&gt;node_modules/vue -->
+<!-- src/components/EditFlog.vue&#45;&gt;node_modules/vue -->
 <g id="edge27" class="edge">
-<title>src/components/Flog.vue&#45;&gt;node_modules/vue</title>
+<title>src/components/EditFlog.vue&#45;&gt;node_modules/vue</title>
 <path fill="none" stroke="#000000" stroke-opacity="0.200000" d="M287.14,-688.74C293.57,-686.52 299.74,-683.02 303.75,-677.54 334.39,-635.64 281.36,-248.51 316.75,-210.54 366.07,-157.6 406.4,-194.54 478.75,-194.54 478.75,-194.54 478.75,-194.54 692.88,-194.54 769.48,-194.54 810.66,-156.03 864.5,-210.54 880.01,-226.24 858.82,-292.21 872.5,-309.54 876.03,-314 880.9,-317.15 886.17,-319.38"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-opacity="0.200000" points="885.13,-321.58 891.48,-321.58 886.51,-317.62 885.13,-321.58"/>
 </g>
-<!-- src/components/Flog.vue&#45;&gt;node_modules/vue&#45;spinner -->
+<!-- src/components/EditFlog.vue&#45;&gt;node_modules/vue&#45;spinner -->
 <g id="edge28" class="edge">
-<title>src/components/Flog.vue&#45;&gt;node_modules/vue&#45;spinner</title>
+<title>src/components/EditFlog.vue&#45;&gt;node_modules/vue&#45;spinner</title>
 <path fill="none" stroke="#000000" stroke-opacity="0.200000" d="M287.15,-688.74C293.57,-686.52 299.74,-683.03 303.75,-677.54 320.07,-655.18 296.97,-198.89 316.75,-179.54 338.5,-158.25 842.16,-156.88 864.5,-177.54 881.19,-192.97 858.43,-261.68 872.5,-279.54 874.85,-282.51 877.79,-284.91 881.05,-286.83"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-opacity="0.200000" points="879.89,-289.08 886.21,-289.81 881.72,-285.3 879.89,-289.08"/>
 </g>
-<!-- src/components/Flog.vue&#45;&gt;src/composables/useFlogSource.ts -->
+<!-- src/components/EditFlog.vue&#45;&gt;src/composables/useFlogSource.ts -->
 <g id="edge24" class="edge">
-<title>src/components/Flog.vue&#45;&gt;src/composables/useFlogSource.ts</title>
+<title>src/components/EditFlog.vue&#45;&gt;src/composables/useFlogSource.ts</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M273.27,-701.72C283.37,-709.9 296.96,-722.82 303.75,-737.54 315.72,-763.5 295.54,-846.37 316.75,-865.54 348.74,-894.44 372.36,-877.61 413.75,-865.54 414.21,-865.4 529.46,-791.92 529.75,-791.54 569.76,-738.3 581.09,-656.72 584.22,-620.7"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="586.53,-620.96 584.9,-614.81 582.35,-620.63 586.53,-620.96"/>
 </g>
-<!-- src/components/Flog.vue&#45;&gt;src/composables/useOpenFlogs.ts -->
+<!-- src/components/EditFlog.vue&#45;&gt;src/composables/useOpenFlogs.ts -->
 <g id="edge25" class="edge">
-<title>src/components/Flog.vue&#45;&gt;src/composables/useOpenFlogs.ts</title>
+<title>src/components/EditFlog.vue&#45;&gt;src/composables/useOpenFlogs.ts</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M287.07,-688.17C293.33,-685.94 299.44,-682.59 303.75,-677.54 325.12,-652.45 294.23,-628.6 316.75,-604.54 347.1,-572.11 383.84,-613.36 413.75,-580.54 429.8,-562.93 405.83,-545.26 421.75,-527.54 423.93,-525.11 426.45,-523.05 429.19,-521.32"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="430.49,-523 434.89,-518.42 428.59,-519.25 430.49,-523"/>
 </g>
@@ -249,9 +249,9 @@
 </a>
 </g>
 </g>
-<!-- src/components/Flog.vue&#45;&gt;src/components/AddEntry.vue -->
+<!-- src/components/EditFlog.vue&#45;&gt;src/components/AddEntry.vue -->
 <g id="edge20" class="edge">
-<title>src/components/Flog.vue&#45;&gt;src/components/AddEntry.vue</title>
+<title>src/components/EditFlog.vue&#45;&gt;src/components/AddEntry.vue</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M287.14,-700.18C298.23,-703.4 311.39,-707.21 323.67,-710.77"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="323.65,-713.53 330,-713.19 324.82,-709.5 323.65,-713.53"/>
 </g>
@@ -264,9 +264,9 @@
 </a>
 </g>
 </g>
-<!-- src/components/Flog.vue&#45;&gt;src/modules/EntryData.ts -->
+<!-- src/components/EditFlog.vue&#45;&gt;src/modules/EntryData.ts -->
 <g id="edge26" class="edge">
-<title>src/components/Flog.vue&#45;&gt;src/modules/EntryData.ts</title>
+<title>src/components/EditFlog.vue&#45;&gt;src/modules/EntryData.ts</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M273.3,-701.71C283.42,-709.87 297.02,-722.79 303.75,-737.54 316.63,-765.76 296.78,-852.8 316.75,-876.54 364.78,-933.63 404.14,-920.54 478.75,-920.54 478.75,-920.54 478.75,-920.54 587.38,-920.54 712.21,-920.54 777.44,-738.51 795.11,-680.25"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="797.95,-680.07 797.63,-673.72 793.92,-678.88 797.95,-680.07"/>
 </g>
@@ -279,9 +279,9 @@
 </a>
 </g>
 </g>
-<!-- src/components/Flog.vue&#45;&gt;src/composables/useFlog.ts -->
+<!-- src/components/EditFlog.vue&#45;&gt;src/composables/useFlog.ts -->
 <g id="edge23" class="edge">
-<title>src/components/Flog.vue&#45;&gt;src/composables/useFlog.ts</title>
+<title>src/components/EditFlog.vue&#45;&gt;src/composables/useFlog.ts</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M287.21,-687.12C293.18,-684.92 299.12,-681.84 303.75,-677.54 314.39,-667.64 305.79,-657.08 316.75,-647.54 351.76,-617.05 405.78,-607.08 441.69,-603.89"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="441.59,-605.78 447.41,-603.22 441.26,-601.59 441.59,-605.78"/>
 </g>
@@ -294,24 +294,24 @@
 </a>
 </g>
 </g>
-<!-- src/components/Flog.vue&#45;&gt;src/components/EntryList.vue -->
+<!-- src/components/EditFlog.vue&#45;&gt;src/components/EntryList.vue -->
 <g id="edge21" class="edge">
-<title>src/components/Flog.vue&#45;&gt;src/components/EntryList.vue</title>
+<title>src/components/EditFlog.vue&#45;&gt;src/components/EntryList.vue</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M269.88,-701.69C280.37,-711.75 298.5,-727.77 316.75,-737.54 318.65,-738.55 320.63,-739.51 322.66,-740.42"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="322.29,-742.35 328.64,-742.65 323.87,-738.45 322.29,-742.35"/>
 </g>
-<!-- src/components/Pretext.vue -->
+<!-- src/components/FlogPretext.vue -->
 <g id="node22" class="node">
-<title>src/components/Pretext.vue</title>
-<g id="a_node22"><a xlink:href="src/components/Pretext.vue" xlink:title="Pretext.vue">
+<title>src/components/FlogPretext.vue</title>
+<g id="a_node22"><a xlink:href="src/components/FlogPretext.vue" xlink:title="FlogPretext.vue">
 <path fill="#41f083" stroke="black" d="M390.21,-701.41C390.21,-701.41 340.29,-701.41 340.29,-701.41 337.33,-701.41 334.38,-698.45 334.38,-695.49 334.38,-695.49 334.38,-689.58 334.38,-689.58 334.38,-686.62 337.33,-683.66 340.29,-683.66 340.29,-683.66 390.21,-683.66 390.21,-683.66 393.17,-683.66 396.12,-686.62 396.12,-689.58 396.12,-689.58 396.12,-695.49 396.12,-695.49 396.12,-698.45 393.17,-701.41 390.21,-701.41"/>
-<text text-anchor="start" x="342.38" y="-688.86" font-family="Helvetica,sans-Serif" font-size="9.00">Pretext.vue</text>
+<text text-anchor="start" x="342.38" y="-688.86" font-family="Helvetica,sans-Serif" font-size="9.00">FlogPretext.vue</text>
 </a>
 </g>
 </g>
-<!-- src/components/Flog.vue&#45;&gt;src/components/Pretext.vue -->
+<!-- src/components/EditFlog.vue&#45;&gt;src/components/FlogPretext.vue -->
 <g id="edge22" class="edge">
-<title>src/components/Flog.vue&#45;&gt;src/components/Pretext.vue</title>
+<title>src/components/EditFlog.vue&#45;&gt;src/components/FlogPretext.vue</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M287.14,-692.54C298.61,-692.54 312.28,-692.54 324.91,-692.54"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="324.88,-694.64 330.88,-692.54 324.88,-690.44 324.88,-694.64"/>
 </g>
@@ -348,15 +348,15 @@
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M292.93,-662.54C302.2,-662.54 312.45,-662.54 322.22,-662.54"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="322.02,-664.64 328.02,-662.54 322.02,-660.44 322.02,-664.64"/>
 </g>
-<!-- src/components/Head.vue&#45;&gt;node_modules/vue -->
+<!-- src/components/FloggerHead.vue&#45;&gt;node_modules/vue -->
 <g id="edge36" class="edge">
-<title>src/components/Head.vue&#45;&gt;node_modules/vue</title>
+<title>src/components/FloggerHead.vue&#45;&gt;node_modules/vue</title>
 <path fill="none" stroke="#000000" stroke-opacity="0.200000" d="M273.25,-803.34C283.33,-795.16 296.92,-782.23 303.75,-767.54 326.37,-718.89 306.86,-700.26 316.75,-647.54 352.19,-458.62 286.53,-246.54 478.75,-246.54 478.75,-246.54 478.75,-246.54 692.88,-246.54 769.37,-246.54 808.21,-207.74 864.5,-259.54 881.06,-274.77 857.87,-292.43 872.5,-309.54 876.04,-313.68 880.74,-316.68 885.78,-318.86"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-opacity="0.200000" points="884.93,-321.15 891.29,-321.2 886.35,-317.2 884.93,-321.15"/>
 </g>
-<!-- src/components/Head.vue&#45;&gt;src/composables/useFlogSource.ts -->
+<!-- src/components/FloggerHead.vue&#45;&gt;src/composables/useFlogSource.ts -->
 <g id="edge34" class="edge">
-<title>src/components/Head.vue&#45;&gt;src/composables/useFlogSource.ts</title>
+<title>src/components/FloggerHead.vue&#45;&gt;src/composables/useFlogSource.ts</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M287.83,-817.34C293.79,-819.56 299.56,-822.8 303.75,-827.54 321.83,-847.97 295.51,-870.41 316.75,-887.54 391.26,-947.63 463.87,-924.99 529.75,-855.54 562.32,-821.2 578.93,-672.36 583.81,-620.46"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="586.16,-620.86 584.61,-614.69 581.97,-620.48 586.16,-620.86"/>
 </g>
@@ -369,72 +369,72 @@
 </a>
 </g>
 </g>
-<!-- src/components/Head.vue&#45;&gt;src/components/ThemeSwitcher.vue -->
+<!-- src/components/FloggerHead.vue&#45;&gt;src/components/ThemeSwitcher.vue -->
 <g id="edge33" class="edge">
-<title>src/components/Head.vue&#45;&gt;src/components/ThemeSwitcher.vue</title>
+<title>src/components/FloggerHead.vue&#45;&gt;src/components/ThemeSwitcher.vue</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M287.94,-820.42C298.84,-823.57 311.62,-827.28 323.57,-830.74"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="323.74,-833.56 330.09,-833.21 324.91,-829.53 323.74,-833.56"/>
 </g>
 <!-- src/modules/Flog.ts -->
 <g id="node24" class="node">
 <title>src/modules/Flog.ts</title>
-<g id="a_node24"><a xlink:href="src/modules/Flog.ts" xlink:title="Flog.ts">
+<g id="a_node24"><a xlink:href="src/modules/Flog.ts" xlink:title="EditFlog.ts">
 <path fill="#ddfeff" stroke="black" d="M712.96,-671.41C712.96,-671.41 670.79,-671.41 670.79,-671.41 667.83,-671.41 664.88,-668.45 664.88,-665.49 664.88,-665.49 664.88,-659.58 664.88,-659.58 664.88,-656.62 667.83,-653.66 670.79,-653.66 670.79,-653.66 712.96,-653.66 712.96,-653.66 715.92,-653.66 718.88,-656.62 718.88,-659.58 718.88,-659.58 718.88,-665.49 718.88,-665.49 718.88,-668.45 715.92,-671.41 712.96,-671.41"/>
-<text text-anchor="start" x="678.38" y="-658.86" font-family="Helvetica,sans-Serif" font-size="9.00">Flog.ts</text>
+<text text-anchor="start" x="678.38" y="-658.86" font-family="Helvetica,sans-Serif" font-size="9.00">EditFlog.ts</text>
 </a>
 </g>
 </g>
-<!-- src/components/Head.vue&#45;&gt;src/modules/Flog.ts -->
+<!-- src/components/FloggerHead.vue&#45;&gt;src/modules/Flog.ts -->
 <g id="edge35" class="edge">
-<title>src/components/Head.vue&#45;&gt;src/modules/Flog.ts</title>
+<title>src/components/FloggerHead.vue&#45;&gt;src/modules/Flog.ts</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M288.02,-817.18C293.97,-819.4 299.69,-822.69 303.75,-827.54 327.16,-855.49 289,-884.88 316.75,-908.54 389.03,-970.14 448.87,-941.3 529.75,-891.54 614.79,-839.21 667.09,-723.44 684.44,-679.71"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="686.41,-679.88 686.62,-673.52 682.49,-678.36 686.41,-679.88"/>
 </g>
-<!-- src/components/Login.vue&#45;&gt;node_modules/vue -->
+<!-- src/components/DropboxLogin.vue&#45;&gt;node_modules/vue -->
 <g id="edge42" class="edge">
-<title>src/components/Login.vue&#45;&gt;node_modules/vue</title>
+<title>src/components/DropboxLogin.vue&#45;&gt;node_modules/vue</title>
 <path fill="none" stroke="#000000" stroke-opacity="0.200000" d="M273.55,-743.47C283.82,-735.37 297.51,-722.5 303.75,-707.54 313.83,-683.38 298.91,-255.69 316.75,-236.54 366.07,-183.6 406.4,-220.54 478.75,-220.54 478.75,-220.54 478.75,-220.54 692.88,-220.54 769.48,-220.54 809.89,-182.81 864.5,-236.54 876.13,-247.98 862.2,-296.87 872.5,-309.54 876.09,-313.95 881,-317.08 886.28,-319.29"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-opacity="0.200000" points="885.23,-321.5 891.59,-321.5 886.62,-317.54 885.23,-321.5"/>
 </g>
-<!-- src/components/Login.vue&#45;&gt;src/composables/useFlogSource.ts -->
+<!-- src/components/DropboxLogin.vue&#45;&gt;src/composables/useFlogSource.ts -->
 <g id="edge40" class="edge">
-<title>src/components/Login.vue&#45;&gt;src/composables/useFlogSource.ts</title>
+<title>src/components/DropboxLogin.vue&#45;&gt;src/composables/useFlogSource.ts</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M273.04,-761.83C282.99,-770.08 296.51,-783.03 303.75,-797.54 319.64,-829.37 289.62,-853.51 316.75,-876.54 349.62,-904.44 371.44,-884.78 413.75,-876.54 427.4,-873.88 520.65,-840.05 529.75,-829.54 583.32,-767.6 587,-662.24 586.15,-620.41"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="588.17,-620.57 585.89,-614.63 583.97,-620.69 588.17,-620.57"/>
 </g>
-<!-- src/components/Login.vue&#45;&gt;src/composables/useOpenFlogs.ts -->
+<!-- src/components/DropboxLogin.vue&#45;&gt;src/composables/useOpenFlogs.ts -->
 <g id="edge41" class="edge">
-<title>src/components/Login.vue&#45;&gt;src/composables/useOpenFlogs.ts</title>
+<title>src/components/DropboxLogin.vue&#45;&gt;src/composables/useOpenFlogs.ts</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M272.46,-743.47C282.33,-735.19 296.05,-722.04 303.75,-707.54 316.54,-683.44 300.24,-669.26 316.75,-647.54 346.23,-608.76 386.2,-636.71 413.75,-596.54 431.21,-571.07 401.52,-550.86 421.75,-527.54 423.92,-525.03 426.46,-522.92 429.23,-521.14"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="430.64,-522.77 435.04,-518.18 428.73,-519.02 430.64,-522.77"/>
 </g>
-<!-- src/components/Intro.vue -->
+<!-- src/components/FloggerIntro.vue -->
 <g id="node25" class="node">
-<title>src/components/Intro.vue</title>
-<g id="a_node25"><a xlink:href="src/components/Intro.vue" xlink:title="Intro.vue">
+<title>src/components/FloggerIntro.vue</title>
+<g id="a_node25"><a xlink:href="src/components/FloggerIntro.vue" xlink:title="FloggerIntro.vue">
 <path fill="#41f083" stroke="black" d="M386.33,-791.41C386.33,-791.41 344.17,-791.41 344.17,-791.41 341.21,-791.41 338.25,-788.45 338.25,-785.49 338.25,-785.49 338.25,-779.58 338.25,-779.58 338.25,-776.62 341.21,-773.66 344.17,-773.66 344.17,-773.66 386.33,-773.66 386.33,-773.66 389.29,-773.66 392.25,-776.62 392.25,-779.58 392.25,-779.58 392.25,-785.49 392.25,-785.49 392.25,-788.45 389.29,-791.41 386.33,-791.41"/>
-<text text-anchor="start" x="347.62" y="-778.86" font-family="Helvetica,sans-Serif" font-size="9.00">Intro.vue</text>
+<text text-anchor="start" x="347.62" y="-778.86" font-family="Helvetica,sans-Serif" font-size="9.00">FloggerIntro.vue</text>
 </a>
 </g>
 </g>
-<!-- src/components/Login.vue&#45;&gt;src/components/Intro.vue -->
+<!-- src/components/DropboxLogin.vue&#45;&gt;src/components/FloggerIntro.vue -->
 <g id="edge38" class="edge">
-<title>src/components/Login.vue&#45;&gt;src/components/Intro.vue</title>
+<title>src/components/DropboxLogin.vue&#45;&gt;src/components/FloggerIntro.vue</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M288.49,-760.58C301.06,-764.22 316.07,-768.57 329.39,-772.43"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="329.52,-775.23 335.86,-774.89 330.69,-771.2 329.52,-775.23"/>
 </g>
-<!-- src/components/Modal.vue -->
+<!-- src/components/ModalContent.vue -->
 <g id="node26" class="node">
-<title>src/components/Modal.vue</title>
-<g id="a_node26"><a xlink:href="src/components/Modal.vue" xlink:title="Modal.vue">
+<title>src/components/ModalContent.vue</title>
+<g id="a_node26"><a xlink:href="src/components/ModalContent.vue" xlink:title="ModalContent.vue">
 <path fill="#41f083" stroke="black" d="M388.71,-821.41C388.71,-821.41 341.79,-821.41 341.79,-821.41 338.83,-821.41 335.88,-818.45 335.88,-815.49 335.88,-815.49 335.88,-809.58 335.88,-809.58 335.88,-806.62 338.83,-803.66 341.79,-803.66 341.79,-803.66 388.71,-803.66 388.71,-803.66 391.67,-803.66 394.62,-806.62 394.62,-809.58 394.62,-809.58 394.62,-815.49 394.62,-815.49 394.62,-818.45 391.67,-821.41 388.71,-821.41"/>
-<text text-anchor="start" x="343.88" y="-808.86" font-family="Helvetica,sans-Serif" font-size="9.00">Modal.vue</text>
+<text text-anchor="start" x="343.88" y="-808.86" font-family="Helvetica,sans-Serif" font-size="9.00">ModalContent.vue</text>
 </a>
 </g>
 </g>
-<!-- src/components/Login.vue&#45;&gt;src/components/Modal.vue -->
+<!-- src/components/DropboxLogin.vue&#45;&gt;src/components/ModalContent.vue -->
 <g id="edge39" class="edge">
-<title>src/components/Login.vue&#45;&gt;src/components/Modal.vue</title>
+<title>src/components/DropboxLogin.vue&#45;&gt;src/components/ModalContent.vue</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M269.88,-761.69C280.37,-771.75 298.5,-787.77 316.75,-797.54 320.01,-799.28 323.51,-800.86 327.07,-802.28"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="327.06,-804.24 333.42,-804.32 328.5,-800.29 327.06,-804.24"/>
 </g>
@@ -537,30 +537,30 @@
 <path fill="none" stroke="#000000" stroke-opacity="0.200000" d="M366.16,-653.36C365.84,-600.99 367.06,-340.57 421.75,-288.54 474.69,-238.17 512.31,-272.54 585.38,-272.54 585.38,-272.54 585.38,-272.54 692.88,-272.54 769.48,-272.54 803.51,-242.18 864.5,-288.54 872.45,-294.58 865.26,-302.65 872.5,-309.54 876.36,-313.21 881.13,-315.98 886.12,-318.08"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-opacity="0.200000" points="885.16,-320.32 891.52,-320.38 886.59,-316.37 885.16,-320.32"/>
 </g>
-<!-- src/components/Entry.vue -->
+<!-- src/components/FlogEntry.vue -->
 <g id="node19" class="node">
-<title>src/components/Entry.vue</title>
-<g id="a_node19"><a xlink:href="src/components/Entry.vue" xlink:title="Entry.vue">
+<title>src/components/FlogEntry.vue</title>
+<g id="a_node19"><a xlink:href="src/components/FlogEntry.vue" xlink:title="Entry.vue">
 <path fill="#41f083" stroke="black" d="M500.96,-682.41C500.96,-682.41 458.54,-682.41 458.54,-682.41 455.58,-682.41 452.62,-679.45 452.62,-676.49 452.62,-676.49 452.62,-670.58 452.62,-670.58 452.62,-667.62 455.58,-664.66 458.54,-664.66 458.54,-664.66 500.96,-664.66 500.96,-664.66 503.92,-664.66 506.88,-667.62 506.88,-670.58 506.88,-670.58 506.88,-676.49 506.88,-676.49 506.88,-679.45 503.92,-682.41 500.96,-682.41"/>
 <text text-anchor="start" x="460.62" y="-669.86" font-family="Helvetica,sans-Serif" font-size="9.00">Entry.vue</text>
 </a>
 </g>
 </g>
-<!-- src/components/Entry.vue&#45;&gt;node_modules/vue -->
+<!-- src/components/FlogEntry.vue&#45;&gt;node_modules/vue -->
 <g id="edge16" class="edge">
-<title>src/components/Entry.vue&#45;&gt;node_modules/vue</title>
+<title>src/components/FlogEntry.vue&#45;&gt;node_modules/vue</title>
 <path fill="none" stroke="#000000" stroke-opacity="0.200000" d="M502.76,-664.19C512.71,-658.79 523.6,-650.96 529.75,-640.54 546.52,-612.1 520.08,-516.54 542.75,-492.54 592.36,-439.99 815.24,-498.4 864.5,-445.54 880.76,-428.09 857.59,-357.15 872.5,-338.54 876.03,-334.12 880.92,-331.06 886.19,-328.95"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-opacity="0.200000" points="886.45,-330.75 891.5,-326.88 885.14,-326.76 886.45,-330.75"/>
 </g>
-<!-- src/components/Entry.vue&#45;&gt;src/modules/EntryData.ts -->
+<!-- src/components/FlogEntry.vue&#45;&gt;src/modules/EntryData.ts -->
 <g id="edge14" class="edge">
-<title>src/components/Entry.vue&#45;&gt;src/modules/EntryData.ts</title>
+<title>src/components/FlogEntry.vue&#45;&gt;src/modules/EntryData.ts</title>
 <path fill="none" stroke="#000000" stroke-opacity="0.200000" d="M507.08,-676.34C554.18,-680.83 655.86,-688.09 740.75,-677.54 747.94,-676.64 755.51,-675.16 762.74,-673.47"/>
 <polygon fill="none" stroke="#000000" stroke-opacity="0.200000" points="762.95,-675.34 768.28,-671.87 761.95,-671.26 762.95,-675.34"/>
 </g>
-<!-- src/components/Entry.vue&#45;&gt;src/composables/useFlog.ts -->
+<!-- src/components/FlogEntry.vue&#45;&gt;src/composables/useFlog.ts -->
 <g id="edge15" class="edge">
-<title>src/components/Entry.vue&#45;&gt;src/composables/useFlog.ts</title>
+<title>src/components/FlogEntry.vue&#45;&gt;src/composables/useFlog.ts</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M479.75,-664.36C479.75,-649.68 479.75,-635 479.75,-620.33"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="481.85,-620.69 479.75,-614.69 477.65,-620.69 481.85,-620.69"/>
 </g>
@@ -600,15 +600,15 @@
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M399.75,-751.41C466.41,-748.31 619.7,-736.88 740.75,-695.54 754.22,-690.93 768.19,-683.34 779.19,-676.59"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="780.68,-677.87 784.63,-672.88 778.43,-674.32 780.68,-677.87"/>
 </g>
-<!-- src/components/EntryList.vue&#45;&gt;src/components/Entry.vue -->
+<!-- src/components/EntryList.vue&#45;&gt;src/components/FlogEntry.vue -->
 <g id="edge17" class="edge">
-<title>src/components/EntryList.vue&#45;&gt;src/components/Entry.vue</title>
+<title>src/components/EntryList.vue&#45;&gt;src/components/FlogEntry.vue</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M399.83,-744.14C404.66,-742.31 409.45,-740.12 413.75,-737.54 434.78,-724.88 454.17,-704.09 466.2,-689.65"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="468.64,-690.74 470.79,-684.76 465.38,-688.1 468.64,-690.74"/>
 </g>
-<!-- src/components/Pretext.vue&#45;&gt;node_modules/vue -->
+<!-- src/components/FlogPretext.vue&#45;&gt;node_modules/vue -->
 <g id="edge43" class="edge">
-<title>src/components/Pretext.vue&#45;&gt;node_modules/vue</title>
+<title>src/components/FlogPretext.vue&#45;&gt;node_modules/vue</title>
 <path fill="none" stroke="#000000" stroke-opacity="0.200000" d="M396.35,-689.03C403.09,-686.79 409.5,-683.21 413.75,-677.54 425.85,-661.4 408.03,-329.33 421.75,-314.54 471.43,-260.96 512.31,-298.54 585.38,-298.54 585.38,-298.54 585.38,-298.54 692.88,-298.54 769.48,-298.54 788.62,-304.01 864.5,-314.54 871.31,-315.48 878.58,-316.69 885.5,-317.93"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-opacity="0.200000" points="884.99,-320.16 891.27,-319.18 885.75,-316.02 884.99,-320.16"/>
 </g>
@@ -633,9 +633,9 @@
 <path fill="none" stroke="#000000" stroke-opacity="0.200000" d="M719.11,-662.54C731.8,-662.54 747.27,-662.54 761.29,-662.54"/>
 <polygon fill="none" stroke="#000000" stroke-opacity="0.200000" points="761.03,-664.64 767.03,-662.54 761.03,-660.44 761.03,-664.64"/>
 </g>
-<!-- src/components/Intro.vue&#45;&gt;src/composables/useFlogSource.ts -->
+<!-- src/components/FloggerIntro.vue&#45;&gt;src/composables/useFlogSource.ts -->
 <g id="edge37" class="edge">
-<title>src/components/Intro.vue&#45;&gt;src/composables/useFlogSource.ts</title>
+<title>src/components/FloggerIntro.vue&#45;&gt;src/composables/useFlogSource.ts</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M392.42,-775.77C399.5,-773.54 407.06,-770.78 413.75,-767.54 469.87,-740.3 486.17,-733.16 529.75,-688.54 550.23,-667.56 567.41,-637.93 577.04,-619.49"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="579.18,-619.95 580.03,-613.65 575.43,-618.05 579.18,-619.95"/>
 </g>

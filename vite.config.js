@@ -26,6 +26,9 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "@components": path.resolve(__dirname, "./src/components"),
+      "@composables": path.resolve(__dirname, "./src/composables"),
+      "@modules": path.resolve(__dirname, "./src/modules"),
     },
   },
   // setting up stylus per https://stackoverflow.com/questions/73228198/global-variables-stylus-vue-vite

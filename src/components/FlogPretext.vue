@@ -1,7 +1,7 @@
 <template>
-  <aside class="vue-file">Pretext.vue</aside>
+  <aside class="vue-file">FlogPretext.vue</aside>
 
-  <button class="small popbutton" popovertarget="my-popover">Flog Info</button>
+  <button class="small popbutton" popovertarget="my-popover">EditFlog Info</button>
   <div id="my-popover" popover class="popover">
     <div class="pretext">
       <button
@@ -68,13 +68,13 @@ watch(
 watch(
   isEditing,
   (newValue) => {
-    if (!!newValue) setupEditing();
+    if (newValue) setupEditing();
   },
   { immediate: true }
 );
 
 // Function to emit the update when blur occurs
-function save(event:FocusEvent) {
+function save() {
   // console.log('save pretextValue', pretextValue)
   // Could use either of these:
   // entryText.value = event.target.innerText;

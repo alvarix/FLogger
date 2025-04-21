@@ -3,7 +3,7 @@
 import { globalIgnores } from "eslint/config";
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
-import vueParser from "vue-eslint-parser"
+import vueParser from "vue-eslint-parser";
 import pluginVue from "eslint-plugin-vue";
 import globals from "globals";
 import eslintConfigPrettier from "eslint-config-prettier";
@@ -15,6 +15,7 @@ export default tseslint.config(
       ".vite/",
       "public/dropbox-examples/",
       ".dependency-cruiser.cjs",
+      "dist",
     ]),
   ],
   eslint.configs.recommended,
@@ -23,7 +24,7 @@ export default tseslint.config(
   // tseslint.configs.stylistic,
   pluginVue?.configs["flat/recommended"],
   {
-    files: ['*.vue', '**/*.vue'],
+    files: ["*.vue", "**/*.vue"],
     plugins: {
       "typescript-eslint": tseslint.plugin,
     },
@@ -39,8 +40,11 @@ export default tseslint.config(
         extraFileExtensions: [".vue"],
         sourceType: "module",
         globals: {
-          ...globals['shared-node-browser'],
+          ...globals["shared-node-browser"],
         },
+      },
+      globals: {
+        ...globals.browser,
       },
     },
   },

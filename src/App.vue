@@ -1,10 +1,10 @@
 <template>
   <main :class="{ connected: hasConnection }">
     <aside class="vue-file">App.vue</aside>
-    <Head />
+    <FloggerHead />
 
     <Suspense>
-      <Login />
+      <DropboxLogin />
     </Suspense>
 
     <div v-if="openFlogs.length == 0">
@@ -14,7 +14,7 @@
     </div>
     <div v-else>
       <div v-for="flog in openFlogs" :key="flog.url">
-        <Flog :flog="flog" />
+        <EditFlog :flog="flog" />
       </div>
     </div>
 
@@ -22,13 +22,13 @@
   </main>
 </template>
 
-<script setup>
-import Login from "@/components/Login.vue";
-import FlogList from "@/components/FlogList.vue";
-import Flog from "@/components/Flog.vue";
+<script setup lang="ts">
+import DropboxLogin from "@components/DropboxLogin.vue";
+import FlogList from "@components/FlogList.vue";
+import EditFlog from "@components/EditFlog.vue";
 import { useOpenFlogs } from "@/composables/useOpenFlogs.ts";
 import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource.ts";
-import Head from "@/components/Head.vue";
+import FloggerHead from "@components/FloggerHead.vue";
 const { hasConnection } = useFlogSource(IFlogSourceType.dropbox);
 const { openFlogs } = useOpenFlogs();
 </script>

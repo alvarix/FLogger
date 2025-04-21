@@ -61,8 +61,8 @@ export const useFlog = (inFlog: IFlog | Ref<IFlog>): IUseFlog => {
     };
 
     const deleteEntry = (entry: IEntry) => {
-        if (!flog || !Array.isArray(flog.value.loadedEntries)) {
-            console.error('Flog or flog.value.loadedEntries is undefined or not an array');
+        if (!flog.value || !Array.isArray(flog.value.loadedEntries)) {
+            console.error('EditFlog.value or flog.value.loadedEntries is undefined or not an array');
             return;
         }
         // Find the index of the entry to delete
@@ -79,8 +79,8 @@ export const useFlog = (inFlog: IFlog | Ref<IFlog>): IUseFlog => {
     };
 
     const editEntry = (entry: IEntry) => {
-        if (!flog || !Array.isArray(flog.value.loadedEntries)) {
-            console.error(`Flog or flog.value.loadedEntries is undefined or not an array: ${flog}`);
+        if (!flog.value || !Array.isArray(flog.value.loadedEntries)) {
+            console.error(`EditFlog or flog.value.loadedEntries is undefined or not an array: ${flog.value}`);
             return;
         }
         // Find the index of the entry to delete

@@ -1,9 +1,9 @@
 /**
- * Interfaces and utility functions for a Flog.
+ * Interfaces and utility functions for a EditFlog.
  */
 
 /**
- * The interface for a Flog
+ * The interface for a EditFlog
  * @public
  */
 export interface IFlog extends IFlogCore {
@@ -16,7 +16,7 @@ export interface IFlog extends IFlogCore {
 }
 
 /**
- * The core abstract model for a Flog
+ * The core abstract model for a EditFlog
  * @private
  */
 interface IFlogCore {

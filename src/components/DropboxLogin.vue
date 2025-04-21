@@ -1,8 +1,8 @@
 <template>
-  <aside class="vue-file">Login.vue</aside>
+  <aside class="vue-file">DropboxLogin.vue</aside>
   <Teleport to="body">
     <!-- use the modal component, pass in the prop -->
-    <Modal :show="showModal" @close="showModal = false">
+    <ModalContent :show="showModal" @close="showModal = false">
       <template #header>
         <h3>Dropbox authorization in progress</h3>
       </template>
@@ -21,7 +21,7 @@
           cancel
         </button>
       </template>
-    </Modal>
+    </ModalContent>
   </Teleport>
 
   <section class="container main">
@@ -31,25 +31,34 @@
         display: hasConnection ? 'none' : 'block',
       }"
     >
-      <Intro />
+      <FloggerIntro />
+      <p>Connect to your DropBox account to begin.</p>
+
+      <button class="dbx__btn" @click="launchConnectFlow">
+        connect to DropBox
+      </button>
     </div>
   </section>
 </template>
 
-<script setup>
-import { IFlogSourceType, useFlogSource } from "@/composables/useFlogSource";
-import { useOpenFlogs } from "@/composables/useOpenFlogs";
+<script setup lang="ts">
 import { ref, watch } from "vue";
-import Modal from "@/components/Modal.vue";
-import Intro from "@/components/Intro.vue";
+import {
+  IFlogSourceType,
+  useFlogSource,
+  type IFlog,
+} from "@/composables/useFlogSource";
+import { useOpenFlogs } from "@/composables/useOpenFlogs";
+import ModalContent from "@components/ModalContent.vue";
+import FloggerIntro from "@components/FloggerIntro.vue";
 
 const {
+  launchConnectFlow,
   openPopup,
   hasConnection,
   connectionPopupWindow,
   availableFlogs,
   loadFlogEntriesFromSource,
-  addFlog,
 } = useFlogSource(IFlogSourceType.dropbox);
 
 const { openFlog } = useOpenFlogs();
@@ -74,7 +83,7 @@ const openPop = () => {
   openPopup();
 };
 
-const selectFile = (file) => {
+const selectFile = (file: IFlog) => {
   console.log("selectFile", file);
   loadFlogEntriesFromSource(file);
   openFlog(file);
@@ -91,7 +100,7 @@ watch(
         defaultFlogAlreadyOpened.value = true;
         window.sessionStorage.setItem(
           "defaultFlogAlreadyOpened",
-          defaultFlogAlreadyOpened.value
+          'true'
         );
         selectFile(defaultFlogFile);
       }
@@ -99,14 +108,6 @@ watch(
   },
   { immediate: true }
 );
-
-function handleAddFlog(flogData) {
-  console.log("Not implemented yet", flogData.value.filename);
-  addFlog({
-    url: flogData.value.filename + ".flogger.txt",
-    loadedEntries: [],
-  });
-}
 </script>
 
 <style scoped lang="stylus">

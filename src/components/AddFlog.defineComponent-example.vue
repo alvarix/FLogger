@@ -20,21 +20,21 @@
   >
     <div class="filename-controls">
       <input
+        id="filename"
+        v-model="typedFilename"
         autofocus
         autocomplete="off"
         :class="['filename', { error: hasError }]"
-        id="filename"
         type="text"
         placeholder="search or create new flog"
-        v-model="typedFilename"
         @focus="showDropdown = true"
         @input="showDropdown = true"
       />
       <!-- required
           @change="change" -->
-      <div class="autoc-select" v-show="showDropdown">
+      <div v-show="showDropdown" class="autoc-select">
         <ul id="files">
-          <li v-for="item in matchedFlogs">
+          <li v-for="item in matchedFlogs" :key="item.url">
             <a href="#" @click.prevent="() => selectFlog(item)">{{
               item.url
             }}</a>
@@ -63,21 +63,12 @@ export default defineComponent({
   },
   emits: ["newFlog", "openFlog"],
   setup(props, { emit }) {
-    // const emit = defineEmits(["newFlog", "openFlog"]);
-    const newFlog = ref({ filename: "" }); // Initialize newFlog as a reactive variable
 
     let typedFilename = ref("");
 
     let showInput = ref(true);
 
     let hasError = ref(false);
-
-    // const props = defineProps({
-    //   availableFlogs: {
-    //     type: Array,
-    //     required: true,
-    //   },
-    // });
 
     const matchedFlogs = ref<IFlog[]>([]);
     // To show all flogs in drop-down when search term is empty, set this ref to [...props.availableFlogs]
@@ -104,8 +95,7 @@ export default defineComponent({
     };
 
     const submitAdd = () => {
-      newFlog.value.filename = typedFilename.value;
-      emit("newFlog", newFlog);
+      emit("newFlog", typedFilename.value + ".flogger.txt");
     };
 
     // Add new ref to control dropdown visibility
@@ -122,7 +112,6 @@ export default defineComponent({
       }
     };
     return {
-      newFlog,
       typedFilename,
       showInput,
       hasError,

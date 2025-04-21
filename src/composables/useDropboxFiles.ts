@@ -431,12 +431,13 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                         const reader = new FileReader();
                         reader.onload = (e) => {
                             const fileData = e.target != null ? e.target.result : null;
-                            callback && callback(
-                                {
-                                    rev: response.result.rev,
-                                    content: fileData as string
-                                }
-                            )
+                            if (callback !== undefined)
+                                callback(
+                                    {
+                                        rev: response.result.rev,
+                                        content: fileData as string
+                                    }
+                                )
                         };
                         //@ts-expect-error - dbx doesn't have typing for fileBlob for some reason
                         reader.readAsText(response.result.fileBlob);
@@ -474,7 +475,8 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                         }
                     )
                     .then((response) => {
-                        callback && callback(response.result)
+                        if (callback !== undefined)
+                            callback(response.result)
                     })
                     .catch((error) => {
                         console.log(
@@ -518,7 +520,8 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                         console.log(response)
                         // addToAvailable(file)
                         checkAvailableFiles()
-                        callback && callback(response.result)
+                        if (callback !== undefined)
+                            callback(response.result)
                     })
                     .catch((error) => {
                         console.log(
@@ -556,7 +559,8 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                     .then((response) => {
                         console.log("deleteFile response", response)
                         checkAvailableFiles()
-                        callback && callback(response.result)
+                        if (callback !== undefined)
+                            callback(response.result)
                     })
                     .catch((error) => {
                         console.log(
@@ -567,7 +571,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                         // clearConnection();
                     });
             })
-            .catch((error:unknown) => {
+            .catch((error: unknown) => {
                 console.log(
                     `Error refreshing access`,
                     (error instanceof Error && error?.message) || error

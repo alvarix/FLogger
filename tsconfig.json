@@ -5,6 +5,24 @@
             "@/*": [
                 "src/*"
             ],
+            "@/components/*": [
+                "src/components/*"
+            ],
+            "@/composables/*": [
+                "src/composables/*"
+            ],
+            "@/modules/*": [
+                "src/modules/*"
+            ],
+            "@components/*": [
+                "src/components/*"
+            ],
+            "@composables/*": [
+                "src/composables/*"
+            ],
+            "@modules/*": [
+                "src/modules/*"
+            ],
         },
         "target": "esnext",
         "module": "esnext",

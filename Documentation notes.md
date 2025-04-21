@@ -9,27 +9,27 @@
 ## Main components
 
 - **main** : **App**
-  - **Head** — Displays the app logo and user settings menu
-  - **Login** — The option to log in if not already.
+  - **FloggerHead** — Displays the app logo and user settings menu
+  - **DropboxLogin** — The option to log in if not already.
   - **FlogList** — If logged in, display either a list of the user's flogs, or...
-  - **Flog** — An open flog. Actually can display multiple, although the app doesn't offer an opportunity to open a second one at present.
+  - **EditFlog** — An open flog. Actually can display multiple, although the app doesn't offer an opportunity to open a second one at present.
 
 - **dbauthpopup** : **DbAuthPopup**
   - **DropBoxAuth** — A component that shows an in progress spinner and handles the return redirect from Dropbox.
 
 ## Main components breakdown
 
-  - **Head**
+  - **FloggerHead**
     - **ThemeSwitcher** — A light/dark mode toggler.
 
-  - **Login**
-    - **Intro** — Homepage content for unauthenticated users.
-    - **Modal** — A modal is displayed while the Dropbox flow is happening in a popup.
+  - **DropboxLogin**
+    - **FloggerIntro** — Homepage content for unauthenticated users.
+    - **ModalContent** — A modal is displayed while the Dropbox flow is happening in a popup.
 
   - **FlogList**
     - **AddFlog**
 
-  - **Flog**
+  - **EditFlog**
     - **FlogPretext**
     - **AddEntry**
     - **EntryList**
@@ -122,6 +122,8 @@ TypeScript is installed with the node package ```typescript``` and config settin
 Using ```vue-tsc``` for Vue TypeScript checking, along with ```@vue/tsconfig``` for the typescript config, and ```vite-plugin-checker``` to run vue-tsc in a worker thread along with Vite dev mode. This will validate ts in vue SFC files. 
 
 The [Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar) extension shows vue-tsc issues in VS Code. And the ```vite-plugin-checker``` module runs vue-tsc with ```yarn dev``` and shows the issues in that terminal window. But you can also run vue-tsc on-demand in a shell (```yarn vue-tsc --noEmit```), or in watch mode in a separate shell parallel to the vite dev mode (```yarn vue-tsc --noEmit --watch```). 
+
+The ```vue-tsc``` errors are also displayed in-browser in dev mode. You can click on the file link to open that line of code in VS Code.
 
 
 ## Linting (including for TypeScript and Vue)
@@ -217,7 +219,7 @@ An AI summary...
  *     - SiblingComponent - Explains how this component interacts with sibling components.
  * @imports
  *   @components
- *     - ImportedComponent from '@/components/path/ImportedComponent.vue' - Describes its role.
+ *     - ImportedComponent from '@components/path/ImportedComponent.vue' - Describes its role.
  *   @composables
  *   @modules
  */

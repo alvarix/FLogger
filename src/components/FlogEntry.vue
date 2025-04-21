@@ -5,8 +5,8 @@
     <!-- If not editing, display rendered markdown with VueShowdown -->
     <div
       v-if="!props.isEditing"
-      @click="handleStartEditing"
       class="entry__body"
+      @click="handleStartEditing"
     >
       <VueShowdown flavor="github" :markdown="entryText" />
     </div>
@@ -87,7 +87,7 @@ function setupEditing() {
 }
 
 // Function to emit the update when blur occurs
-function handleBlur(event: Event) {
+function handleBlur() {
   // console.log("handleBlur triggered", event.srcElement.value, entryText.value);
   // Could use either of these:
   // entryText.value = event.target.innerText;
@@ -113,7 +113,7 @@ watch(
 watch(
   () => props.isEditing,
   (newValue) => {
-    if (!!newValue) setupEditing();
+    if (newValue) setupEditing();
   },
   { immediate: true }
 );

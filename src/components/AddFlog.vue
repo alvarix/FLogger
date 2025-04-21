@@ -20,21 +20,19 @@
   >
     <div class="filename-controls">
       <input
+        id="filename"
+        v-model="typedFilename"
         autofocus
         autocomplete="off"
         :class="['filename', { error: hasError }]"
-        id="filename"
         type="text"
         placeholder="search or create new flog"
-        v-model="typedFilename"
         @focus="showDropdown = true"
         @input="showDropdown = true"
       />
-      <!-- required
-          @change="change" -->
-      <div class="autoc-select" v-show="showDropdown">
+      <div v-show="showDropdown" class="autoc-select">
         <ul id="files">
-          <li v-for="item in matchedFlogs">
+          <li v-for="item in matchedFlogs" :key="item.url">
             <a href="#" @click.prevent="() => selectFlog(item)">{{
               item.url
             }}</a>

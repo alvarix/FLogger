@@ -8,7 +8,7 @@
           v-model="entryDate"
           :class="['date', { error: hasError }]"
           type="text"
-          :placeholder="defaultFormEntry.date"
+          :placeholder="defaultFormEntry.date.toLocaleString('en-US')"
           required
         />
         <em class="date-validation hidden" :class="{ error: hasError }"
@@ -40,10 +40,11 @@
   </form>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, watch, nextTick } from "vue";
 import EntryData from "@/modules/EntryData";
-import { defineEmits } from "vue";
+// as per compiler: [@vue/compiler-sfc] `defineEmits` is a compiler macro and no longer needs to be imported.
+// import { defineEmits } from "vue";
 import { placeCursorAtEnd } from "@/modules/utilities";
 
 const props = defineProps({
@@ -61,14 +62,15 @@ const emit = defineEmits(["newEntry"]);
 const datetime = new Date();
 
 const defaultFormEntry = new EntryData(
-  `${datetime.toLocaleDateString("en-US")} ${datetime.toLocaleTimeString(
-    "en-US"
-  )}`,
-  props.entryValue || ""
+  // `${datetime.toLocaleDateString("en-US")} ${datetime.toLocaleTimeString(
+  //   "en-US"
+  // )}`,
+  datetime,
+  props.entryValue?.entry || ""
 );
 
 const entryDate = ref(defaultFormEntry.date);
-const entryEl = ref(null); // Element ref for the contenteditable
+const entryEl = ref<HTMLElement | null>(null); // Element ref for the contenteditable
 
 const hasError = ref(false);
 
@@ -76,11 +78,14 @@ const submitAdd = () => {
   // emit the event with a
   emit(
     "newEntry",
-    new EntryData(entryDate.value, entryEl.value.innerText || "")
+    new EntryData(
+      entryDate.value,
+      (entryEl.value !== null && entryEl.value.innerText) || ""
+    )
   );
   // Reset the form data
   entryDate.value = defaultFormEntry.date;
-  entryEl.value.innerText = defaultFormEntry.entry;
+  if (entryEl.value !== null) entryEl.value.innerText = defaultFormEntry.entry;
 };
 
 // this watch is triggered when copying an entry
@@ -88,9 +93,9 @@ watch(
   () => props.entryValue,
   (newVal) => {
     if (!newVal || !newVal?.entry) {
-      entryEl.value.innerText = "";
+      if (entryEl.value !== null) entryEl.value.innerText = "";
     } else if (newVal?.entry) {
-      entryEl.value.innerText = newVal.entry; // Prepopulate the textarea with the copied entry
+      if (entryEl.value !== null) entryEl.value.innerText = newVal.entry; // Prepopulate the textarea with the copied entry
 
       nextTick(() => {
         if (entryEl.value && entryEl.value != null) {
