@@ -47,29 +47,77 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * A component with a form for creating a new flog, or opening a flog from availableFlogs
+ * @component
+ */
+
 import { ref, watch } from "vue";
 import type { IFlog } from "@/modules/Flog";
-// as per compiler: [@vue/compiler-sfc] `defineEmits` is a compiler macro and no longer needs to be imported.
-// import { defineEmits } from "vue";
 
-const emit = defineEmits(["newFlog", "openFlog"]);
+const emit = defineEmits([
+  /**
+   * @event newFlog - Emitted when the user submits the form with a filename that doesn't
+   * already exist in availableFlogs.
+   * @property {string} filename - The filename entered by the user with the FLogger
+   * extension added.
+   */
+  "newFlog",
+  /**
+   * @event openFlog - Emitted when the user submits the form with a filename that does
+   * already exists in availableFlogs.
+   * @property {IFlog} flog - The flog from availableFlogs selected by the user.
+   */
+  "openFlog",
+]);
 
+/**
+ * A ref containing the user input filename string.
+ * The standard FLogger file extension will be added to this.
+ * @type {Ref<string>}
+ */
 const typedFilename = ref("");
 
+/**
+ * A ref flag that determines whether or not the submit button is displayed.
+ * @type {Ref<boolean>}
+ */
 const showInput = ref(true);
 
+/**
+ * A ref flag that determines whether or not UI error elements are displayed.
+ * @type {Ref<boolean>}
+ */
 const hasError = ref(false);
 
 const props = defineProps({
+  /**
+   * @property {Array<IFlog>} availableFlogs - An array of existing flogs used for
+   * autocompletion to open existing rather than creating a new flog.
+   */
   availableFlogs: {
     type: Array<IFlog>,
     required: true,
   },
 });
 
+/**
+ * A ref array of flogs in availableFlogs that match the partial (or full)
+ * filename entered by the user.
+ * @type {Ref<IFlog[]>}
+ */
 const matchedFlogs = ref<IFlog[]>([]);
 // To show all flogs in drop-down when search term is empty, set this ref to [...props.availableFlogs]
 
+/**
+ * A ref flag to show/hide the dropdown of matchedFlogs.
+ * @type {Ref<boolean>}
+ */
+ const showDropdown = ref(true);
+
+/**
+ * @watch 'availableFlogs' and 'typedFilename'
+ */
 watch(
   [() => props.availableFlogs as IFlog[], typedFilename],
   ([newItems, newFilename = ""]) => {
@@ -84,6 +132,24 @@ watch(
   }
 );
 
+/**
+ * Handler for creating a new flog.
+ * Emits the newFlog event.
+ * @method
+ * @param {IFlog} flog - The selected flog
+ * @returns {void} - No return value
+ */
+const submitAdd = () => {
+  emit("newFlog", typedFilename.value + ".flogger.txt");
+};
+
+/**
+ * Handler for selecting a flog from availableFlogs.
+ * Emits the openFlog event.
+ * @method
+ * @param {IFlog} flog - The selected flog
+ * @returns {void} - No return value
+ */
 const selectFlog = (flog: IFlog) => {
   typedFilename.value = flog.url;
   // Could skip selectedFlog and just emit flog without any checks?
@@ -91,21 +157,21 @@ const selectFlog = (flog: IFlog) => {
   emit("openFlog", selectedFlog.length > 0 && selectedFlog[0]);
 };
 
-const submitAdd = () => {
-  emit("newFlog", typedFilename.value + ".flogger.txt");
-};
-
-// Add new ref to control dropdown visibility
-const showDropdown = ref(true);
-
-// Add new methods to handle hiding dropdown
+/**
+ * Handler to close the dropdown of matchedFlogs.
+ * @method
+ */
 const hideDropdown = () => {
   showDropdown.value = false;
 };
 
+/**
+ * Handler to close the dropdown of matchedFlogs when user hits the Escape key.
+ * @method
+ */
 const handleKeydown = (e: KeyboardEvent) => {
   if (e.key === "Escape") {
-    showDropdown.value = false;
+    hideDropdown();
   }
 };
 </script>
