@@ -5,7 +5,7 @@
   </section>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource.ts";
 
 // Calling useFlogSource to handle the flow to check authentication,

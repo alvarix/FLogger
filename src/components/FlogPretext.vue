@@ -1,7 +1,7 @@
 <template>
-  <aside class="vue-file">Pretext.vue</aside>
+  <aside class="vue-file">FlogPretext.vue</aside>
 
-  <button class="small popbutton" popovertarget="my-popover">Flog Info</button>
+  <button class="small popbutton" popovertarget="my-popover">EditFlog Info</button>
   <div id="my-popover" popover class="popover">
     <div class="pretext">
       <button
@@ -28,6 +28,7 @@
 
 <script setup lang="ts">
 import { ref, watch, nextTick } from "vue";
+import { placeCursorAtEnd } from "@/modules/utilities";
 
 const props = defineProps<{
   pretext?: string;
@@ -38,23 +39,12 @@ const props = defineProps<{
 const emit = defineEmits(["update-pretext"]);
 
 const isEditing = ref(false);
-const pretextEl = ref(null);
-const pretextValue = ref<string>(props.pretext);
+const pretextEl = ref<HTMLElement | null>(null);
+const pretextValue = ref<string>(props.pretext || "");
 console.log("pretextValue.value", pretextValue.value);
 
 function edit() {
   isEditing.value = true;
-}
-
-function placeCursorAtEnd(element) {
-  if (element) {
-    const range = document.createRange();
-    range.selectNodeContents(element);
-    range.collapse(false); // Collapse to the end
-    const selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
-  }
 }
 
 function setupEditing() {
@@ -71,25 +61,24 @@ function setupEditing() {
 watch(
   () => props.pretext,
   (newValue) => {
-    // console.log('watch props.entry')
-    pretextValue.value = newValue;
+    pretextValue.value = newValue || '';
   },
   { immediate: true }
 );
 watch(
   isEditing,
   (newValue) => {
-    if (!!newValue) setupEditing();
+    if (newValue) setupEditing();
   },
   { immediate: true }
 );
 
 // Function to emit the update when blur occurs
-function save(event) {
+function save() {
   // console.log('save pretextValue', pretextValue)
   // Could use either of these:
   // entryText.value = event.target.innerText;
-  pretextValue.value = pretextEl.value.innerText;
+  pretextValue.value = pretextEl.value!=null ? pretextEl.value.innerText : '';
   emit("update-pretext", pretextValue.value);
   isEditing.value = false;
 }

@@ -1,4 +1,5 @@
-import { ref, Ref, watch } from "vue"
+import { ref, watch } from "vue"
+import type { Ref } from "vue"
 import type { IFlog } from "@/composables/useFlogSource"
 import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource";
 
@@ -57,7 +58,7 @@ watch(availableFlogs, () => {
     }
 })
 
-export const useOpenFlogs = () => {
+export const useOpenFlogs = (): IUseFlogs => {
 
     const openFlog = (newFlog: IFlog,) => {
         if (!openFlogs.value.includes(newFlog)) {
