@@ -13,8 +13,10 @@
       />
       <div v-if="editingEntry == entry" class="entry__btns">
         <button class="entry__btn mr-8" @click.prevent="">#</button>
-
-        <button class="small entry__btn" @click="changeEntry('update', entry)">
+        <div id="tooltip__save" popover="auto" class='tooltip left' anchor="btn_save" role="tooltip">
+          Shift + Return
+        </div>
+        <button popovertarget="tooltip__save" id="btn__save" class="small entry__btn" @click="changeEntry('update', entry)">
           Save
         </button>
         <button class="small entry__btn" @click="changeEntry('edit', entry)">
@@ -64,6 +66,8 @@ const emit = defineEmits([
   "start-editing",
   "stop-editing",
 ]);
+
+
 
 function changeEntry(
   actionName: "copy" | "delete" | "edit" | "update",

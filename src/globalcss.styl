@@ -47,7 +47,28 @@ button
         box-shadow 0 2px 4px rgba(0, 0, 0, 0.5)
         color var(--link-color)
 
+.left {
+  padding-left: .75rem;
+  clip-path: polygon(
+    100% 0%,
+    100% 100%,
+    5px 100%,
+    5px calc(50% + 5px),
+    0% 50%,
+    5px calc(50% - 5px),
+    5px 0%
+  );
+}
 
+.tooltip[popover] {
+  color: #fff;
+}
+
+.tooltip[popover] {
+  left: calc(anchor(right) + 2px);
+  top: anchor(center);
+  transform: translateY(-50%);
+}
 
 button.big 
     padding 15px 30px
@@ -55,9 +76,11 @@ button.big
 
 button.small 
     padding 5px 10px
-    font-size 10px
-    text-transform uppercase
+
+.small
     margin 10px 5px 0 0
+    text-transform uppercase
+    font-size 10px
 
 input:not(submit), textarea 
     background-color var(--input-color)
