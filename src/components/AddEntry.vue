@@ -2,7 +2,7 @@
   <aside class="vue-file">AddEntry.vue</aside>
   <form id="add-entry" @submit.prevent="submitAdd">
     <div class="form-inner">
-      <div>
+      <div class="add-entry__wrap">
         <input
           id="time"
           v-model="entryDate"
@@ -15,7 +15,7 @@
           >Please enter valid date</em
         >
       </div>
-      <div>
+      <div class="entry__body">
         <pre
           id="entry"
           ref="entryEl"
@@ -190,10 +190,13 @@ h3
   font-size 14px
   margin 50px 0 20px 20px
 
+
+
+
+
 .entry__body
   background-color: var(--misc-color)
   max-width: 600px;
-  height: 50vw;
   border-radius: 14px;
   padding: 20px;
 
