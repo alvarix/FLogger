@@ -45,16 +45,16 @@
   </header>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
 import { useFlogSource } from "@/composables/useFlogSource";
-import ThemeSwitcher from "@/components/ThemeSwitcher.vue";
+import ThemeSwitcher from "@components/ThemeSwitcher.vue";
 import { IFlogSourceType } from "@/modules/Flog";
 
 const { hasConnection, accountOwner, clearConnection } = useFlogSource(
   IFlogSourceType.dropbox
 );
-const dialog = ref(null);
+const dialog = ref<HTMLDialogElement | null>(null);
 const fileViewOn = ref(false);
 
 const accountOwnerValue = ref(accountOwner.value);
@@ -72,19 +72,19 @@ onMounted(() => {
 
   if (modalBtn && dialog.value) {
     modalBtn.addEventListener("click", () => {
-      dialog.value.showModal();
+      if (dialog.value !== null) dialog.value.showModal();
     });
   }
 });
 
 const disconnect = () => {
   clearConnection();
-  dialog.value.close();
+  if (dialog.value !== null) dialog.value.close();
 };
 
 const fileView = () => {
   fileViewOn.value = !fileViewOn.value;
-  const fileElements = document.querySelectorAll(".vue-file");
+  const fileElements = document.querySelectorAll<HTMLElement>(".vue-file");
   fileElements.forEach((el) => {
     const element = el;
     // Toggle display between "none" and "block"

@@ -13,10 +13,9 @@
         <div class="modal-footer">
           <slot name="footer">
             default footer
-            <button
-              class="modal-default-button"
-              @click="$emit('close')"
-            >OK</button>
+            <button class="modal-default-button" @click="$emit('close')">
+              OK
+            </button>
           </slot>
         </div>
       </div>
@@ -24,10 +23,13 @@
   </Transition>
 </template>
 
-<script setup>
-const props = defineProps({
-  show: Boolean
-})
+<script setup lang="ts">
+const { show } = defineProps({
+  show: Boolean,
+});
+
+defineEmits(['close'])
+
 </script>
 
 <style>

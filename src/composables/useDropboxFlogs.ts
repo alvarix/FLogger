@@ -1,9 +1,9 @@
-import { ref, Ref, watch, onUpdated, onActivated } from "vue"
+import { ref, watch } from "vue"
+import type { Ref } from "vue"
 import type { IFlog } from "@/modules/Flog"
 import { IFlogStatus, IFlogSourceType, deserializeFlog, serializeFlog } from "@/modules/Flog"
 import { useDropboxFiles } from "@/composables/useDropboxFiles"
-import { IDropboxFile } from "@/composables/useDropboxFiles";
-import { timestamp, useTimestamp } from "@vueuse/core";
+import type { IDropboxFile } from "@/composables/useDropboxFiles";
 
 // Re-export these for convenience
 export type { IFlog as IFlog }
@@ -16,6 +16,7 @@ export interface IDropboxFlogs {
     // pass through from useDropboxFiles
     launchConnectFlow: () => void;
     // pass through from useDropboxFiles
+    // eslint-disable-next-line
     connectionPopupWindow: Ref<any>;
     openDbxPopup: () => void;
     // pass through from useDropboxFiles
@@ -34,13 +35,6 @@ export interface IDropboxFlogs {
     deleteFlog: (flog: IDropboxFlog) => void;
     accountOwner: Ref<string | null>;
 }
-
-// const initialReadmeFile = fs.readFileSync('./repo_template/README.flogger.txt').toString("utf-8");
-// const response1 = await fetch('./repo_template/README.flogger.txt');
-// const response1Text = await response.text();
-// console.log(response1Text)
-
-const folderContents = ref([])
 
 // Using a list of repoFiles (paths and contents using interface IDropboxFile) 
 // as default files to save to a user's Dropbox app folder.
@@ -74,7 +68,7 @@ const repoFilesGlob = import.meta.glob("../../public/repo_template/**/*"); // ma
 // So when the frontend does fetch calls, it will add the '/repo_template/' part back.
 // 
 for (const propName in repoFilesGlob) {
-    if (repoFilesGlob.hasOwnProperty(propName)) {
+    if (Object.prototype.hasOwnProperty.call(repoFilesGlob, propName)) {
         const globPathValue = propName
         repoFiles.value.push(
             { path: globPathValue.replace("../../public/repo_template/", "") } //IDropboxFlog
@@ -84,7 +78,7 @@ for (const propName in repoFilesGlob) {
 // console.log("repoFiles.value", repoFiles.value);
 
 // Clientside fetches to get file contents for each path
-let repoFilesWithContents: IDropboxFile[] = []
+const repoFilesWithContents: IDropboxFile[] = []
 repoFiles.value.forEach(async repoFile => {
     // console.log(repoFile.path)
 
@@ -135,8 +129,8 @@ const {
 // See https://vuejs.org/guide/scaling-up/state-management#simple-state-management-with-reactivity-api
 // Using module-scoped state requires special handling with SSR, if we ever want SSR.
 // See https://vuejs.org/guide/scaling-up/state-management#simple-state-management-with-reactivity-api
-const availableFlogs = ref([]);
-const availableRepoFlogs = ref([]);
+const availableFlogs = ref<IDropboxFlog[]>([]);
+const availableRepoFlogs = ref<IDropboxFlog[]>([]);
 
 // Ref variables that are passed through from a specific use[SourceFilesSDK] composable
 // need watchers on source variables
@@ -164,9 +158,9 @@ watch(
             (file) => ({
                 sourceType: IFlogSourceType.dropbox,
                 url: file.path,
-                modified: new Date(file.modified),
-                rev: null,
-                loadedEntries: null
+                modified: file.modified ? new Date(file.modified) : new Date(),
+                rev: undefined,
+                loadedEntries: []
             } as IDropboxFlog)
         )
     }
@@ -228,7 +222,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
                 // rev: flog.rev, 
                 content: serializeFlog(flog.loadedEntries)
             } as IDropboxFile,
-            () => { } // can parameterize so calling app gets notice once save is complete 
+            // () => { } // can parameterize so calling app gets notice once save is complete 
         )
     }
 
@@ -239,7 +233,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
                 path: flog.url,
                 rev: flog.rev
             } as IDropboxFile,
-            () => { } // can parameterize so calling app gets notice once delete is complete 
+            // () => { } // can parameterize so calling app gets notice once delete is complete 
         )
     }
 

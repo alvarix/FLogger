@@ -1,12 +1,12 @@
 <template>
-  <aside class="vue-file">Flog.vue</aside>
+  <aside class="vue-file">EditFlog.vue</aside>
   <section class="container main">
     <h4 class="flog-title">
       {{ flog.url }}
 
-      <Pretext
+      <FlogPretext
         :pretext="flog.pretext"
-        :readOnly="flog.readOnly"
+        :read-only="flog.readOnly"
         @update-pretext="
           (updatedPretext) => handleUpdatePretext(flog, updatedPretext)
         "
@@ -17,8 +17,8 @@
     </h4>
 
     <AddEntry
-      @newEntry="(entryData) => addNewEntry(unref(entryData), flog)"
-      :entryValue="addEntryValue"
+      :entry-value="addEntryValue"
+      @new-entry="(entryData) => addNewEntry(unref(entryData), flog)"
     />
     <div id="spinner">
       <PacmanLoader
@@ -30,8 +30,8 @@
     <div v-if="flog.status == IFlogStatus.loaded">
       <EntryList
         :entries="flog.loadedEntries"
-        :editingEntry="getFlogEditingEntry(flog)"
-        :readOnly="flog.readOnly"
+        :editing-entry="getFlogEditingEntry(flog)"
+        :read-only="flog.readOnly"
         @edit-entry="editEntry"
         @copy-entry="handleCopyEntry"
         @delete-entry="(entry) => handleDeleteEntry(flog, entry)"
@@ -49,32 +49,25 @@ import { useOpenFlogs } from "@/composables/useOpenFlogs";
 import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource";
 import { useFlog, IFlogStatus } from "@/composables/useFlog";
 import type { IFlog } from "@/composables/useFlog";
-import EntryData, { IEntry } from "@/modules/EntryData";
-import AddEntry from "@/components/AddEntry.vue";
-import EntryList from "@/components/EntryList.vue";
-import Pretext from "@/components/Pretext.vue";
+import EntryData from "@/modules/EntryData";
+import type { IEntry } from "@/modules/EntryData";
+import AddEntry from "@components/AddEntry.vue";
+import EntryList from "@components/EntryList.vue";
+import FlogPretext from "@components/FlogPretext.vue";
+// @ts-expect-error - vue-spinner typing issue
 import PacmanLoader from "vue-spinner/src/PacmanLoader.vue";
 
 const props = defineProps<{
   flog: IFlog; // Accept the flog as a prop
 }>();
 
-const {
-  closeFlog,
-} = useOpenFlogs();
+const { closeFlog } = useOpenFlogs();
 
-const {
-  saveFlogToSource,
-} = useFlogSource(IFlogSourceType.dropbox);
+const { saveFlogToSource } = useFlogSource(IFlogSourceType.dropbox);
 
-const {
-  addEntry,
-  updatePretext,
-  deleteEntry,
-  editEntry,
-} = useFlog(props.flog);
+const { addEntry, updatePretext, deleteEntry, editEntry } = useFlog(props.flog);
 
-const addEntryValue = ref(null); // Initialize reactive addEntryValue
+const addEntryValue = ref<IEntry | undefined>(); // Initialize reactive addEntryValue
 const isEditingFlogEntries = ref(new Map<IFlog, IEntry>()); // Keep a map of [flog, index] pairs to look up index of entry being edit PER flog
 const getFlogEditingEntry = (flog: IFlog): IEntry | undefined =>
   isEditingFlogEntries.value.get(flog);
@@ -95,7 +88,6 @@ const handleStartEditingEntry = (flog: IFlog, entry: IEntry) => {
 
 const handleStopEditingEntry = (flog: IFlog) => {
   // console.log('handleStopEditingEntry')
-  isEditingFlogEntries.value.set(flog, undefined);
   isEditingFlogEntries.value.delete(flog);
 };
 
@@ -134,8 +126,6 @@ const handleUpdateEntry = (flog: IFlog, updatedEntry: IEntry) => {
   }
 };
 
-const getTimestamp = () => ref(new Date().toLocaleDateString("en-US"));
-
 const loaderProps = {
   size: undefined,
   color: undefined,
@@ -149,10 +139,6 @@ function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
     updatePretext(updatedPretext);
     saveFlogToSource(flog);
   }
-}
-const emit = defineEmits(["FlogList"]);
-function closeFlogHandler() {
-  emit("FlogList");
 }
 </script>
 

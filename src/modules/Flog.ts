@@ -1,15 +1,11 @@
-import type { IEntry } from './EntryData'
+/**
+ * Interfaces and utility functions for a EditFlog.
+ */
 
-export enum IFlogStatus { loaded, error };
-
-
-export enum IFlogSourceType { "dropbox", "localFile" };
-
-interface IFlogCore {
-    loadedEntries: IEntry[],
-    pretext?: string,
-    status?: IFlogStatus
-}
+/**
+ * The interface for a EditFlog
+ * @public
+ */
 export interface IFlog extends IFlogCore {
     sourceType: IFlogSourceType,
     url: string,
@@ -19,11 +15,46 @@ export interface IFlog extends IFlogCore {
     modified?: Date
 }
 
+/**
+ * The core abstract model for a EditFlog
+ * @private
+ */
+interface IFlogCore {
+    loadedEntries: IEntry[],
+    pretext?: string,
+    status?: IFlogStatus
+}
+
+/**
+ * Uses IEntry to define the entries for a flog.
+ */
+import type { IEntry } from './EntryData'
+
+/**
+ * An enum for flog status values
+ * @public
+ */
+export enum IFlogStatus { loaded, error };
+
+/**
+ * An enum for flog source types
+ * @public
+ */
+export enum IFlogSourceType { "dropbox", "localFile" };
+
+/**
+ * Convert a flog into its string representation.
+ * @public
+ */
 export function serializeFlog(entriesList: IEntry[], pretext?: string): string {
     const sE = serializeEntries(entriesList)
     return (pretext ? pretext + '\n\n' : '') + sE
 }
 
+/**
+ * Convert an array of IEntries into its string representation
+ * @public
+ */
 export function serializeEntries(entriesList: IEntry[]): string {
     return entriesList.reduce<string>(
         (accumulatedValue, currentEntry, index) => {
@@ -36,34 +67,42 @@ export function serializeEntries(entriesList: IEntry[]): string {
     )
 }
 
-// Expects rawEntryContent string in this format:
-// 
-// [Any "pretext" before the first date is optional]
-// 8/22/2024
-// Entry text
-// 
-// 8/22/2024
-// Entry text
-// 
+/**
+ * Convert an array of IEntries into its string representation
+ * @public
+ * 
+ * @param rawEntryContent: string
+ * 
+ * @returns IFlogCore
+ * 
+ * @remarks
+ * Expects rawEntryContent string in this format:
+ * 
+ * @example
+ * [Any "pretext" before the first date is optional]
+ * 8/22/2024
+ * Entry text
+ * 
+ * 8/22/2024
+ * Entry text
+ */
 export function deserializeFlog(rawEntryContent: string): IFlogCore {
     const legacyDateRegEx = /([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4}|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2})/
     const newDateTimeRegEx = /([0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{4} 1?[0-9]:[0-9]{2}:[0-9]{2} [AP]M|[0-1]?[0-9]\/[0-3]?[0-9]\/[0-9]{2} 1?[0-9]:[0-9]{2}:[0-9]{2} [AP]M)/
-    function isValidDate(dateString) {
-        // const date = new Date(dateString);
-        // return !isNaN(date.getTime());
-        return (new RegExp("^" + legacyDateRegEx.source + "$")).test(
-            dateString
-        );
+    function isValidDate(dateString?: string) {
+        if (dateString)
+            return (new RegExp("^" + legacyDateRegEx.source + "$")).test(
+                dateString
+            );
     }
-    function isValidDateTime(datetimeString) {
-        // const date = new Date(dateString);
-        // return !isNaN(date.getTime());
-        return (new RegExp("^" + newDateTimeRegEx.source + "$")).test(
-            datetimeString
-        );
+    function isValidDateTime(datetimeString?: string) {
+        if (datetimeString)
+            return (new RegExp("^" + newDateTimeRegEx.source + "$")).test(
+                datetimeString
+            );
     }
-    let filteredEntries, pretext, status;
-    let splitItems, filteredItems, itemsMappedToEntries;
+    let filteredEntries: IEntry[] | undefined, pretext: (string | undefined), status: IFlogStatus;
+    let splitItems: (string | undefined)[], filteredItems: (string | undefined)[], itemsMappedToEntries: IEntry[];
     try {
         let legacyDateOnly = false
         splitItems = rawEntryContent.split(
@@ -83,20 +122,31 @@ export function deserializeFlog(rawEntryContent: string): IFlogCore {
         // into an array of objects with date and entry properties:
         //    [{date, entry},{date, entry},...]
         filteredItems = splitItems.filter((item) => !!item);
-        itemsMappedToEntries = filteredItems.map((item, index, arr) => {
-            if (legacyDateOnly && isValidDate(item) && arr[index + 1]) {
-                return { date: new Date(arr[index]), entry: arr[index + 1] };
-            }
-            if (!legacyDateOnly && isValidDateTime(item) && arr[index + 1]) {
-                return { date: new Date(arr[index]), entry: arr[index + 1] };
-            }
-        });
+        itemsMappedToEntries = filteredItems
+            // map parsed strings to IEntry objects
+            .map((item, index, arr) => {
+                if (legacyDateOnly && isValidDate(item) && arr[index + 1]) {
+                    return {
+                        date: arr[index] ? new Date(arr[index]) : new Date(),
+                        entry: arr[index + 1]
+                    } as IEntry;
+                }
+                if (!legacyDateOnly && isValidDateTime(item) && arr[index + 1]) {
+                    return {
+                        date: arr[index] ? new Date(arr[index]) : new Date(),
+                        entry: arr[index + 1]
+                    } as IEntry;
+                }
+            })
+            // filter out possible undefined values (if unexpected parsing issues)
+            // TO DO: Check for proper parsing, and throw error if not in pairs of date+entry
+            .filter(item => !!item);
         filteredEntries = itemsMappedToEntries.filter((item) => !!item);
 
         // "pretext" found before the first date is not returned by this deserializeFlog function (... yet?)
         // But this is how it can be parsed out here, after already splitting by date:
-        let firstEntryFound;
-        pretext = splitItems.reduce((prev, item, index, arr) => {
+        let firstEntryFound: number;
+        pretext = splitItems.reduce((prev, item, index) => {
             if (legacyDateOnly && !firstEntryFound && isValidDate(item)) {
                 firstEntryFound = index;
                 return prev;
@@ -119,8 +169,6 @@ export function deserializeFlog(rawEntryContent: string): IFlogCore {
         // return [];
     }
 
-    return { loadedEntries: filteredEntries, pretext, status };
+    return { loadedEntries: filteredEntries || [], pretext, status };
 
 }
-
-export interface IFlogNewParams extends IFlog { }
