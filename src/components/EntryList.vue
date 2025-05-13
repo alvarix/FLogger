@@ -13,15 +13,9 @@
       />
       <div v-if="editingEntry == entry" class="entry__btns">
         <button class="entry__btn mr-8" @click.prevent="">#</button>
-        <div id="tooltip__save" popover="auto" class='tooltip left' anchor="btn_save" role="tooltip">
-          Shift + Return
-        </div>
-        <button popovertarget="tooltip__save" id="btn__save" class="small entry__btn" @click="changeEntry('update', entry)">
-          Save
-        </button>
-        <button class="small entry__btn" @click="changeEntry('edit', entry)">
-          Cancel
-        </button>
+        <span class='small'>
+          Shift + Return or Tab to save
+        </span>
       </div>
       <div v-else class="entry__btns">
         <button
