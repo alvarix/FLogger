@@ -62,7 +62,6 @@ const emit = defineEmits([
 ]);
 
 
-
 function changeEntry(
   actionName: "copy" | "delete" | "edit" | "update",
   entry: IEntry

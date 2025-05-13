@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick } from "vue";
+import { ref, watch, nextTick, onMounted } from "vue";
 import EntryData from "@/modules/EntryData";
 // as per compiler: [@vue/compiler-sfc] `defineEmits` is a compiler macro and no longer needs to be imported.
 // import { defineEmits } from "vue";
@@ -56,6 +56,17 @@ const props = defineProps({
     },
   }, // Accept the copied entry as a prop
 });
+
+
+onMounted(() => {
+  const entryElement = document.getElementById("entry");
+      if (entryElement) {
+        entryElement.focus();
+      } else {
+        console.warn("Element with ID 'entry' not found on mount.");
+      }
+});
+
 
 const emit = defineEmits(["newEntry"]);
 
