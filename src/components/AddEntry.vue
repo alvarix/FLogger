@@ -181,6 +181,10 @@ input.date {
   border: none;
 }
 
+#time {
+  field-sizing: content;
+}
+
 input {
   padding: 5px;
   font-size: 16px;
