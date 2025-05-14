@@ -1,6 +1,11 @@
 <template>
   <aside class="vue-file">EditFlog.vue</aside>
-  <h4 class="flog-title">
+
+  <div class="flex gap-8">
+
+    <section class="container main">
+      <div class="viewport">  
+        <h4 class="flog-title">
     {{ flog.url }}
     
     <FlogPretext
@@ -14,11 +19,6 @@
     flog list
     </button>
   </h4>
-
-  <div class="flex gap-8">
-
-    <section class="container main">
-      <div class="viewport">  
 
         <AddEntry
         :entry-value="addEntryValue"
@@ -52,8 +52,15 @@
         />
       </div>
     </section>
-    <section class="container toc">
-      <h2>Table of Contents (h1s)</h2>
+    <section class="container">
+      <div class="toc mb-7">
+        <h2>Table of Contents (h1s)</h2>
+          <PacmanLoader
+            :loading="!tocLoaded"
+            :color="loaderProps.color"
+            :size="loaderProps.size"
+          />
+      </div>
 
     </section>
   </div>
@@ -76,6 +83,9 @@ import PacmanLoader from "vue-spinner/src/PacmanLoader.vue";
 const props = defineProps<{
   flog: IFlog; // Accept the flog as a prop
 }>();
+
+
+let tocLoaded = ref(false);
 
 const { closeFlog } = useOpenFlogs();
 
@@ -167,6 +177,7 @@ onMounted(() => {
     const headers = document.querySelectorAll('h1');
     if (headers.length > 0) {
       const list = document.createElement('ul');
+      list.className = 'toc-list';
       headers.forEach((header, index) => {
         if (header.id === "logo") return;
         if (!header.id) {
@@ -182,6 +193,7 @@ onMounted(() => {
       toc.appendChild(list);
       // Stop observing after we've built the TOC
       observer.disconnect();
+      tocLoaded.value = true;
     }
   });
 
@@ -194,7 +206,7 @@ onMounted(() => {
 
 </script>
 
-<style scoped lang="styl">
+<style scoped>
 #spinner {
   text-align: left;
   width: 100%;
@@ -203,7 +215,18 @@ onMounted(() => {
 
 .toc {
   scroll-behavior: smooth;
+  position: fixed;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  max-width: 300px;
+  
+  h2 {
+    margin-top:0
+  } 
+
 }
+
 
 h4 {
   box-sizing: border-box;
@@ -218,6 +241,14 @@ h5 {
   padding: 0;
 }
 
-button.small
-  margin-left 10px
+button.small{
+  margin-left: 10px
+  }
+</style>
+<style>
+.toc-list li { 
+  padding: 5px 0;
+  list-style:circle;
+  margin-left: 20px;
+}
 </style>
