@@ -1,25 +1,34 @@
 <template>
   <aside class="vue-file">EditFlog.vue</aside>
   <section class="container main">
-    <h4 class="flog-title">
-      {{ flog.url }}
 
-      <FlogPretext
+    <div class="viewport">  
+
+      <h4 class="flog-title">
+        {{ flog.url }}
+        
+        <FlogPretext
         :pretext="flog.pretext"
         :read-only="flog.readOnly"
         @update-pretext="
           (updatedPretext) => handleUpdatePretext(flog, updatedPretext)
-        "
-      />
-      <button class="small close-flog" @click.prevent="() => closeFlog(flog)">
+          "
+        />
+        <button class="small close-flog" @click.prevent="() => closeFlog(flog)">
         flog list
-      </button>
-    </h4>
-
-    <AddEntry
+        </button>
+      </h4>
+    
+      <AddEntry
       :entry-value="addEntryValue"
       @new-entry="(entryData) => addNewEntry(unref(entryData), flog)"
-    />
+      />
+      
+    </div>
+    
+
+
+
     <div id="spinner">
       <PacmanLoader
         :loading="flog.status != IFlogStatus.loaded"
@@ -149,11 +158,12 @@ function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
   padding: 1rem;
 }
 
-h4
-  margin 10px 0 10px
-  padding 0 0 10px 0
-  font-style italic
-
+h4 {
+  box-sizing: border-box;
+  margin: 10px 0 10px;
+  padding: 0 0 10px 0;
+  font-style: italic;
+}
 .no-margin-bottom {
   margin-bottom: 0px;
 }

@@ -1,8 +1,9 @@
 <template>
   <aside class="vue-file">AddEntry.vue</aside>
+
   <form id="add-entry" @submit.prevent="submitAdd">
     <div class="form-inner">
-      <div class="add-entry__wrap">
+      <div class='date_wrap'>
         <input
           id="time"
           v-model="entryDate"
@@ -15,28 +16,17 @@
           >Please enter valid date</em
         >
       </div>
-      <div class="entry__body">
+      <div class="entry__body-div">
         <pre
           id="entry"
           ref="entryEl"
           name=""
           class="entry__body"
           contenteditable
-          >{{ defaultFormEntry.entry }}</pre
-        >
-        <!-- @blur="handleBlur"
-          @keydown="handleKeyDown" -->
-        <!-- <textarea
-          class="auto-resize"
-          autofocus
-          id="entry"
-          name=""
-          v-model="entryBody"
-          required
-        ></textarea> -->
+          >{{ defaultFormEntry.entry }}</pre >
       </div>
+      <div><button class="big" type="submit">Add Entry</button></div>
     </div>
-    <div><button class="big" type="submit">Add Entry</button></div>
   </form>
 </template>
 
@@ -159,7 +149,25 @@ watch(
 
 */
 
-input.error {
+
+
+#add-entry .form-inner {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  
+
+    pre, .entry__body {
+        height:100%
+    }
+  
+}
+
+.entry__body-div {
+  flex-grow:1;
+}
+
+input.error { 
   border: 1px solid var(--red-color);
 }
 
@@ -209,27 +217,16 @@ h3
   background-color: var(--misc-color)
   max-width: 600px;
   border-radius: 14px;
-  padding: 20px;
-
-pre.entry__body
   white-space: pre-wrap; /* Enables wrapping of text, preserving spaces and line breaks */
   word-wrap: break-word; /* Breaks long words to prevent overflow */
-
-
-.entry__body {
   font-size: 16px;
   font-family: var(--font);
   width: 100%;
   box-sizing: border-box;
-}
-
-.entry__body {
   text-align: left;
   max-width: 600px;
-  border-radius: 14px;
-  padding: 20px;
   padding: 10px 20px ;
-}
+
 
 .entry__textarea {
   background-color: var(--input-color);

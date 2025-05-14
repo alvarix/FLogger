@@ -29,6 +29,10 @@
     --link-color light-dark(#646cff, #646cff)
     --red-color light-dark(#e0521d, #e0521d)
 
+div 
+    box-sizing: border-box;
+
+
 li a
   word-break break-all
   overflow-wrap break-word
@@ -60,22 +64,28 @@ button
   );
 }
 
+header 
+    height 40px
 
+.viewport 
+    height calc(100svh - 90px)
+    display flex
+    flex-direction column
+
+    form 
+        flex-grow 1
 
 #add-entry .form-inner {
-  height: 50svh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   
-  .add-entry__wrap {
-    flex-grow: 1;
-   }
+
     pre, .entry__body {
         height:100%
     }
   
 }
-
 button.big 
     padding 15px 30px
     border-radius 16px
@@ -118,11 +128,7 @@ a
     font-size 2vw
     transition 500ms all ease-in-out
     
-h4.flog-title {
-    font-size 11px
-}
 
-h4.flog-title,
 .connected #logo 
     margin 0
     padding 0
