@@ -103,6 +103,10 @@ const handleStopEditingEntry = () => {
 </script>
 
 <style scoped>
+.entry-list {
+  scroll-behavior: smooth;
+}
+
 .entry-list > li {
   border-radius: 14px;
   list-style: none;

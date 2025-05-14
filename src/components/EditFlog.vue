@@ -1,59 +1,66 @@
 <template>
   <aside class="vue-file">EditFlog.vue</aside>
-  <section class="container main">
+  <h4 class="flog-title">
+    {{ flog.url }}
+    
+    <FlogPretext
+    :pretext="flog.pretext"
+    :read-only="flog.readOnly"
+    @update-pretext="
+      (updatedPretext) => handleUpdatePretext(flog, updatedPretext)
+      "
+    />
+    <button class="small close-flog" @click.prevent="() => closeFlog(flog)">
+    flog list
+    </button>
+  </h4>
 
-    <div class="viewport">  
+  <div class="flex gap-8">
 
-      <h4 class="flog-title">
-        {{ flog.url }}
-        
-        <FlogPretext
-        :pretext="flog.pretext"
-        :read-only="flog.readOnly"
-        @update-pretext="
-          (updatedPretext) => handleUpdatePretext(flog, updatedPretext)
-          "
+    <section class="container main">
+      <div class="viewport">  
+
+        <AddEntry
+        :entry-value="addEntryValue"
+        @new-entry="(entryData) => addNewEntry(unref(entryData), flog)"
         />
-        <button class="small close-flog" @click.prevent="() => closeFlog(flog)">
-        flog list
-        </button>
-      </h4>
-    
-      <AddEntry
-      :entry-value="addEntryValue"
-      @new-entry="(entryData) => addNewEntry(unref(entryData), flog)"
-      />
+        
+      </div>
       
-    </div>
-    
 
 
 
-    <div id="spinner">
-      <PacmanLoader
-        :loading="flog.status != IFlogStatus.loaded"
-        :color="loaderProps.color"
-        :size="loaderProps.size"
-      />
-    </div>
-    <div v-if="flog.status == IFlogStatus.loaded">
-      <EntryList
-        :entries="flog.loadedEntries"
-        :editing-entry="getFlogEditingEntry(flog)"
-        :read-only="flog.readOnly"
-        @edit-entry="editEntry"
-        @copy-entry="handleCopyEntry"
-        @delete-entry="(entry) => handleDeleteEntry(flog, entry)"
-        @update-entry="(entry) => handleUpdateEntry(flog, entry)"
-        @start-editing="(entry) => handleStartEditingEntry(flog, entry)"
-        @stop-editing="() => handleStopEditingEntry(flog)"
-      />
-    </div>
-  </section>
+      <div id="spinner">
+        <PacmanLoader
+          :loading="flog.status != IFlogStatus.loaded"
+          :color="loaderProps.color"
+          :size="loaderProps.size"
+        />
+      </div>
+      
+      <div v-if="flog.status == IFlogStatus.loaded">
+        <EntryList
+          :entries="flog.loadedEntries"
+          :editing-entry="getFlogEditingEntry(flog)"
+          :read-only="flog.readOnly"
+          @edit-entry="editEntry"
+          @copy-entry="handleCopyEntry"
+          @delete-entry="(entry) => handleDeleteEntry(flog, entry)"
+          @update-entry="(entry) => handleUpdateEntry(flog, entry)"
+          @start-editing="(entry) => handleStartEditingEntry(flog, entry)"
+          @stop-editing="() => handleStopEditingEntry(flog)"
+        />
+      </div>
+    </section>
+    <section class="container toc">
+      <h2>Table of Contents (h1s)</h2>
+
+    </section>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, unref } from "vue";
+import { ref, unref, onMounted } from "vue";
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
 import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource";
 import { useFlog, IFlogStatus } from "@/composables/useFlog";
@@ -149,6 +156,42 @@ function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
     saveFlogToSource(flog);
   }
 }
+
+
+onMounted(() => {
+  const toc = document.querySelector('.toc');
+  if (!toc) return;
+
+  const observer = new MutationObserver((mutations) => {
+    // Look for added h1 nodes
+    const headers = document.querySelectorAll('h1');
+    if (headers.length > 0) {
+      const list = document.createElement('ul');
+      headers.forEach((header, index) => {
+        if (header.id === "logo") return;
+        if (!header.id) {
+          header.id = `heading-${index}`;
+        }
+        const listItem = document.createElement('li');
+        const anchor = document.createElement('a');
+        anchor.href = `#${header.id}`;
+        anchor.textContent = header.textContent || `Heading ${index + 1}`;
+        listItem.appendChild(anchor);
+        list.appendChild(listItem);
+      });
+      toc.appendChild(list);
+      // Stop observing after we've built the TOC
+      observer.disconnect();
+    }
+  });
+
+  // Start observing the document body for added nodes.
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+  });
+});
+
 </script>
 
 <style scoped lang="styl">
@@ -156,6 +199,10 @@ function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
   text-align: left;
   width: 100%;
   padding: 1rem;
+}
+
+.toc {
+  scroll-behavior: smooth;
 }
 
 h4 {
