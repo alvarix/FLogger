@@ -1,8 +1,9 @@
 <template>
   <aside class="vue-file">AddEntry.vue</aside>
+
   <form id="add-entry" @submit.prevent="submitAdd">
     <div class="form-inner">
-      <div>
+      <div class='date_wrap'>
         <input
           id="time"
           v-model="entryDate"
@@ -15,33 +16,22 @@
           >Please enter valid date</em
         >
       </div>
-      <div>
+      <div class="entry__body-div">
         <pre
           id="entry"
           ref="entryEl"
           name=""
           class="entry__body"
           contenteditable
-          >{{ defaultFormEntry.entry }}</pre
-        >
-        <!-- @blur="handleBlur"
-          @keydown="handleKeyDown" -->
-        <!-- <textarea
-          class="auto-resize"
-          autofocus
-          id="entry"
-          name=""
-          v-model="entryBody"
-          required
-        ></textarea> -->
+          >{{ defaultFormEntry.entry }}</pre >
       </div>
+      <div><button class="big" type="submit">Add Entry</button></div>
     </div>
-    <div><button class="big" type="submit">Add Entry</button></div>
   </form>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick } from "vue";
+import { ref, watch, nextTick, onMounted } from "vue";
 import EntryData from "@/modules/EntryData";
 // as per compiler: [@vue/compiler-sfc] `defineEmits` is a compiler macro and no longer needs to be imported.
 // import { defineEmits } from "vue";
@@ -56,6 +46,17 @@ const props = defineProps({
     },
   }, // Accept the copied entry as a prop
 });
+
+
+onMounted(() => {
+  const entryElement = document.getElementById("entry");
+      if (entryElement) {
+        entryElement.focus();
+      } else {
+        console.warn("Element with ID 'entry' not found on mount.");
+      }
+});
+
 
 const emit = defineEmits(["newEntry"]);
 
@@ -148,7 +149,25 @@ watch(
 
 */
 
-input.error {
+
+
+#add-entry .form-inner {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  
+
+    pre, .entry__body {
+        height:100%
+    }
+  
+}
+
+.entry__body-div {
+  flex-grow:1;
+}
+
+input.error { 
   border: 1px solid var(--red-color);
 }
 
@@ -160,6 +179,10 @@ input.error {
 input.date {
   font-weight: bold;
   border: none;
+}
+
+#time {
+  field-sizing: content;
 }
 
 input {
@@ -190,32 +213,24 @@ h3
   font-size 14px
   margin 50px 0 20px 20px
 
+
+
+
+
 .entry__body
   background-color: var(--misc-color)
   max-width: 600px;
-  height: 50vw;
   border-radius: 14px;
-  padding: 20px;
-
-pre.entry__body
   white-space: pre-wrap; /* Enables wrapping of text, preserving spaces and line breaks */
   word-wrap: break-word; /* Breaks long words to prevent overflow */
-
-
-.entry__body {
   font-size: 16px;
   font-family: var(--font);
   width: 100%;
   box-sizing: border-box;
-}
-
-.entry__body {
   text-align: left;
   max-width: 600px;
-  border-radius: 14px;
-  padding: 20px;
   padding: 10px 20px ;
-}
+
 
 .entry__textarea {
   background-color: var(--input-color);

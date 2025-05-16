@@ -1,50 +1,69 @@
 <template>
   <aside class="vue-file">EditFlog.vue</aside>
-  <section class="container main">
-    <h4 class="flog-title">
-      {{ flog.url }}
 
-      <FlogPretext
-        :pretext="flog.pretext"
-        :read-only="flog.readOnly"
-        @update-pretext="
-          (updatedPretext) => handleUpdatePretext(flog, updatedPretext)
-        "
-      />
-      <button class="small close-flog" @click.prevent="() => closeFlog(flog)">
-        flog list
-      </button>
-    </h4>
+  <div class="flex gap-8">
 
-    <AddEntry
-      :entry-value="addEntryValue"
-      @new-entry="(entryData) => addNewEntry(unref(entryData), flog)"
+    <section class="container main">
+      <div class="viewport">  
+        <h4 class="flog-title">
+    {{ flog.url }}
+    
+    <FlogPretext
+    :pretext="flog.pretext"
+    :read-only="flog.readOnly"
+    @update-pretext="
+      (updatedPretext) => handleUpdatePretext(flog, updatedPretext)
+      "
     />
-    <div id="spinner">
-      <PacmanLoader
-        :loading="flog.status != IFlogStatus.loaded"
-        :color="loaderProps.color"
-        :size="loaderProps.size"
-      />
-    </div>
-    <div v-if="flog.status == IFlogStatus.loaded">
-      <EntryList
-        :entries="flog.loadedEntries"
-        :editing-entry="getFlogEditingEntry(flog)"
-        :read-only="flog.readOnly"
-        @edit-entry="editEntry"
-        @copy-entry="handleCopyEntry"
-        @delete-entry="(entry) => handleDeleteEntry(flog, entry)"
-        @update-entry="(entry) => handleUpdateEntry(flog, entry)"
-        @start-editing="(entry) => handleStartEditingEntry(flog, entry)"
-        @stop-editing="() => handleStopEditingEntry(flog)"
-      />
-    </div>
-  </section>
+    <button class="small close-flog" @click.prevent="() => closeFlog(flog)">
+    flog list
+    </button>
+  </h4>
+
+        <AddEntry
+        :entry-value="addEntryValue"
+        @new-entry="(entryData) => addNewEntry(unref(entryData), flog)"
+        />
+      </div>
+      
+      <div id="spinner">
+        <PacmanLoader
+          :loading="flog.status != IFlogStatus.loaded"
+          :color="loaderProps.color"
+          :size="loaderProps.size"
+        />
+      </div>
+      
+      <div v-if="flog.status == IFlogStatus.loaded">
+        <EntryList
+          :entries="flog.loadedEntries"
+          :editing-entry="getFlogEditingEntry(flog)"
+          :read-only="flog.readOnly"
+          @edit-entry="editEntry"
+          @copy-entry="handleCopyEntry"
+          @delete-entry="(entry) => handleDeleteEntry(flog, entry)"
+          @update-entry="(entry) => handleUpdateEntry(flog, entry)"
+          @start-editing="(entry) => handleStartEditingEntry(flog, entry)"
+          @stop-editing="() => handleStopEditingEntry(flog)"
+          @mounted="mountedCheck"
+        />
+      </div>
+    </section>
+    <section class="container sidebar">
+      <div class="toc viewport mb-7">
+        <h2>Table of Contents (h1s)</h2>
+          <PacmanLoader
+            :loading="!mounted"
+            :color="loaderProps.color"
+            :size="loaderProps.size"
+          />
+      </div>
+    </section>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, unref } from "vue";
+import { ref, unref, watch } from "vue";
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
 import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource";
 import { useFlog, IFlogStatus } from "@/composables/useFlog";
@@ -140,20 +159,82 @@ function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
     saveFlogToSource(flog);
   }
 }
+
+// Function to handle the TOC in right column
+
+const mounted = ref(false);       
+const mountedCheck = () => {
+    mounted.value = true;
+};       
+
+watch(mounted, (newValue) => {
+  if (newValue) {
+    const toc = document.querySelector('.toc');
+    if (!toc) return;
+
+    // Look for added h1 nodes
+    const headers = document.querySelectorAll('h1');
+    if (headers.length > 0) {
+      const list = document.createElement('ul');
+      list.className = 'toc-list';
+
+      // Add a "Back to Top" link as the first item
+      const backToTopItem = document.createElement('li');
+      const backToTopAnchor = document.createElement('a');
+      backToTopAnchor.href = '#logo';
+      backToTopAnchor.textContent = 'Back to Top';
+      backToTopItem.appendChild(backToTopAnchor);
+      list.appendChild(backToTopItem);
+
+      headers.forEach((header, index) => {
+        if (header.id === "logo") return;
+        if (!header.id) {
+          header.id = `heading-${index}`;
+        }
+        const listItem = document.createElement('li');
+        const anchor = document.createElement('a');
+        anchor.href = `#${header.id}`;
+        anchor.textContent = header.textContent || `Heading ${index + 1}`;
+        listItem.appendChild(anchor);
+        list.appendChild(listItem);
+      });
+      toc.appendChild(list);
+    }
+  }
+});
+
+
 </script>
 
-<style scoped lang="styl">
+<style scoped>
 #spinner {
   text-align: left;
   width: 100%;
   padding: 1rem;
 }
 
-h4
-  margin 10px 0 10px
-  padding 0 0 10px 0
-  font-style italic
+.toc {
+  scroll-behavior: smooth;
+  position: fixed;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  max-width: 300px;
+  overflow: auto;
+  
+  h2 {
+    margin-top:0
+  } 
 
+}
+
+
+h4 {
+  box-sizing: border-box;
+  margin: 10px 0 10px;
+  padding: 0 0 10px 0;
+  font-style: italic;
+}
 .no-margin-bottom {
   margin-bottom: 0px;
 }
@@ -161,6 +242,21 @@ h5 {
   padding: 0;
 }
 
-button.small
-  margin-left 10px
+button.small{
+  margin-left: 10px
+  }
+</style>
+<style>
+.sidebar {
+  display: none;
+  @media (min-width: 990px) {
+    display: block;
+  }
+}
+
+.toc-list li { 
+  padding: 5px 0;
+  list-style:circle;
+  margin-left: 20px;
+}
 </style>
