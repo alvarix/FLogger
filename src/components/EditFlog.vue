@@ -49,7 +49,7 @@
         />
       </div>
     </section>
-    <section class="container">
+    <section class="container sidebar">
       <div class="toc viewport mb-7">
         <h2>Table of Contents (h1s)</h2>
           <PacmanLoader
@@ -79,9 +79,6 @@ import PacmanLoader from "vue-spinner/src/PacmanLoader.vue";
 const props = defineProps<{
   flog: IFlog; // Accept the flog as a prop
 }>();
-
-
-let tocLoaded = ref(false);
 
 const { closeFlog } = useOpenFlogs();
 
@@ -250,6 +247,13 @@ button.small{
   }
 </style>
 <style>
+.sidebar {
+  display: none;
+  @media (min-width: 990px) {
+    display: block;
+  }
+}
+
 .toc-list li { 
   padding: 5px 0;
   list-style:circle;
