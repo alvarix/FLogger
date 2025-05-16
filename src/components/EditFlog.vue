@@ -50,7 +50,7 @@
       </div>
     </section>
     <section class="container">
-      <div class="toc mb-7">
+      <div class="toc viewport mb-7">
         <h2>Table of Contents (h1s)</h2>
           <PacmanLoader
             :loading="!mounted"
@@ -180,12 +180,20 @@ watch(mounted, (newValue) => {
     if (headers.length > 0) {
       const list = document.createElement('ul');
       list.className = 'toc-list';
+
+      // Add a "Back to Top" link as the first item
+      const backToTopItem = document.createElement('li');
+      const backToTopAnchor = document.createElement('a');
+      backToTopAnchor.href = '#logo';
+      backToTopAnchor.textContent = 'Back to Top';
+      backToTopItem.appendChild(backToTopAnchor);
+      list.appendChild(backToTopItem);
+
       headers.forEach((header, index) => {
         if (header.id === "logo") return;
         if (!header.id) {
           header.id = `heading-${index}`;
         }
-        
         const listItem = document.createElement('li');
         const anchor = document.createElement('a');
         anchor.href = `#${header.id}`;
@@ -193,15 +201,10 @@ watch(mounted, (newValue) => {
         listItem.appendChild(anchor);
         list.appendChild(listItem);
       });
-      if (toc) {
-        toc.appendChild(list);
-      }
+      toc.appendChild(list);
     }
   }
-
-
 });
-
 
 
 </script>
@@ -220,6 +223,7 @@ watch(mounted, (newValue) => {
   border: 1px solid #ccc;
   border-radius: 10px;
   max-width: 300px;
+  overflow: auto;
   
   h2 {
     margin-top:0
