@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, onMounted, defineEmits } from "vue";
 import FlogEntry from "@components/FlogEntry.vue";
 import type { IEntry } from "@/modules/EntryData";
 
@@ -59,6 +59,7 @@ const emit = defineEmits([
   "update-entry",
   "start-editing",
   "stop-editing",
+  "mounted"
 ]);
 
 
@@ -100,6 +101,10 @@ const handleStopEditingEntry = () => {
   emit("stop-editing");
 };
 
+onMounted(() => {
+  console.log('Child component mounted!');
+  emit('mounted'); // Correctly emits the 'mounted' event
+});
 </script>
 
 <style scoped>

@@ -24,12 +24,8 @@
         :entry-value="addEntryValue"
         @new-entry="(entryData) => addNewEntry(unref(entryData), flog)"
         />
-        
       </div>
       
-
-
-
       <div id="spinner">
         <PacmanLoader
           :loading="flog.status != IFlogStatus.loaded"
@@ -49,6 +45,7 @@
           @update-entry="(entry) => handleUpdateEntry(flog, entry)"
           @start-editing="(entry) => handleStartEditingEntry(flog, entry)"
           @stop-editing="() => handleStopEditingEntry(flog)"
+          @mounted="mountedCheck"
         />
       </div>
     </section>
@@ -56,18 +53,17 @@
       <div class="toc mb-7">
         <h2>Table of Contents (h1s)</h2>
           <PacmanLoader
-            :loading="!tocLoaded"
+            :loading="!mounted"
             :color="loaderProps.color"
             :size="loaderProps.size"
           />
       </div>
-
     </section>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, unref, onMounted } from "vue";
+import { ref, unref, watch } from "vue";
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
 import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource";
 import { useFlog, IFlogStatus } from "@/composables/useFlog";
@@ -167,12 +163,18 @@ function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
   }
 }
 
+// Function to handle the TOC in right column
 
-onMounted(() => {
-  const toc = document.querySelector('.toc');
-  if (!toc) return;
+const mounted = ref(false);       
+const mountedCheck = () => {
+    mounted.value = true;
+};       
 
-  const observer = new MutationObserver((mutations) => {
+watch(mounted, (newValue) => {
+  if (newValue) {
+    const toc = document.querySelector('.toc');
+    if (!toc) return;
+
     // Look for added h1 nodes
     const headers = document.querySelectorAll('h1');
     if (headers.length > 0) {
@@ -183,6 +185,7 @@ onMounted(() => {
         if (!header.id) {
           header.id = `heading-${index}`;
         }
+        
         const listItem = document.createElement('li');
         const anchor = document.createElement('a');
         anchor.href = `#${header.id}`;
@@ -190,19 +193,16 @@ onMounted(() => {
         listItem.appendChild(anchor);
         list.appendChild(listItem);
       });
-      toc.appendChild(list);
-      // Stop observing after we've built the TOC
-      observer.disconnect();
-      tocLoaded.value = true;
+      if (toc) {
+        toc.appendChild(list);
+      }
     }
-  });
+  }
 
-  // Start observing the document body for added nodes.
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-  });
+
 });
+
+
 
 </script>
 
