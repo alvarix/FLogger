@@ -13,13 +13,9 @@
       />
       <div v-if="editingEntry == entry" class="entry__btns">
         <button class="entry__btn mr-8" @click.prevent="">#</button>
-
-        <button class="small entry__btn" @click="changeEntry('update', entry)">
-          Save
-        </button>
-        <button class="small entry__btn" @click="changeEntry('edit', entry)">
-          Cancel
-        </button>
+        <span class='small'>
+          Shift + Return or Tab to save
+        </span>
       </div>
       <div v-else class="entry__btns">
         <button
@@ -46,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, onMounted, defineEmits } from "vue";
 import FlogEntry from "@components/FlogEntry.vue";
 import type { IEntry } from "@/modules/EntryData";
 
@@ -63,7 +59,9 @@ const emit = defineEmits([
   "update-entry",
   "start-editing",
   "stop-editing",
+  "mounted"
 ]);
+
 
 function changeEntry(
   actionName: "copy" | "delete" | "edit" | "update",
@@ -103,9 +101,17 @@ const handleStopEditingEntry = () => {
   emit("stop-editing");
 };
 
+onMounted(() => {
+  console.log('Child component mounted!');
+  emit('mounted'); // Correctly emits the 'mounted' event
+});
 </script>
 
 <style scoped>
+.entry-list {
+  scroll-behavior: smooth;
+}
+
 .entry-list > li {
   border-radius: 14px;
   list-style: none;

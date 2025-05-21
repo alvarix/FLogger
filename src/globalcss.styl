@@ -29,6 +29,10 @@
     --link-color light-dark(#646cff, #646cff)
     --red-color light-dark(#e0521d, #e0521d)
 
+div 
+    box-sizing: border-box;
+
+
 li a
   word-break break-all
   overflow-wrap break-word
@@ -47,17 +51,52 @@ button
         box-shadow 0 2px 4px rgba(0, 0, 0, 0.5)
         color var(--link-color)
 
+.left {
+  padding-left: .75rem;
+  clip-path: polygon(
+    100% 0%,
+    100% 100%,
+    5px 100%,
+    5px calc(50% + 5px),
+    0% 50%,
+    5px calc(50% - 5px),
+    5px 0%
+  );
+}
 
+.connected header 
+    height 40px
 
+.viewport 
+    height calc(100svh - 90px)
+    display flex
+    flex-direction column
+
+    form 
+        flex-grow 1
+
+#add-entry .form-inner {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  
+
+    pre, .entry__body {
+        height:100%
+    }
+  
+}
 button.big 
     padding 15px 30px
     border-radius 16px
 
 button.small 
     padding 5px 10px
-    font-size 10px
-    text-transform uppercase
+
+.small
     margin 10px 5px 0 0
+    text-transform uppercase
+    font-size 10px
 
 input:not(submit), textarea 
     background-color var(--input-color)
@@ -89,11 +128,7 @@ a
     font-size 2vw
     transition 500ms all ease-in-out
     
-h4.flog-title {
-    font-size 11px
-}
 
-h4.flog-title,
 .connected #logo 
     margin 0
     padding 0
