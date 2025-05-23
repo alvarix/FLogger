@@ -22,6 +22,5 @@ export interface ITagFlogEntryPointer {
 export interface ITagIndex {
     file: IFlog['url'];
     rev: TagRev | undefined;
-    tags?: ITag[];
     tagMap?: TagMap;
 }

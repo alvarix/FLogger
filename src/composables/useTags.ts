@@ -22,7 +22,6 @@ export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
         console.log('New tag index', newTagIndex.rev);
         tagIndex.value = {
             tagMap: unref(newTagIndex.tagMap),
-            tags: unref(newTagIndex.tags),
             rev: unref(newTagIndex.rev),
             file: unref(newTagIndex.file),
         }

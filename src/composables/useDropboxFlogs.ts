@@ -167,7 +167,7 @@ const {
 
 const tagIndexFileName = "flogger.tag-index.json"
 const tagIndexFilePath = "/" + tagIndexFileName
-const { tagIndex: tagIndex_useTags, setTagsIndex, getFlogTags } = useTags({ file: tagIndexFilePath, rev: undefined, tags: [] })
+const { tagIndex: tagIndex_useTags, setTagsIndex, getFlogTags } = useTags({ file: tagIndexFilePath, rev: undefined })
 
 const tagIndex = ref(tagIndex_useTags)
 watch(
@@ -205,7 +205,6 @@ function handleTagIndexFileLoad(result: ILoadFileContentCallbackSuccess | ILoadF
                 setTagsIndex({
                     file: tagIndexFilePath,
                     rev: result.rev,
-                    tags: [],
                     tagMap: [],
                 })
             })
@@ -225,7 +224,6 @@ function handleTagIndexFileLoad(result: ILoadFileContentCallbackSuccess | ILoadF
         setTagsIndex({
             file: tagIndexFilePath,
             rev,
-            // tags: [...parsedTags],
             tagMap: [...parsedTags],
         })
         // console.log("TAGS tagIndex", { ...unref(ref(tagIndex)), setTagsIndex: undefined })
