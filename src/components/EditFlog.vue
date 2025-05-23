@@ -56,10 +56,8 @@
         <div
           v-for="tab in sidebarTabs"
           :key="tab"
-          :class="[
-            currentTab == tab ? 'sidebar-tab-selected' : '',
-            'sidebar-tab',
-          ]"
+          :data-tab-selected="currentTab == tab" 
+          class="sidebar-tab"
           @click="
             () => {
               currentTab = tab;
@@ -300,10 +298,7 @@ button.small {
   height: fit-content;
 }
 
-.sidebar-tab-selected {
-  border: 1px solid #fff;
-  border-radius: 4px 4px 0 0;
-  border-bottom: none;
+.sidebar-tab[data-tab-selected="true"] {
   font-weight: bold;
 }
 
