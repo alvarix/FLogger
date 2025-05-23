@@ -2,30 +2,32 @@
   <aside class="vue-file">EditFlog.vue</aside>
 
   <div class="flex gap-8">
-
     <section class="container main">
-      <div class="viewport">  
+      <div class="viewport">
         <h4 class="flog-title">
-    {{ flog.url }}
-    
-    <FlogPretext
-    :pretext="flog.pretext"
-    :read-only="flog.readOnly"
-    @update-pretext="
-      (updatedPretext) => handleUpdatePretext(flog, updatedPretext)
-      "
-    />
-    <button class="small close-flog" @click.prevent="() => closeFlog(flog)">
-    flog list
-    </button>
-  </h4>
+          {{ flog.url }}
+
+          <FlogPretext
+            :pretext="flog.pretext"
+            :read-only="flog.readOnly"
+            @update-pretext="
+              (updatedPretext) => handleUpdatePretext(flog, updatedPretext)
+            "
+          />
+          <button
+            class="small close-flog"
+            @click.prevent="() => closeFlog(flog)"
+          >
+            flog list
+          </button>
+        </h4>
 
         <AddEntry
-        :entry-value="addEntryValue"
-        @new-entry="(entryData) => addNewEntry(unref(entryData), flog)"
+          :entry-value="addEntryValue"
+          @new-entry="(entryData) => addNewEntry(unref(entryData), flog)"
         />
       </div>
-      
+
       <div id="spinner">
         <PacmanLoader
           :loading="flog.status != IFlogStatus.loaded"
@@ -33,7 +35,7 @@
           :size="loaderProps.size"
         />
       </div>
-      
+
       <div v-if="flog.status == IFlogStatus.loaded">
         <EntryList
           :entries="flog.loadedEntries"
@@ -49,14 +51,66 @@
         />
       </div>
     </section>
-    <section class="container sidebar">
-      <div class="toc viewport mb-7">
+    <section class="container sidebar viewport">
+      <div class="sidebar-tabs">
+        <div
+          v-for="tab in sidebarTabs"
+          :key="tab"
+          :class="[
+            currentTab == tab ? 'sidebar-tab-selected' : '',
+            'sidebar-tab',
+          ]"
+          @click="
+            () => {
+              currentTab = tab;
+            }
+          "
+        >
+          {{ tab }}
+        </div>
+      </div>
+      <div :data-tab-selected="currentTab == 'Tags'" class="sidebar-panel mb-7">
+        <h2>Tags</h2>
+        <ul>
+          <li v-for="[tag, flogs] in flogTagMap" :key="tag">
+            <button @click="() => (currentTag = tag)">{{ tag }}</button>
+            <ul v-if="currentTag == tag">
+              <li>
+                <i>this flog</i>
+                <ul class="bullet">
+                  <li
+                    v-for="[flogFile, entries] in filterTagFlogs(flogs, 'this flog')"
+                    :key="flogFile"
+                  >
+                    {{ flogFile }} ({{entries.length}} entries)
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <i>other flogs</i>
+                <ul class="bullet">
+                  <li
+                    v-for="[flogFile, entries] in filterTagFlogs(flogs, 'not this flog')"
+                    :key="flogFile"
+                  >
+                    {{ flogFile }} ({{entries.length}} entries)
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div
+        :data-tab-selected="currentTab == 'ToC'"
+        class="toc sidebar-panel mb-7"
+      >
         <h2>Table of Contents (h1s)</h2>
-          <PacmanLoader
-            :loading="!mounted"
-            :color="loaderProps.color"
-            :size="loaderProps.size"
-          />
+        <PacmanLoader
+          :loading="!mounted"
+          :color="loaderProps.color"
+          :size="loaderProps.size"
+        />
       </div>
     </section>
   </div>
@@ -65,7 +119,12 @@
 <script setup lang="ts">
 import { ref, unref, watch } from "vue";
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
-import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource";
+import {
+  useFlogSource,
+  IFlogSourceType,
+  type ITag,
+  type TagFlogTuple,
+} from "@/composables/useFlogSource";
 import { useFlog, IFlogStatus } from "@/composables/useFlog";
 import type { IFlog } from "@/composables/useFlog";
 import EntryData from "@/modules/EntryData";
@@ -82,7 +141,33 @@ const props = defineProps<{
 
 const { closeFlog } = useOpenFlogs();
 
-const { saveFlogToSource } = useFlogSource(IFlogSourceType.dropbox);
+const { saveFlogToSource, tagIndex, getFlogTags } = useFlogSource(
+  IFlogSourceType.dropbox
+);
+const flogTagMap = ref(getFlogTags(props.flog.url));
+
+const filterTagFlogs = (
+  flogsToFilter: TagFlogTuple[],
+  mode: "this flog" | "not this flog"
+) =>
+  flogsToFilter.filter(([filterFlogFile]) => {
+    switch (mode) {
+      case "this flog":
+        return filterFlogFile == props.flog.url;
+      case "not this flog":
+        return filterFlogFile != props.flog.url;
+    }
+  });
+
+// Not sure why this isn't updating when the flog is saved
+watch(
+  [tagIndex, getFlogTags],
+  () => {
+    console.log("TAGS tagIndex watch", getFlogTags(props.flog.url));
+    flogTagMap.value = getFlogTags(props.flog.url);
+  },
+  { immediate: true }
+);
 
 const { addEntry, updatePretext, deleteEntry, editEntry } = useFlog(props.flog);
 
@@ -160,29 +245,35 @@ function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
   }
 }
 
+// Sidebar Tabs
+type SidebarTab = "ToC" | "Tags";
+const currentTab = ref<SidebarTab>("ToC");
+const sidebarTabs = ref<SidebarTab[]>(["ToC", "Tags"]);
+const currentTag = ref<ITag["tag"]>();
+
 // Function to handle the TOC in right column
 
-const mounted = ref(false);       
+const mounted = ref(false);
 const mountedCheck = () => {
-    mounted.value = true;
-};       
+  mounted.value = true;
+};
 
 watch(mounted, (newValue) => {
   if (newValue) {
-    const toc = document.querySelector('.toc');
+    const toc = document.querySelector(".toc");
     if (!toc) return;
 
     // Look for added h1 nodes
-    const headers = document.querySelectorAll('h1');
+    const headers = document.querySelectorAll("h1");
     if (headers.length > 0) {
-      const list = document.createElement('ul');
-      list.className = 'toc-list';
+      const list = document.createElement("ul");
+      list.className = "toc-list";
 
       // Add a "Back to Top" link as the first item
-      const backToTopItem = document.createElement('li');
-      const backToTopAnchor = document.createElement('a');
-      backToTopAnchor.href = '#logo';
-      backToTopAnchor.textContent = 'Back to Top';
+      const backToTopItem = document.createElement("li");
+      const backToTopAnchor = document.createElement("a");
+      backToTopAnchor.href = "#logo";
+      backToTopAnchor.textContent = "Back to Top";
       backToTopItem.appendChild(backToTopAnchor);
       list.appendChild(backToTopItem);
 
@@ -191,8 +282,8 @@ watch(mounted, (newValue) => {
         if (!header.id) {
           header.id = `heading-${index}`;
         }
-        const listItem = document.createElement('li');
-        const anchor = document.createElement('a');
+        const listItem = document.createElement("li");
+        const anchor = document.createElement("a");
         anchor.href = `#${header.id}`;
         anchor.textContent = header.textContent || `Heading ${index + 1}`;
         listItem.appendChild(anchor);
@@ -202,8 +293,6 @@ watch(mounted, (newValue) => {
     }
   }
 });
-
-
 </script>
 
 <style scoped>
@@ -212,22 +301,6 @@ watch(mounted, (newValue) => {
   width: 100%;
   padding: 1rem;
 }
-
-.toc {
-  scroll-behavior: smooth;
-  position: fixed;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  max-width: 300px;
-  overflow: auto;
-  
-  h2 {
-    margin-top:0
-  } 
-
-}
-
 
 h4 {
   box-sizing: border-box;
@@ -242,11 +315,10 @@ h5 {
   padding: 0;
 }
 
-button.small{
-  margin-left: 10px
-  }
-</style>
-<style>
+button.small {
+  margin-left: 10px;
+}
+
 .sidebar {
   display: none;
   @media (min-width: 990px) {
@@ -254,9 +326,62 @@ button.small{
   }
 }
 
-.toc-list li { 
+.sidebar-tabs {
+  scroll-behavior: smooth;
+  position: fixed;
+  padding-left: 10px;
+}
+
+.sidebar-tab {
+  display: inline-block;
+  width: fit-content;
+  padding: 4px;
+  margin-right: 0.5px;
+  border: 1px solid #ccc;
+  border-radius: 4px 4px 0 0;
+  border-bottom: none;
+  height: fit-content;
+}
+
+.sidebar-tab-selected {
+  border: 1px solid #fff;
+  border-radius: 4px 4px 0 0;
+  border-bottom: none;
+  font-weight: bold;
+}
+
+.sidebar-panel {
+  scroll-behavior: smooth;
+  position: fixed;
+  top: 92px;
+  height: calc(100dvh - 140px);
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  max-width: 300px;
+  overflow: auto;
+
+  h2 {
+    margin-top: 0;
+  }
+}
+
+.sidebar-panel {
+  visibility: hidden;
+}
+.sidebar-panel[data-tab-selected="true"] {
+  visibility: visible;
+}
+
+.toc-list li {
   padding: 5px 0;
-  list-style:circle;
+  list-style: circle;
+  margin-left: 20px;
+}
+
+.bullet {
+  list-style-type: none;
+  list-style-position: outside;
   margin-left: 20px;
 }
 </style>
