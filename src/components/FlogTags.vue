@@ -4,7 +4,7 @@
   <h2>Tags</h2>
   <ul>
     <li v-for="[tag, flogs] in flogTagMap" :key="tag">
-      <button @click="() => (currentTag = tag)">{{ tag }}</button>
+      <button @click="() => (currentTag != tag) ? (currentTag = tag) : (currentTag = undefined)">{{ tag }}</button>
       <ul v-if="currentTag == tag">
         <li>
           <i>this flog</i>
