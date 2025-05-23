@@ -14,11 +14,11 @@ export interface IDropboxFlog extends IFlog {
 
 export interface IDropboxFlogs {
     // pass through from useDropboxFiles
-    launchConnectFlow: () => void;
+    launchConnectFlow: (targetWindow: Window) => void;
     // pass through from useDropboxFiles
     // eslint-disable-next-line
     connectionPopupWindow: Ref<any>;
-    openDbxPopup: () => void;
+    openDbxPopup: (targetWindow: Window) => void;
     // pass through from useDropboxFiles
     hasConnection: Ref<boolean>;
     // pass through from useDropboxFiles

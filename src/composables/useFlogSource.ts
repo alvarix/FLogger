@@ -67,8 +67,8 @@ export interface IFlogSource {
     // on the sourceType param in useSourceType(sourceType).
     // The naming of these could be improved, or generalized 
     // to make sense for multiple sources. 
-    launchConnectFlow: () => void;
-    openPopup: () => void;
+    launchConnectFlow: (targetWindow: Window) => void;
+    openPopup: (targetWindow: Window) => void;
     clearConnection: () => void;
 
     // useFlogSource provides a hasConnection boolean.
@@ -211,19 +211,19 @@ export const useFlogSource = (sourceType: IFlogSourceType): IFlogSource => {
         }
     }
 
-    const launchConnectFlow = () => {
+    const launchConnectFlow = (targetWindow: Window) => {
         switch (sourceType) {
             case IFlogSourceType.dropbox:
-                launchConnectFlow_dropbox();
+                launchConnectFlow_dropbox(targetWindow);
                 break;
             default:
         }
     }
 
-    const openPopup = () => {
+    const openPopup = (targetWindow: Window) => {
         switch (sourceType) {
             case IFlogSourceType.dropbox:
-                openDbxPopup_dropbox();
+                openDbxPopup_dropbox(targetWindow);
                 break;
             default:
         }
