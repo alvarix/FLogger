@@ -56,7 +56,7 @@
         <div
           v-for="tab in sidebarTabs"
           :key="tab"
-          :data-tab-selected="currentTab == tab" 
+          :data-tab-selected="currentTab == tab"
           class="sidebar-tab"
           @click="
             () => {
@@ -71,10 +71,10 @@
         <FlogTags :flog-tag-map="flogTagMap" :flog-file="flog.url" />
       </div>
       <div
-        :data-tab-selected="currentTab == 'ToC'"
+        :data-tab-selected="currentTab == 'TOC'"
         class="toc sidebar-panel mb-7"
       >
-        <h2>Table of Contents (h1s)</h2>
+        <h2>Contents</h2>
         <PacmanLoader
           :loading="!mounted"
           :color="loaderProps.color"
@@ -113,7 +113,9 @@ const { closeFlog } = useOpenFlogs();
 const { saveFlogToSource, tagIndex, getFlogTags } = useFlogSource(
   IFlogSourceType.dropbox
 );
-const flogTagMap = ref<TagMap>(unref(getFlogTags(props.flog.url) || []) as TagMap);
+const flogTagMap = ref<TagMap>(
+  unref(getFlogTags(props.flog.url) || []) as TagMap
+);
 
 // Not sure why this isn't updating when the flog is saved
 watch(
@@ -202,9 +204,9 @@ function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
 }
 
 // Sidebar Tabs
-type SidebarTab = "ToC" | "Tags";
-const currentTab = ref<SidebarTab>("ToC");
-const sidebarTabs = ref<SidebarTab[]>(["ToC", "Tags"]);
+type SidebarTab = "TOC" | "Tags";
+const currentTab = ref<SidebarTab>("TOC");
+const sidebarTabs = ref<SidebarTab[]>(["TOC", "Tags"]);
 
 // Function to handle the TOC in right column
 
@@ -274,6 +276,19 @@ button.small {
   margin-left: 10px;
 }
 
+.toc-list li {
+  padding: 5px 0;
+  list-style: circle;
+  margin-left: 20px;
+}
+
+.bullet {
+  list-style-type: none;
+  list-style-position: outside;
+  margin-left: 20px;
+}
+</style>
+<style>
 .sidebar {
   display: none;
   @media (min-width: 990px) {
@@ -323,17 +338,5 @@ button.small {
 }
 .sidebar-panel[data-tab-selected="true"] {
   visibility: visible;
-}
-
-.toc-list li {
-  padding: 5px 0;
-  list-style: circle;
-  margin-left: 20px;
-}
-
-.bullet {
-  list-style-type: none;
-  list-style-position: outside;
-  margin-left: 20px;
 }
 </style>
