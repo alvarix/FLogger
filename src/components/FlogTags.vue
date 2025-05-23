@@ -2,9 +2,10 @@
   <aside class="vue-file">FlogTags.vue</aside>
 
   <h2>Tags</h2>
+  <p>Select a tag to filter flog entries containing that tag.</p>
   <ul>
     <li v-for="[tag, flogs] in flogTagMap" :key="tag">
-      <button @click="() => (currentTag != tag) ? (currentTag = tag) : (currentTag = undefined)">{{ tag }}</button>
+      <button @click="() => handleTagSelect(tag)">{{ tag }}</button>
       <ul v-if="currentTag == tag">
         <li>
           <i>this flog</i>
@@ -38,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, defineEmits } from "vue";
 import type { TagFlogFile, Tag, TagMap } from "@/composables/useTags";
 
 const { flogFile, flogTagMap } = defineProps<{
@@ -46,8 +47,14 @@ const { flogFile, flogTagMap } = defineProps<{
   flogTagMap: TagMap; // Accept the flog as a prop
 }>();
 
+const emit = defineEmits(["tagSelected"]);
+
 const currentTag = ref<Tag["tag"]>();
 
+const handleTagSelect = (tag: Tag["tag"]) => {
+  currentTag.value = currentTag.value != tag ? tag : undefined;
+  emit("tagSelected", currentTag.value);
+};
 </script>
 
 <style scoped>

@@ -3,7 +3,7 @@
 
   <div class="flex gap-8">
     <section class="container main">
-      <div class="viewport">
+      <div :class="{ viewport: !selectedTag }">
         <h4 class="flog-title">
           {{ flog.url }}
 
@@ -23,6 +23,7 @@
         </h4>
 
         <AddEntry
+          v-if="!selectedTag"
           :entry-value="addEntryValue"
           @new-entry="(entryData) => addNewEntry(unref(entryData), flog)"
         />
@@ -38,7 +39,7 @@
 
       <div v-if="flog.status == IFlogStatus.loaded">
         <EntryList
-          :entries="flog.loadedEntries"
+          :entries="filteredEntries"
           :editing-entry="getFlogEditingEntry(flog)"
           :read-only="flog.readOnly"
           @edit-entry="editEntry"
@@ -68,7 +69,11 @@
         </div>
       </div>
       <div :data-tab-selected="currentTab == 'Tags'" class="sidebar-panel mb-7">
-        <FlogTags :flog-tag-map="flogTagMap" :flog-file="flog.url" />
+        <FlogTags
+          :flog-tag-map="flogTagMap"
+          :flog-file="flog.url"
+          @tag-selected="handleTagSelect"
+        />
       </div>
       <div
         :data-tab-selected="currentTab == 'TOC'"
@@ -110,6 +115,7 @@ import {
   useFlogSource,
   IFlogSourceType,
   type TagMap,
+  type Tag,
 } from "@/composables/useFlogSource";
 import { useFlog, IFlogStatus } from "@/composables/useFlog";
 import type { IFlog } from "@/composables/useFlog";
@@ -127,9 +133,9 @@ import { useTheme } from "@composables/useTheme";
 // See the v-bind(shadowColor) used in the <style> block.
 const { isDark } = useTheme();
 const shadowColor = ref(isDark.value ? "white" : "black");
-watch(isDark,()=>{
-  shadowColor.value = isDark.value ? "white" : "black"
-})
+watch(isDark, () => {
+  shadowColor.value = isDark.value ? "white" : "black";
+});
 
 const props = defineProps<{
   flog: IFlog; // Accept the flog as a prop
@@ -140,11 +146,10 @@ const { closeFlog } = useOpenFlogs();
 const { saveFlogToSource, tagIndex, getFlogTags } = useFlogSource(
   IFlogSourceType.dropbox
 );
+
 const flogTagMap = ref<TagMap>(
   unref(getFlogTags(props.flog.url) || []) as TagMap
 );
-
-// Not sure why this isn't updating when the flog is saved
 watch(
   [tagIndex, getFlogTags],
   () => {
@@ -153,6 +158,8 @@ watch(
   },
   { immediate: true }
 );
+
+const filteredEntries = ref<IEntry[]>(props.flog.loadedEntries);
 
 const { addEntry, updatePretext, deleteEntry, editEntry } = useFlog(props.flog);
 
@@ -232,8 +239,40 @@ function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
 
 // Sidebar Tabs
 type SidebarTab = "TOC" | "Tags" | "About";
-const currentTab = ref<SidebarTab>("TOC");
+const currentTab = ref<SidebarTab>("Tags");
 const sidebarTabs = ref<SidebarTab[]>(["TOC", "Tags", "About"]);
+
+const selectedTag = ref<Tag["tag"]>();
+
+const handleTagSelect = (tag: Tag["tag"]) => {
+  console.log("TAGS handleTagSelect", tag);
+  selectedTag.value = tag;
+  if (!tag) {
+    filteredEntries.value = props.flog.loadedEntries;
+  } else {
+    filteredEntries.value = props.flog.loadedEntries.filter((entry) => {
+      const tagFlogs = new Map(flogTagMap.value).get(tag) || [];
+
+      const flogTagFlog = tagFlogs.filter(
+        ([tagFlogFile]) => tagFlogFile == props.flog.url
+      );
+
+      const tagFlogEntryDates = flogTagFlog
+        .map(([, tagFlogEntries]) =>
+          tagFlogEntries.map((tagFlogEntry) => new Date(tagFlogEntry).getTime())
+        )
+        .flat();
+
+      const entryMatch = tagFlogEntryDates.includes(
+        new Date(entry.date).getTime()
+      );
+
+      // console.log("TAGS check", entryMatch);
+
+      return entryMatch;
+    });
+  }
+};
 
 // Function to handle the TOC in right column
 
