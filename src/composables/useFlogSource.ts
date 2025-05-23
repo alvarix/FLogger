@@ -3,13 +3,12 @@ import type { Ref } from "vue"
 import type { IFlog } from "@/modules/Flog"
 import { IFlogStatus, IFlogSourceType } from "@/modules/Flog"
 import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
-import type { IDropboxFlog, ITagsComposable, TagIndex, TagMap, TagFlogTuple, Tag } from "@/composables/useDropboxFlogs";
+import type { IDropboxFlog, ITagsComposable, TagIndex, TagMap, Tag } from "@/composables/useDropboxFlogs";
 
 // Re-export these for convenience
 export type { IFlog as IFlog }
 export type { Tag as Tag }
 export type { TagMap as TagMap }
-export type { TagFlogTuple as TagFlogTuple }
 export { IFlogStatus as IFlogStatus }
 export { IFlogSourceType as IFlogSourceType }
 

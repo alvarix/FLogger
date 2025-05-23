@@ -1,18 +1,18 @@
 import { ref, unref } from "vue"
 import type { Ref } from "vue"
-import type { TagIndex, TagMap, Tag, TagRev, TagFlogEntryPointer, TagFlogTuple } from "@modules/Tag"
+import type { TagIndex, TagMap, Tag, TagIndexRev, TagFlogFile } from "@modules/Tag"
 
 
 export type { TagIndex as TagIndex }
 export type { TagMap as TagMap }
-export type { TagRev as TagRev }
+export type { TagIndexRev as TagIndexRev }
 export type { Tag as Tag };
-export type { TagFlogEntryPointer as TagFlogEntryPointer }
+export type { TagFlogFile as TagFlogFile }
 
 export interface ITagsComposable {
     tagIndex: Ref<TagIndex | undefined>
     setTagsIndex: (newTagIndex: TagIndex, callback?: ICallback) => void,
-    getFlogTags: (flogFile: TagFlogEntryPointer['file']) => TagMap,
+    getFlogTags: (flogFile: TagFlogFile) => TagMap,
 }
 
 export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
@@ -31,7 +31,7 @@ export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
         if (callback) callback({ rev: tagIndex.value.rev })
     }
 
-    const getFlogTags = (flogFile: TagFlogEntryPointer['file']) => {
+    const getFlogTags = (flogFile: TagFlogFile) => {
         const mapWithTagsFiltered: TagMap =
             (tagIndex.value?.tagMap?.filter(
                 ([, tagFlogs]) =>
@@ -42,7 +42,7 @@ export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
         const mapWithTagsFilteredAndFlogRemoved: TagMap = (
             mapWithTagsFiltered?.map(
                 ([tag, tagFlogs]) => {
-                    const shortFlogs: TagFlogTuple[] = tagFlogs.filter(
+                    const shortFlogs: Tag['flogs'] = tagFlogs.filter(
                         ([file]) => (file != flogFile)
                     )
                     return [
@@ -64,5 +64,5 @@ export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
     }
 }
 
-type ICallback = (result: { rev?: TagRev, file?: string }) => void
+type ICallback = (result: { rev?: TagIndexRev, file?: string }) => void
 

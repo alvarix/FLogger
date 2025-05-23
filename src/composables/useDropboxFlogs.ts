@@ -5,7 +5,7 @@ import { IFlogStatus, IFlogSourceType, deserializeFlog, serializeFlog } from "@/
 import { useDropboxFiles } from "@/composables/useDropboxFiles"
 import type { IDropboxFile, ILoadFileContentCallbackSuccess, ILoadFileContentCallbackError } from "@/composables/useDropboxFiles";
 import { useTags, type ITagsComposable, type TagMap } from "./useTags"
-import type { TagIndex, Tag, TagFlogTuple } from "@/modules/Tag"
+import type { TagIndex, Tag } from "@/modules/Tag"
 import type { IEntry } from "@/modules/EntryData"
 
 // Re-export these for convenience
@@ -15,7 +15,6 @@ export type { ITagsComposable as ITagsComposable }
 export type { TagIndex as TagIndex }
 export type { TagMap as TagMap }
 export type { Tag as Tag }
-export type { TagFlogTuple as TagFlogTuple }
 export interface IDropboxFlog extends IFlog {
     rev?: string;
 }
@@ -339,9 +338,11 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
                 }
 
                 // Grab current tagMap
-                const tagMap = new Map<Tag['tag'], TagFlogTuple[]>([...(tagIndex.value?.tagMap || [])]);
+                const tagMap: Map<Tag['tag'], Tag['flogs']> 
+                    = new Map([...(tagIndex.value?.tagMap || [])]);
                 // Build tagMap for current flog
-                const thisFlogTagMap = new Map<Tag['tag'], TagFlogTuple[]>()
+                const thisFlogTagMap: Map<Tag['tag'], Tag['flogs']> 
+                    = new Map()
                 flog.loadedEntries.forEach(entry => {
                     const entryTags = parseTagsFromEntry(entry)
                     entryTags.forEach(tag => {
@@ -360,7 +361,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
                     })
                 })
                 // Merge thisFlogTagMap with tagIndex tagMap
-                const mergedTagMap = new Map<Tag['tag'], TagFlogTuple[]>()
+                const mergedTagMap = new Map<Tag['tag'], Tag['flogs']>()
                 const allTags = [...new Set([...tagMap.keys(), ...thisFlogTagMap.keys()])]
                 allTags.forEach(tag => {
                     const existingTagFlogs = new Map(tagMap.get(tag))
@@ -370,7 +371,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
                         // update
                         const mergedTagFlogs = new Map(existingTagFlogs)
                         mergedTagFlogs.set(flog.url, thisFlogTagFlog)
-                        mergedTagMap.set(tag, [...mergedTagFlogs] as TagFlogTuple[])
+                        mergedTagMap.set(tag, [...mergedTagFlogs] as Tag['flogs'])
                     } else if (existingTagFlogs && !thisFlogTagFlog) {
                         // remove
                         const mergedTagFlogs = new Map(existingTagFlogs)
@@ -379,10 +380,10 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
                             // remove tag if this flog was the only one using it
                             mergedTagMap.delete(tag)
                         else
-                            mergedTagMap.set(tag, [...mergedTagFlogs] as TagFlogTuple[])
+                            mergedTagMap.set(tag, [...mergedTagFlogs] as Tag['flogs'])
                     } else if (!existingTagFlogs && thisFlogTagFlog) {
                         // add
-                        mergedTagMap.set(tag, [...thisFlogTagFlogs] as TagFlogTuple[])
+                        mergedTagMap.set(tag, [...thisFlogTagFlogs] as Tag['flogs'])
                     }
                 })
                 console.log("TAGS mergedTagMap", [...mergedTagMap])
