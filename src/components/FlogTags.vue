@@ -40,17 +40,17 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import {
-  type ITagFlogEntryPointer,
-  type ITag,
+  type TagFlogEntryPointer,
+  type Tag,
   type TagMap,
 } from "@/composables/useTags";
 
 const { flogFile, flogTagMap } = defineProps<{
-  flogFile: ITagFlogEntryPointer["file"];
+  flogFile: TagFlogEntryPointer["file"];
   flogTagMap: TagMap; // Accept the flog as a prop
 }>();
 
-const currentTag = ref<ITag["tag"]>();
+const currentTag = ref<Tag["tag"]>();
 </script>
 
 <style scoped>

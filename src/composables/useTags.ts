@@ -1,22 +1,22 @@
 import { ref, unref } from "vue"
 import type { Ref } from "vue"
-import type { TagIndex, TagMap, ITag, TagRev, ITagIndex, ITagFlogEntryPointer, TagFlogTuple } from "@modules/Tag"
+import type { TagIndex, TagMap, Tag, TagRev, TagFlogEntryPointer, TagFlogTuple } from "@modules/Tag"
 
 
 export type { TagIndex as TagIndex }
 export type { TagMap as TagMap }
 export type { TagRev as TagRev }
-export type { ITag as ITag };
-export type { ITagFlogEntryPointer as ITagFlogEntryPointer }
+export type { Tag as Tag };
+export type { TagFlogEntryPointer as TagFlogEntryPointer }
 
 export interface ITagsComposable {
     tagIndex: Ref<TagIndex | undefined>
     setTagsIndex: (newTagIndex: TagIndex, callback?: ICallback) => void,
-    getFlogTags: (flogFile: ITagFlogEntryPointer['file']) => TagMap,
+    getFlogTags: (flogFile: TagFlogEntryPointer['file']) => TagMap,
 }
 
 export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
-    const tagIndex = ref<ITagIndex | undefined>(starterIndex)
+    const tagIndex = ref<TagIndex | undefined>(starterIndex)
 
     const setTagsIndex = (newTagIndex: TagIndex, callback?: ICallback) => {
         console.log('New tag index', newTagIndex.rev);
@@ -31,7 +31,7 @@ export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
         if (callback) callback({ rev: tagIndex.value.rev })
     }
 
-    const getFlogTags = (flogFile: ITagFlogEntryPointer['file']) => {
+    const getFlogTags = (flogFile: TagFlogEntryPointer['file']) => {
         const mapWithTagsFiltered: TagMap =
             (tagIndex.value?.tagMap?.filter(
                 ([, tagFlogs]) =>

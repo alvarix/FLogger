@@ -3,11 +3,11 @@ import type { Ref } from "vue"
 import type { IFlog } from "@/modules/Flog"
 import { IFlogStatus, IFlogSourceType } from "@/modules/Flog"
 import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
-import type { IDropboxFlog, ITagsComposable, ITagIndex, TagMap, TagFlogTuple, ITag } from "@/composables/useDropboxFlogs";
+import type { IDropboxFlog, ITagsComposable, TagIndex, TagMap, TagFlogTuple, Tag } from "@/composables/useDropboxFlogs";
 
 // Re-export these for convenience
 export type { IFlog as IFlog }
-export type { ITag as ITag }
+export type { Tag as Tag }
 export type { TagMap as TagMap }
 export type { TagFlogTuple as TagFlogTuple }
 export { IFlogStatus as IFlogStatus }
@@ -100,7 +100,7 @@ export interface IFlogSource {
     // The value contains the pass through ref the corresponding 
     // corresponding source based on the sourceType param in
     // useSourceType(sourceType).
-    tagIndex: Ref<ITagIndex | undefined>;
+    tagIndex: Ref<TagIndex | undefined>;
     getFlogTags: ITagsComposable['getFlogTags']
 
 }
@@ -137,7 +137,7 @@ const accountOwner = ref<string | null>(null);
 const hasConnection = ref<boolean>(false);
 // eslint-disable-next-line
 const connectionPopupWindow = ref<any>();
-const tagIndex = ref<ITagIndex>();
+const tagIndex = ref<TagIndex>();
 
 // Ref variables that are passed through from a specific use[Source]Flogs composable
 // need watchers on source variables
