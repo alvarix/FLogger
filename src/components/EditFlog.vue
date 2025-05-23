@@ -70,36 +70,7 @@
         </div>
       </div>
       <div :data-tab-selected="currentTab == 'Tags'" class="sidebar-panel mb-7">
-        <h2>Tags</h2>
-        <ul>
-          <li v-for="[tag, flogs] in flogTagMap" :key="tag">
-            <button @click="() => (currentTag = tag)">{{ tag }}</button>
-            <ul v-if="currentTag == tag">
-              <li>
-                <i>this flog</i>
-                <ul class="bullet">
-                  <li
-                    v-for="[flogFile, entries] in filterTagFlogs(flogs, 'this flog')"
-                    :key="flogFile"
-                  >
-                    {{ flogFile }} ({{entries.length}} entries)
-                  </li>
-                </ul>
-              </li>
-              <li>
-                <i>other flogs</i>
-                <ul class="bullet">
-                  <li
-                    v-for="[flogFile, entries] in filterTagFlogs(flogs, 'not this flog')"
-                    :key="flogFile"
-                  >
-                    {{ flogFile }} ({{entries.length}} entries)
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-        </ul>
+        <FlogTags :flog-tag-map="flogTagMap" :flog-file="flog.url" />
       </div>
       <div
         :data-tab-selected="currentTab == 'ToC'"
@@ -117,13 +88,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, unref, watch } from "vue";
+import { ref, unref, watch, nextTick } from "vue";
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
 import {
   useFlogSource,
   IFlogSourceType,
-  type ITag,
-  type TagFlogTuple,
+  type TagMap,
 } from "@/composables/useFlogSource";
 import { useFlog, IFlogStatus } from "@/composables/useFlog";
 import type { IFlog } from "@/composables/useFlog";
@@ -134,6 +104,7 @@ import EntryList from "@components/EntryList.vue";
 import FlogPretext from "@components/FlogPretext.vue";
 // @ts-expect-error - vue-spinner typing issue
 import PacmanLoader from "vue-spinner/src/PacmanLoader.vue";
+import FlogTags from "@components/FlogTags.vue";
 
 const props = defineProps<{
   flog: IFlog; // Accept the flog as a prop
@@ -144,27 +115,14 @@ const { closeFlog } = useOpenFlogs();
 const { saveFlogToSource, tagIndex, getFlogTags } = useFlogSource(
   IFlogSourceType.dropbox
 );
-const flogTagMap = ref(getFlogTags(props.flog.url));
-
-const filterTagFlogs = (
-  flogsToFilter: TagFlogTuple[],
-  mode: "this flog" | "not this flog"
-) =>
-  flogsToFilter.filter(([filterFlogFile]) => {
-    switch (mode) {
-      case "this flog":
-        return filterFlogFile == props.flog.url;
-      case "not this flog":
-        return filterFlogFile != props.flog.url;
-    }
-  });
+const flogTagMap = ref<TagMap>(unref(getFlogTags(props.flog.url) || []) as TagMap);
 
 // Not sure why this isn't updating when the flog is saved
 watch(
   [tagIndex, getFlogTags],
   () => {
-    console.log("TAGS tagIndex watch", getFlogTags(props.flog.url));
-    flogTagMap.value = getFlogTags(props.flog.url);
+    // console.log("TAGS watch tagIndex", getFlogTags(props.flog.url));
+    flogTagMap.value = unref(getFlogTags(props.flog.url) || []) as TagMap;
   },
   { immediate: true }
 );
@@ -249,7 +207,6 @@ function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
 type SidebarTab = "ToC" | "Tags";
 const currentTab = ref<SidebarTab>("ToC");
 const sidebarTabs = ref<SidebarTab[]>(["ToC", "Tags"]);
-const currentTag = ref<ITag["tag"]>();
 
 // Function to handle the TOC in right column
 

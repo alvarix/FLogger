@@ -4,15 +4,16 @@ import type { IFlog } from "@/modules/Flog"
 import { IFlogStatus, IFlogSourceType, deserializeFlog, serializeFlog } from "@/modules/Flog"
 import { useDropboxFiles } from "@/composables/useDropboxFiles"
 import type { IDropboxFile, ILoadFileContentCallbackSuccess, ILoadFileContentCallbackError } from "@/composables/useDropboxFiles";
-import { useTags, type ITagsComposable } from "./useTags"
+import { useTags, type ITagsComposable, type TagMap } from "./useTags"
 import type { ITagIndex, ITag, TagFlogTuple, TagIndex } from "@/modules/Tag"
 import type { IEntry } from "@/modules/EntryData"
 
 // Re-export these for convenience
 export type { IFlog as IFlog }
-export { IFlogStatus as IFlogStatus };
+export { IFlogStatus as IFlogStatus }; //enum, not a type
 export type { ITagsComposable as ITagsComposable }
 export type { ITagIndex as ITagIndex }
+export type { TagMap as TagMap }
 export type { ITag as ITag }
 export type { TagFlogTuple as TagFlogTuple }
 export interface IDropboxFlog extends IFlog {
@@ -172,7 +173,7 @@ const tagIndex = ref(tagIndex_useTags)
 watch(
     tagIndex_useTags,
     () => {
-        console.log('TAGS tagIndex_useTags watch')
+        // console.log("TAGS watch tagIndex_useTags")
         tagIndex.value = tagIndex_useTags.value
     }
     ,
@@ -193,14 +194,14 @@ watch(
     { immediate: true })
 
 function handleTagIndexFileLoad(result: ILoadFileContentCallbackSuccess | ILoadFileContentCallbackError) {
-    // console.log('TAGS loadFileContent callback', result)
+    // console.log("TAGS loadFileContent callback", result)
     const { rev, content, error } = result
     if (error) {
         if (error == "file not found") {
             // If loading content fails because the file doesn't exist, create the file
             addFile({ path: tagIndexFileName, content: JSON.stringify([]) }, (result) => {
                 // Once the file is created, set the index in useTags
-                // console.log('TAGS addFile callback', result)
+                // console.log("TAGS addFile callback", result)
                 setTagsIndex({
                     file: tagIndexFilePath,
                     rev: result.rev,
@@ -211,7 +212,7 @@ function handleTagIndexFileLoad(result: ILoadFileContentCallbackSuccess | ILoadF
         }
         else {
             // Otherwise report the error
-            console.log('TAGS Error creating tag index file for DropboxFlogs:', error)
+            console.log("TAGS Error creating tag index file for DropboxFlogs:", error)
         }
     } else {
         // If loaded, set the index for useTags
@@ -219,7 +220,7 @@ function handleTagIndexFileLoad(result: ILoadFileContentCallbackSuccess | ILoadF
         try {
             parsedTags = JSON.parse(content || '')
         } catch (error) {
-            console.log('TAGS Error parsing tag index:', error)
+            console.log("TAGS Error parsing tag index:", error)
         }
         setTagsIndex({
             file: tagIndexFilePath,
@@ -227,7 +228,7 @@ function handleTagIndexFileLoad(result: ILoadFileContentCallbackSuccess | ILoadF
             // tags: [...parsedTags],
             tagMap: [...parsedTags],
         })
-        // console.log('TAGS tagIndex', { ...unref(ref(tagIndex)), setTagsIndex: undefined })
+        // console.log("TAGS tagIndex", { ...unref(ref(tagIndex)), setTagsIndex: undefined })
     }
 }
 
@@ -386,7 +387,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
                         mergedTagMap.set(tag, [...thisFlogTagFlogs] as TagFlogTuple[])
                     }
                 })
-                console.log('TAGS mergedTagMap', [...mergedTagMap])
+                console.log("TAGS mergedTagMap", [...mergedTagMap])
 
                 // Update and save tagIndex
                 if (tagIndex.value?.file && tagIndex?.value.rev) {
@@ -401,6 +402,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
                             // Then update tagIndex with new rev
                             setTagsIndex({
                                 ...(tagIndex.value as TagIndex),
+                                tagMap: [...mergedTagMap] as TagMap,
                                 rev: result.rev,
                             })
                         } // can parameterize so calling app gets notice once save is complete 

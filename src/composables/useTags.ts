@@ -1,16 +1,18 @@
 import { ref, unref } from "vue"
 import type { Ref } from "vue"
-import type { TagIndex, ITag, TagRev, ITagIndex, ITagFlogEntryPointer, TagFlogTuple } from "@modules/Tag"
+import type { TagIndex, TagMap, ITag, TagRev, ITagIndex, ITagFlogEntryPointer, TagFlogTuple } from "@modules/Tag"
 
 
 export type { TagIndex as TagIndex }
+export type { TagMap as TagMap }
 export type { TagRev as TagRev }
 export type { ITag as ITag };
+export type { ITagFlogEntryPointer as ITagFlogEntryPointer }
 
 export interface ITagsComposable {
     tagIndex: Ref<TagIndex | undefined>
     setTagsIndex: (newTagIndex: TagIndex, callback?: ICallback) => void,
-    getFlogTags: (flogFile: ITagFlogEntryPointer['file']) => TagIndex['tagMap'],
+    getFlogTags: (flogFile: ITagFlogEntryPointer['file']) => TagMap,
 }
 
 export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
@@ -31,14 +33,14 @@ export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
     }
 
     const getFlogTags = (flogFile: ITagFlogEntryPointer['file']) => {
-        const mapWithTagsFiltered: TagIndex['tagMap'] =
+        const mapWithTagsFiltered: TagMap =
             (tagIndex.value?.tagMap?.filter(
                 ([, tagFlogs]) =>
                     // true if this tag contains an entry for this flog
                     tagFlogs.map(
                         ([file]) => file
                     ).includes(flogFile))) || [];
-        const mapWithTagsFilteredAndFlogRemoved: TagIndex['tagMap'] = (
+        const mapWithTagsFilteredAndFlogRemoved: TagMap = (
             mapWithTagsFiltered?.map(
                 ([tag, tagFlogs]) => {
                     const shortFlogs: TagFlogTuple[] = tagFlogs.filter(
@@ -51,7 +53,7 @@ export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
                 }
             )
         ) || [];
-        console.log('TAGS mapWithTagsFiltered, mapWithTagsFilteredAndFlogRemoved', mapWithTagsFiltered, mapWithTagsFilteredAndFlogRemoved);
+        console.log("TAGS mapWithTagsFiltered, mapWithTagsFilteredAndFlogRemoved", mapWithTagsFiltered, mapWithTagsFilteredAndFlogRemoved);
         // return mapWithTagsFilteredAndFlogRemoved
         return mapWithTagsFiltered
     }

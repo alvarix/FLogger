@@ -3,12 +3,13 @@ import type { Ref } from "vue"
 import type { IFlog } from "@/modules/Flog"
 import { IFlogStatus, IFlogSourceType } from "@/modules/Flog"
 import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
-import type { IDropboxFlog, ITagsComposable, ITagIndex, TagFlogTuple, ITag } from "@/composables/useDropboxFlogs";
+import type { IDropboxFlog, ITagsComposable, ITagIndex, TagMap, TagFlogTuple, ITag } from "@/composables/useDropboxFlogs";
 
 // Re-export these for convenience
 export type { IFlog as IFlog }
 export type { ITag as ITag }
-export type {TagFlogTuple as TagFlogTuple}
+export type { TagMap as TagMap }
+export type { TagFlogTuple as TagFlogTuple }
 export { IFlogStatus as IFlogStatus }
 export { IFlogSourceType as IFlogSourceType }
 
@@ -190,7 +191,7 @@ watch(connectionPopupWindow_dropbox,
 watch(
     tagIndex_dropbox,
     () => {
-        console.log('TAGS watch tagIndex_dropbox', tagIndex_dropbox)
+        // console.log("TAGS watch tagIndex_dropbox", tagIndex_dropbox)
         tagIndex.value = tagIndex_dropbox.value
     }
     ,
@@ -265,8 +266,9 @@ export const useFlogSource = (sourceType: IFlogSourceType): IFlogSource => {
     const getFlogTags: ITagsComposable['getFlogTags'] = (args) => {
         switch (sourceType) {
             case IFlogSourceType.dropbox:
-                return getFlogTags_dropbox(args);
+                return (getFlogTags_dropbox(args) || []) as TagMap;
             default:
+                return [] as TagMap
         }
     }
 

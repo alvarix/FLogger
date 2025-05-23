@@ -1,3 +1,4 @@
+import type { IFlog } from "./Flog";
 import type { IEntry } from "./EntryData";
 export type TagRev = string
 
@@ -14,12 +15,12 @@ export interface ITag {
 }
 
 export interface ITagFlogEntryPointer {
-    file: string;
+    file: IFlog['url'];
     entryDates: IEntry['date'][]; // An array of IEntry.date properties
 }
 
 export interface ITagIndex {
-    file: string;
+    file: IFlog['url'];
     rev: TagRev | undefined;
     tags?: ITag[];
     tagMap?: TagMap;
