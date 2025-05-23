@@ -121,6 +121,15 @@ import FlogPretext from "@components/FlogPretext.vue";
 // @ts-expect-error - vue-spinner typing issue
 import PacmanLoader from "vue-spinner/src/PacmanLoader.vue";
 import FlogTags from "@components/FlogTags.vue";
+import { useTheme } from "@composables/useTheme";
+
+// Use the current theme to set a color var for the CSS.
+// See the v-bind(shadowColor) used in the <style> block.
+const { isDark } = useTheme();
+const shadowColor = ref(isDark.value ? "white" : "black");
+watch(isDark,()=>{
+  shadowColor.value = isDark.value ? "white" : "black"
+})
 
 const props = defineProps<{
   flog: IFlog; // Accept the flog as a prop
@@ -332,7 +341,7 @@ button.small {
 }
 
 .sidebar-tab[data-tab-selected="true"] {
-  font-weight: bold;
+  text-shadow: 0px 0px 1px v-bind(shadowColor), 0px 0px 1px v-bind(shadowColor);
 }
 
 .sidebar-panel {
@@ -344,6 +353,7 @@ button.small {
   border: 1px solid #ccc;
   border-radius: 10px;
   max-width: 300px;
+  width: 100%;
   overflow: auto;
 
   h2 {
