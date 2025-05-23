@@ -81,6 +81,24 @@
           :size="loaderProps.size"
         />
       </div>
+      <div
+        :data-tab-selected="currentTab == 'About'"
+        class="sidebar-panel mb-7"
+      >
+        <h2>About</h2>
+        <p>Add a new entry to this flog.</p>
+        <p>Scroll to read and edit entries in this flog.</p>
+        <p>Write entries using markdown.</p>
+        <p>
+          Use h1's (a line staring with "# ") to tag your entries. One or more
+          tags will automatically be extracted from any h1.
+        </p>
+        <p>The TOC panel allows you to navigate the h1's.</p>
+        <p>
+          The Tags panel allows you to navigate the tags in this flog, and other
+          flogs with those tags.
+        </p>
+      </div>
     </section>
   </div>
 </template>
@@ -204,9 +222,9 @@ function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
 }
 
 // Sidebar Tabs
-type SidebarTab = "TOC" | "Tags";
+type SidebarTab = "TOC" | "Tags" | "About";
 const currentTab = ref<SidebarTab>("TOC");
-const sidebarTabs = ref<SidebarTab[]>(["TOC", "Tags"]);
+const sidebarTabs = ref<SidebarTab[]>(["TOC", "Tags", "About"]);
 
 // Function to handle the TOC in right column
 
@@ -338,5 +356,9 @@ button.small {
 }
 .sidebar-panel[data-tab-selected="true"] {
   visibility: visible;
+}
+
+.sidebar-panel p {
+  padding: 7px 0px;
 }
 </style>
