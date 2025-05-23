@@ -88,7 +88,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, unref, watch, nextTick } from "vue";
+import { ref, unref, watch } from "vue";
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
 import {
   useFlogSource,

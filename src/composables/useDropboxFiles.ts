@@ -457,7 +457,6 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
     // loadFileContent: (file: IDropboxFile, 
     const loadFileContent = async (
         file: IDropboxFile,
-        // eslint-disable-next-line
         callback?: (result: ILoadFileContentCallbackResult) => void
     ) => {
         console.log('loadFileContent file', file)
