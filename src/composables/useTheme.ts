@@ -1,10 +1,11 @@
 // useTheme.ts
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 
+const isDark = ref(false)
+const isSystemTheme = ref(true)
+const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+
 export function useTheme() {
-  const isDark = ref(false)
-  const isSystemTheme = ref(true)
-  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
   const updateThemeFromSystem = (event?: MediaQueryListEvent | MediaQueryList) => {
     const systemPrefersDark = event?.matches ?? mediaQuery.matches;
