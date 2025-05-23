@@ -34,7 +34,7 @@
       <FloggerIntro />
       <p>Connect to your DropBox account to begin.</p>
 
-      <button class="dbx__btn" @click="launchConnectFlow">
+      <button class="dbx__btn" @click.prevent="openWindowAndLaunchConnectFlog">
         connect to DropBox
       </button>
     </div>
@@ -79,8 +79,19 @@ watch(
 );
 
 const openPop = () => {
-  console.log("openPop", openPopup());
-  openPopup();
+  console.log("openPop");
+  const windowFeatures =
+    "popup=true,menubar=false,width=700height=700,innerWidth=700,innerHeight=700,left=100,top=100";
+  const popup = window.open("", "dbauthPopupWindow", windowFeatures);
+
+  if (popup) openPopup(popup);
+};
+const openWindowAndLaunchConnectFlog = () => {
+  const windowFeatures =
+    "popup=true,menubar=false,width=700height=700,innerWidth=700,innerHeight=700,left=100,top=100";
+  const popup = window.open("", "dbauthPopupWindow", windowFeatures);
+
+  if (popup) launchConnectFlow(popup);
 };
 
 const selectFile = (file: IFlog) => {
@@ -98,10 +109,7 @@ watch(
       )[0];
       if (defaultFlogFile) {
         defaultFlogAlreadyOpened.value = true;
-        window.sessionStorage.setItem(
-          "defaultFlogAlreadyOpened",
-          'true'
-        );
+        window.sessionStorage.setItem("defaultFlogAlreadyOpened", "true");
         selectFile(defaultFlogFile);
       }
     }

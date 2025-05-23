@@ -16,8 +16,8 @@ export interface IDropboxFile {
 
 export interface IDropboxFiles {
     accountInfo: Ref<DropboxUsers.FullAccount | null>
-    launchConnectFlow: () => void
-    openDbxPopup: () => void
+    launchConnectFlow: (targetWindow: Window) => void
+    openDbxPopup: (targetWindow: Window) => void
     // eslint-disable-next-line
     connectionPopupWindow: Ref<any>
     hasConnection: Ref<boolean>
@@ -134,6 +134,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
         if (hasRedirectedFromAuth.value) {
 
             const codeVerifier = window.sessionStorage.getItem("codeVerifier");
+            console.log('codeVerifier', codeVerifier)
             dbxAuth.setCodeVerifier(codeVerifier || '');
 
             // dbxauth-popup: Not needed because code is in URL of popup, which gets closed. Opener window is simply reloaded.
@@ -355,7 +356,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
 
     // eslint-disable-next-line
     const connectionPopupWindow = ref<any>()
-    const launchConnectFlow = () => {
+    const launchConnectFlow = (targetWindow: Window) => {
         // console.log("launchConnectFlow", "dbxAuthReturnUri", dbxAuthReturnUri);
 
         dbxAuth
@@ -372,7 +373,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                 dbxAuthUrl.value = authUrl
                 clearConnection();
                 //@ts-expect-error — Unsure why the dbxAuth typing is not recognizing codeVerifier
-                window.sessionStorage.setItem("codeVerifier", dbxAuth.codeVerifier);
+                targetWindow.sessionStorage.setItem("codeVerifier", dbxAuth.codeVerifier);
                 //@ts-expect-error — Unsure why the dbxAuth typing is not recognizing codeVerifier
                 console.log("dbxAuth.codeVerifier", dbxAuth.codeVerifier);
                 // // dbxauth-popup: Replace open popup rather than redirecting to Db in this window
@@ -380,7 +381,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                 // //@ts-expect-error
                 // connectionPopupWindow.value = window.open(authUrl, 'dbauthPopupWindow', windowFeatures)
                 // console.log('connectionPopupWindow.value', connectionPopupWindow.value)
-                openDbxPopup();
+                openDbxPopup(targetWindow);
             })
             .catch((error) => {
                 console.error(`Error getting auth URL:`, error?.message || error);
@@ -388,10 +389,11 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
             });
     }
 
-    const openDbxPopup = () => {
+    const openDbxPopup = (targetWindow: Window) => {
         try {
-            const windowFeatures = "popup=true,menubar=false,width=700height=700,innerWidth=700,innerHeight=700,left=100,top=100";
-            connectionPopupWindow.value = window.open(dbxAuthUrl.value, 'dbauthPopupWindow', windowFeatures)
+            // const windowFeatures = "popup=true,menubar=false,width=700height=700,innerWidth=700,innerHeight=700,left=100,top=100";
+            // window.open(dbxAuthUrl.value, 'dbauthPopupWindow', windowFeatures)
+            connectionPopupWindow.value = targetWindow.location.href = dbxAuthUrl.value
             console.log('connectionPopupWindow.value', connectionPopupWindow.value)
         }
         catch (error: unknown) {
