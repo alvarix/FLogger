@@ -143,18 +143,18 @@ const props = defineProps<{
 
 const { closeFlog } = useOpenFlogs();
 
-const { saveFlogToSource, tagIndex, getFlogTags } = useFlogSource(
+const { saveFlogToSource, tagIndex, getTagsForFlog } = useFlogSource(
   IFlogSourceType.dropbox
 );
 
 const flogTagMap = ref<TagMap>(
-  unref(getFlogTags(props.flog.url) || []) as TagMap
+  unref(getTagsForFlog(props.flog.url) || []) as TagMap
 );
 watch(
-  [tagIndex, getFlogTags],
+  [tagIndex, getTagsForFlog],
   () => {
-    // console.log("TAGS watch tagIndex", getFlogTags(props.flog.url));
-    flogTagMap.value = unref(getFlogTags(props.flog.url) || []) as TagMap;
+    // console.log("TAGS watch tagIndex", getTagsForFlog(props.flog.url));
+    flogTagMap.value = unref(getTagsForFlog(props.flog.url) || []) as TagMap;
   },
   { immediate: true }
 );

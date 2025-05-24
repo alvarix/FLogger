@@ -12,7 +12,7 @@ export type { TagFlogFile as TagFlogFile }
 export interface ITagsComposable {
     tagIndex: Ref<TagIndex | undefined>
     setTagsIndex: (newTagIndex: TagIndex, callback?: ICallback) => void,
-    getFlogTags: (flogFile: TagFlogFile) => TagMap,
+    getTagsForFlog: (flogFile: TagFlogFile) => TagMap,
 }
 
 export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
@@ -31,7 +31,7 @@ export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
         if (callback) callback({ rev: tagIndex.value.rev })
     }
 
-    const getFlogTags = (flogFile: TagFlogFile) => {
+    const getTagsForFlog = (flogFile: TagFlogFile) => {
         const mapWithTagsFiltered: TagMap =
             (tagIndex.value?.tagMap?.filter(
                 ([, tagFlogs]) =>
@@ -60,7 +60,7 @@ export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
     return {
         tagIndex,
         setTagsIndex,
-        getFlogTags,
+        getTagsForFlog,
     }
 }
 

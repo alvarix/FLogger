@@ -46,7 +46,7 @@ export interface IDropboxFlogs {
     accountOwner: Ref<string | null>;
     // manages the tags index for all flogs in the user's dropbox source
     tagIndex: Ref<TagIndex | undefined>;
-    getFlogTags: ITagsComposable['getFlogTags']
+    getTagsForFlog: ITagsComposable['getTagsForFlog']
 }
 
 /*
@@ -166,7 +166,7 @@ const {
 
 const tagIndexFileName = "flogger.tag-index.json"
 const tagIndexFilePath = "/" + tagIndexFileName
-const { tagIndex: tagIndex_useTags, setTagsIndex, getFlogTags } = useTags({ file: tagIndexFilePath, rev: undefined })
+const { tagIndex: tagIndex_useTags, setTagsIndex, getTagsForFlog } = useTags({ file: tagIndexFilePath, rev: undefined })
 
 const tagIndex = ref(tagIndex_useTags)
 watch(
@@ -456,6 +456,6 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
         deleteFlog,
         accountOwner: accountOwner,
         tagIndex,
-        getFlogTags,
+        getTagsForFlog,
     }
 }
