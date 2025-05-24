@@ -1,6 +1,6 @@
 import { ref, unref } from "vue"
 import type { Ref } from "vue"
-import type { TagIndex, TagMap, Tag, TagIndexRev, TagFlogFile } from "@modules/Tag"
+import type { TagIndex, TagMap, Tag, TagIndexRev, TagFlogFile, TagValue, TagEntryDate } from "@modules/Tag"
 
 
 export type { TagIndex as TagIndex }
@@ -13,6 +13,7 @@ export interface ITagsComposable {
     tagIndex: Ref<TagIndex | undefined>
     setTagsIndex: (newTagIndex: TagIndex, callback?: ICallback) => void,
     getTagsForFlog: (flogFile: TagFlogFile) => TagMap,
+    tagHasFlogEntryDate: (tag:TagValue, flogFile: TagFlogFile, entryDate: TagEntryDate) => boolean,
 }
 
 export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
@@ -57,10 +58,33 @@ export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
         return mapWithTagsFiltered
     }
 
+    const tagHasFlogEntryDate = (tag:TagValue, flogFile: TagFlogFile, entryDate: TagEntryDate) => {
+        const tagFlogs = new Map(tagIndex.value?.tagMap || []).get(tag) || [];
+      
+        const flogTagFlog = tagFlogs.filter(
+          ([tagFlogFile]) => tagFlogFile == flogFile
+        );
+  
+        const tagFlogEntryDates = flogTagFlog
+          .map(([, tagFlogEntries]) =>
+            tagFlogEntries.map((tagFlogEntry) => new Date(tagFlogEntry).getTime())
+          )
+          .flat();
+  
+        const entryMatch = tagFlogEntryDates.includes(
+            entryDate.getTime()
+        );
+  
+        // console.log("TAGS check", entryMatch);
+  
+        return entryMatch;
+}
+
     return {
         tagIndex,
         setTagsIndex,
         getTagsForFlog,
+        tagHasFlogEntryDate,
     }
 }
 

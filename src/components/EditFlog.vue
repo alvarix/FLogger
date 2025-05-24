@@ -143,7 +143,7 @@ const props = defineProps<{
 
 const { closeFlog } = useOpenFlogs();
 
-const { saveFlogToSource, tagIndex, getTagsForFlog } = useFlogSource(
+const { saveFlogToSource, tagIndex, getTagsForFlog, tagHasFlogEntryDate } = useFlogSource(
   IFlogSourceType.dropbox
 );
 
@@ -251,25 +251,7 @@ const handleTagSelect = (tag: Tag["tag"]) => {
     filteredEntries.value = props.flog.loadedEntries;
   } else {
     filteredEntries.value = props.flog.loadedEntries.filter((entry) => {
-      const tagFlogs = new Map(flogTagMap.value).get(tag) || [];
-
-      const flogTagFlog = tagFlogs.filter(
-        ([tagFlogFile]) => tagFlogFile == props.flog.url
-      );
-
-      const tagFlogEntryDates = flogTagFlog
-        .map(([, tagFlogEntries]) =>
-          tagFlogEntries.map((tagFlogEntry) => new Date(tagFlogEntry).getTime())
-        )
-        .flat();
-
-      const entryMatch = tagFlogEntryDates.includes(
-        new Date(entry.date).getTime()
-      );
-
-      // console.log("TAGS check", entryMatch);
-
-      return entryMatch;
+      return tagHasFlogEntryDate(tag, props.flog.url, entry.date)
     });
   }
 };
