@@ -44,7 +44,7 @@ import type { TagFlogFile, Tag, TagMap } from "@/composables/useTags";
 
 const { flogFile, flogTagMap } = defineProps<{
   flogFile: TagFlogFile;
-  flogTagMap: TagMap; // Accept the flog as a prop
+  flogTagMap: TagMap;
 }>();
 
 const emit = defineEmits(["tagSelected"]);
