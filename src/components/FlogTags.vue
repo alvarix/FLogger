@@ -4,9 +4,14 @@
   <h2>Tags</h2>
   <p>Select a tag to filter flog entries containing that tag.</p>
   <ul>
-    <li v-for="[tag, flogs] in flogTagMap" :key="tag">
-      <button @click="() => handleTagSelect(tag)">{{ tag }}</button>
-      <ul v-if="currentTag == tag">
+    <li v-for="[tag] in flogTagMap" :key="tag">
+      <button
+        :class="{ selected: selectedTag == tag }"
+        @click="() => handleTagSelect(tag)"
+      >
+        {{ tag }}
+      </button>
+      <!-- <ul v-if="selectedTag == tag">
         <li>
           <i>this flog</i>
           <ul class="tag-list">
@@ -33,7 +38,7 @@
             </li>
           </ul>
         </li>
-      </ul>
+      </ul> -->
     </li>
   </ul>
 </template>
@@ -49,11 +54,11 @@ const { flogFile, flogTagMap } = defineProps<{
 
 const emit = defineEmits(["tagSelected"]);
 
-const currentTag = ref<Tag["tag"]>();
+const selectedTag = ref<Tag["tag"]>();
 
 const handleTagSelect = (tag: Tag["tag"]) => {
-  currentTag.value = currentTag.value != tag ? tag : undefined;
-  emit("tagSelected", currentTag.value);
+  selectedTag.value = selectedTag.value != tag ? tag : undefined;
+  emit("tagSelected", selectedTag.value);
 };
 </script>
 
@@ -62,5 +67,9 @@ const handleTagSelect = (tag: Tag["tag"]) => {
   list-style-type: none;
   list-style-position: outside;
   margin-left: 20px;
+}
+button.selected {
+  border: 2px solid light-dark(orange,deepskyblue);
+  text-shadow: 0px 0px 1px light-dark(orange,deepskyblue), 0px 0px 1px light-dark(orange,deepskyblue);
 }
 </style>

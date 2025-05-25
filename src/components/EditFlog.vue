@@ -105,6 +105,9 @@
         </p>
       </div>
     </section>
+    <section v-if="selectedTag" class="container sidebar viewport">
+      <TagFlogsEntries :key="selectedTag" :flog-entries-map="externalFlogTagMap"/>
+    </section>
   </div>
 </template>
 
@@ -127,15 +130,7 @@ import FlogPretext from "@components/FlogPretext.vue";
 // @ts-expect-error - vue-spinner typing issue
 import PacmanLoader from "vue-spinner/src/PacmanLoader.vue";
 import FlogTags from "@components/FlogTags.vue";
-import { useTheme } from "@composables/useTheme";
-
-// Use the current theme to set a color var for the CSS.
-// See the v-bind(shadowColor) used in the <style> block.
-const { isDark } = useTheme();
-const shadowColor = ref(isDark.value ? "white" : "black");
-watch(isDark, () => {
-  shadowColor.value = isDark.value ? "white" : "black";
-});
+import TagFlogsEntries from "./TagFlogsEntries.vue";
 
 const props = defineProps<{
   flog: IFlog; // Accept the flog as a prop
@@ -143,9 +138,8 @@ const props = defineProps<{
 
 const { closeFlog } = useOpenFlogs();
 
-const { saveFlogToSource, tagIndex, getTagsForFlog, tagHasFlogEntryDate } = useFlogSource(
-  IFlogSourceType.dropbox
-);
+const { saveFlogToSource, tagIndex, getTagsForFlog, tagHasFlogEntryDate } =
+  useFlogSource(IFlogSourceType.dropbox);
 
 const flogTagMap = ref<TagMap>(
   unref(getTagsForFlog(props.flog.url) || []) as TagMap
@@ -251,10 +245,25 @@ const handleTagSelect = (tag: Tag["tag"]) => {
     filteredEntries.value = props.flog.loadedEntries;
   } else {
     filteredEntries.value = props.flog.loadedEntries.filter((entry) => {
-      return tagHasFlogEntryDate(tag, props.flog.url, entry.date)
+      return tagHasFlogEntryDate(tag, props.flog.url, entry.date);
     });
   }
 };
+
+const externalFlogTagMap = ref<Tag["flogs"]>([]);
+watch(
+  [selectedTag, flogTagMap],
+  ([newSelectedTag, newFlogTagMap], [oldSelectedTag]) => {
+    if (!newSelectedTag) externalFlogTagMap.value = [];
+    else if (oldSelectedTag!=newSelectedTag)
+      externalFlogTagMap.value = newFlogTagMap
+        .filter(([tag]) => tag == newSelectedTag)
+        .map<Tag["flogs"]>(([, flogs]) => flogs)
+        .flat()
+        .filter(([flogFile]) => flogFile != props.flog.url);
+  },
+  { immediate: true, deep: true }
+);
 
 // Function to handle the TOC in right column
 
@@ -362,7 +371,7 @@ button.small {
 }
 
 .sidebar-tab[data-tab-selected="true"] {
-  text-shadow: 0px 0px 1px v-bind(shadowColor), 0px 0px 1px v-bind(shadowColor);
+  text-shadow: 0px 0px 1px light-dark(black,white), 0px 0px 1px light-dark(black,white);
 }
 
 .sidebar-panel {

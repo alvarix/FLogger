@@ -153,7 +153,7 @@ watch(
             .concat(availableFlogs_dropbox.value)
     }
     ,
-    { immediate: true }
+    { immediate: true, deep: true }
 )
 watch(
     availableRepoFlogs_dropbox,
@@ -166,7 +166,7 @@ watch(
             .concat(availableRepoFlogs_dropbox.value)
     }
     ,
-    { immediate: true }
+    { immediate: true, deep: true }
 )
 watch(accountOwner_dropbox,
     () => {
@@ -196,7 +196,7 @@ watch(
         tagIndex.value = tagIndex_dropbox.value
     }
     ,
-    { immediate: true }
+    { immediate: true, deep: true }
 )
 
 export const useFlogSource = (sourceType: IFlogSourceType): IFlogSource => {

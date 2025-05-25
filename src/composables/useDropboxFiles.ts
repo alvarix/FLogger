@@ -468,6 +468,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                 await dbx
                     .filesDownload({ path: file.path })
                     .then((response) => {
+                        console.log('loadFileContent reading', response.result)
                         const reader = new FileReader();
                         reader.onload = (e) => {
                             const fileData = e.target != null ? e.target.result : null;

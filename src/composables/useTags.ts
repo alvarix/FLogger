@@ -13,7 +13,7 @@ export interface ITagsComposable {
     tagIndex: Ref<TagIndex | undefined>
     setTagsIndex: (newTagIndex: TagIndex, callback?: ICallback) => void,
     getTagsForFlog: (flogFile: TagFlogFile) => TagMap,
-    tagHasFlogEntryDate: (tag:TagValue, flogFile: TagFlogFile, entryDate: TagEntryDate) => boolean,
+    tagHasFlogEntryDate: (tag: TagValue, flogFile: TagFlogFile, entryDate: TagEntryDate) => boolean,
 }
 
 export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
@@ -58,27 +58,30 @@ export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
         return mapWithTagsFiltered
     }
 
-    const tagHasFlogEntryDate = (tag:TagValue, flogFile: TagFlogFile, entryDate: TagEntryDate) => {
-        const tagFlogs = new Map(tagIndex.value?.tagMap || []).get(tag) || [];
-      
+    const tagHasFlogEntryDate = (tag: TagValue, flogFile: TagFlogFile, entryDate: TagEntryDate) => {
+        const tagFlogs = (new Map(tagIndex.value?.tagMap || [])).get(tag) || [];
+        console.log('CHAD tagFlogs', flogFile, entryDate.toLocaleString(), tagFlogs)
+
         const flogTagFlog = tagFlogs.filter(
-          ([tagFlogFile]) => tagFlogFile == flogFile
+            ([tagFlogFile]) => tagFlogFile == flogFile
         );
-  
+        console.log('CHAD flogTagFlog', flogFile, flogTagFlog)
+
         const tagFlogEntryDates = flogTagFlog
-          .map(([, tagFlogEntries]) =>
-            tagFlogEntries.map((tagFlogEntry) => new Date(tagFlogEntry).getTime())
-          )
-          .flat();
-  
+            .map(([, tagFlogEntryDates]) =>
+                tagFlogEntryDates.map((tagFlogEntryDate) => (new Date(tagFlogEntryDate)).toDateString())
+            )
+            .flat();
+        console.log('CHAD tagFlogEntryDates', entryDate.toDateString(), tagFlogEntryDates)
+
         const entryMatch = tagFlogEntryDates.includes(
-            entryDate.getTime()
+            entryDate.toDateString()
         );
-  
+
         // console.log("TAGS check", entryMatch);
-  
+
         return entryMatch;
-}
+    }
 
     return {
         tagIndex,
