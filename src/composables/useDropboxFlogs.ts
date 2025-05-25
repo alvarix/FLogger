@@ -3,11 +3,18 @@ import type { Ref } from "vue"
 import type { IFlog } from "@/modules/Flog"
 import { IFlogStatus, IFlogSourceType, deserializeFlog, serializeFlog } from "@/modules/Flog"
 import { useDropboxFiles } from "@/composables/useDropboxFiles"
-import type { IDropboxFile } from "@/composables/useDropboxFiles";
+import type { IDropboxFile, ILoadFileContentCallbackSuccess, ILoadFileContentCallbackError } from "@/composables/useDropboxFiles";
+import { useTags, type ITagsComposable, type TagMap } from "./useTags"
+import type { TagIndex, Tag } from "@/modules/Tag"
+import type { IEntry } from "@/modules/EntryData"
 
 // Re-export these for convenience
 export type { IFlog as IFlog }
-export { IFlogStatus as IFlogStatus };
+export { IFlogStatus as IFlogStatus }; //enum, not a type
+export type { ITagsComposable as ITagsComposable }
+export type { TagIndex as TagIndex }
+export type { TagMap as TagMap }
+export type { Tag as Tag }
 export interface IDropboxFlog extends IFlog {
     rev?: string;
 }
@@ -31,10 +38,31 @@ export interface IDropboxFlogs {
     loadFlogEntries: (flog: IDropboxFlog) => void;
     // makes use of ... from useDropboxFiles
     saveFlogEntries: (flog: IDropboxFlog) => void;
+    // makes use of ... from useDropboxFiles
     addFlog: (flog: IDropboxFlog) => void;
+    // makes use of ... from useDropboxFiles
     deleteFlog: (flog: IDropboxFlog) => void;
+    // pass through from useDropboxFiles
     accountOwner: Ref<string | null>;
+    // manages the tags index for all flogs in the user's dropbox source
+    tagIndex: Ref<TagIndex | undefined>;
+    getTagsForFlog: ITagsComposable['getTagsForFlog'];
+    tagHasFlogEntryDate: ITagsComposable['tagHasFlogEntryDate'];
 }
+
+/*
+ * Module-scoped: 
+ * Some of the composable ref vars are managed at the module level, 
+ * and therefore shared across all instances where useDropboxFlogs is used.
+ *  - REPO FILES (providing)
+ *  - TAGS INDEX (using useTags)
+ *  - useDropboxFiles (and the parts of its interface that are returned by useDropboxFlogs )
+ *  - AVAILABLE FLOGS
+ */
+
+/*
+ * Module-scoped: REPO FILES
+ */
 
 // Using a list of repoFiles (paths and contents using interface IDropboxFile) 
 // as default files to save to a user's Dropbox app folder.
@@ -106,6 +134,18 @@ repoFiles.value.forEach(async repoFile => {
 repoFiles.value = repoFilesWithContents
 // console.log('repoFiles.value', repoFiles.value)
 
+/*
+ * Module-scoped: useDropboxFiles 
+ * (and the parts of its interface that are returned by useDropboxFlogs )
+ * 
+ * Some of these are passed through, meaning they are returned directly by useDropboxFlogs:
+ *  - launchConnectFlow
+ *  - connectionPopupWindow
+ *  - openDbxPopup
+ *  - hasConnection
+ * The rest are used within useDropboxFlogs-specific methods
+*/
+
 const {
     launchConnectFlow,
     connectionPopupWindow,
@@ -120,6 +160,79 @@ const {
     deleteFile,
     accountOwner
 } = useDropboxFiles(repoFiles.value)
+
+/*
+ * Module-scoped: TAGS INDEX
+ */
+
+const tagIndexFileName = "flogger.tag-index.json"
+const tagIndexFilePath = "/" + tagIndexFileName
+const { tagIndex: tagIndex_useTags, setTagsIndex, getTagsForFlog, tagHasFlogEntryDate } = useTags({ file: tagIndexFilePath, rev: undefined })
+
+const tagIndex = ref(tagIndex_useTags)
+watch(
+    tagIndex_useTags,
+    () => {
+        // console.log("TAGS watch tagIndex_useTags")
+        tagIndex.value = tagIndex_useTags.value
+    }
+    ,
+    { immediate: true }
+)
+
+watch(
+    hasConnection,
+    () => {
+        if (hasConnection.value) {
+            // First try to load the file from Dropbox
+            loadFileContent(
+                { path: tagIndexFilePath },
+                handleTagIndexFileLoad
+            )
+        }
+    },
+    { immediate: true })
+
+function handleTagIndexFileLoad(result: ILoadFileContentCallbackSuccess | ILoadFileContentCallbackError) {
+    // console.log("TAGS loadFileContent callback", result)
+    const { rev, content, error } = result
+    if (error) {
+        if (error == "file not found") {
+            // If loading content fails because the file doesn't exist, create the file
+            addFile({ path: tagIndexFileName, content: JSON.stringify([]) }, (result) => {
+                // Once the file is created, set the index in useTags
+                // console.log("TAGS addFile callback", result)
+                setTagsIndex({
+                    file: tagIndexFilePath,
+                    rev: result.rev,
+                    tagMap: [],
+                })
+            })
+        }
+        else {
+            // Otherwise report the error
+            console.log("TAGS Error creating tag index file for DropboxFlogs:", error)
+        }
+    } else {
+        // If loaded, set the index for useTags
+        let parsedTags = [];
+        try {
+            parsedTags = JSON.parse(content || '')
+        } catch (error) {
+            console.log("TAGS Error parsing tag index:", error)
+        }
+        setTagsIndex({
+            file: tagIndexFilePath,
+            rev,
+            tagMap: [...parsedTags],
+        })
+        // console.log("TAGS tagIndex", { ...unref(ref(tagIndex)), setTagsIndex: undefined })
+    }
+}
+
+/*
+ * Module-scoped: AVAILABLE FLOGS
+ */
 
 // Defining all ref variables at the module scope 
 // (meaning at the root of this module file, 
@@ -185,9 +298,10 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
         loadFileContent(
             { path: flog.url },
             (result) => {
-                flog.rawContent = result.content
-                flog.rev = result.rev;
-                const { pretext, loadedEntries, status } = deserializeFlog(result.content)
+                const { rev, content } = result
+                flog.rawContent = content
+                flog.rev = rev;
+                const { pretext, loadedEntries, status } = deserializeFlog(content || '')
                 flog.status = status
                 if (status != IFlogStatus.error) {
                     flog.pretext = pretext
@@ -200,16 +314,102 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
 
     const saveFlogEntries = (flog: IDropboxFlog) => {
         // console.log('saveFlogEntries flog', flog)
+        // First save the flog file
         saveFileContent(
             {
                 path: flog.url,
-                // rev is required, but I'm not 100% sure of usage. 
-                // Might be required like this to ensure writing new version of current version. 
-                // Or, it might allow specing a new rev to version rather than overwrite.
                 rev: flog.rev,
                 content: serializeFlog(flog.loadedEntries, flog.pretext)
             } as IDropboxFile,
-            (result) => { flog.rev = result.rev } // can parameterize so calling app gets notice once save is complete 
+            (result) => {
+                // Update the flog with the new rev
+                flog.rev = result.rev;
+
+                // Second, parse tags in flog and save to tagIndex
+
+                // // Parse content of entries for tags
+                function parseTagsFromEntry(entry: IEntry): string[] {
+                    const headings: string[] = entry.entry.match(/(?<=^# ).*$/gm) ?? [];
+                    const headingsTags = headings.map(h => parseTagsFromString(h));
+                    const tags = [...new Set<string>(headingsTags.flat())]
+                    return tags
+                }
+                function parseTagsFromString(value: string): string[] {
+                    return value.split(' ')
+                }
+
+                // Grab current tagMap
+                const tagMap: Map<Tag['tag'], Tag['flogs']> 
+                    = new Map([...(tagIndex.value?.tagMap || [])]);
+                // Build tagMap for current flog
+                const thisFlogTagMap: Map<Tag['tag'], Tag['flogs']> 
+                    = new Map()
+                flog.loadedEntries.forEach(entry => {
+                    const entryTags = parseTagsFromEntry(entry)
+                    entryTags.forEach(tag => {
+                        // Need to get tag-flog-entries already added in previous iterations
+                        // First get the tag-flogs
+                        const existingTagFlogs = new Map(thisFlogTagMap.get(tag))
+                        // Then get the tag-flog-entries
+                        const existingTagFlogEntries = existingTagFlogs.get(flog.url) || [];
+                        // Merge this entry into tag-flog-entries and de-dupe
+                        const mergedTagFlogEntries = [...new Set([...existingTagFlogEntries, entry.date])];
+                        // Save merged tag-flog-entries
+                        thisFlogTagMap.set(tag, [[flog.url, mergedTagFlogEntries]])
+                        // Since we're building a tagMap for this flog, each tag in the map
+                        // will only ever have one flog entry, 
+                        // which will have 1+ tag-flog-entries
+                    })
+                })
+                // Merge thisFlogTagMap with tagIndex tagMap
+                const mergedTagMap = new Map<Tag['tag'], Tag['flogs']>()
+                const allTags = [...new Set([...tagMap.keys(), ...thisFlogTagMap.keys()])]
+                allTags.forEach(tag => {
+                    const existingTagFlogs = new Map(tagMap.get(tag))
+                    const thisFlogTagFlogs = new Map(thisFlogTagMap.get(tag))
+                    const thisFlogTagFlog = thisFlogTagFlogs.get(flog.url)
+                    if (existingTagFlogs && thisFlogTagFlog) {
+                        // update
+                        const mergedTagFlogs = new Map(existingTagFlogs)
+                        mergedTagFlogs.set(flog.url, thisFlogTagFlog)
+                        mergedTagMap.set(tag, [...mergedTagFlogs] as Tag['flogs'])
+                    } else if (existingTagFlogs && !thisFlogTagFlog) {
+                        // remove
+                        const mergedTagFlogs = new Map(existingTagFlogs)
+                        mergedTagFlogs.delete(flog.url)
+                        if (mergedTagFlogs.size == 0)
+                            // remove tag if this flog was the only one using it
+                            mergedTagMap.delete(tag)
+                        else
+                            mergedTagMap.set(tag, [...mergedTagFlogs] as Tag['flogs'])
+                    } else if (!existingTagFlogs && thisFlogTagFlog) {
+                        // add
+                        mergedTagMap.set(tag, [...thisFlogTagFlogs] as Tag['flogs'])
+                    }
+                })
+                console.log("TAGS mergedTagMap", [...mergedTagMap])
+
+                // Update and save tagIndex
+                if (tagIndex.value?.file && tagIndex?.value.rev) {
+                    saveFileContent(
+                        {
+                            path: tagIndex.value.file,
+                            rev: tagIndex.value.rev,
+                            // content: JSON.stringify(tagIndex.value.tags)
+                            content: JSON.stringify([...mergedTagMap], null, "\t")
+                        },
+                        (result) => {
+                            // Then update tagIndex with new rev
+                            setTagsIndex({
+                                ...(tagIndex.value as TagIndex),
+                                tagMap: [...mergedTagMap] as TagMap,
+                                rev: result.rev,
+                            })
+                        } // can parameterize so calling app gets notice once save is complete 
+                    )
+                }
+
+            } // can parameterize so calling app gets notice once save is complete 
         )
     }
 
@@ -255,6 +455,9 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
         saveFlogEntries,
         addFlog,
         deleteFlog,
-        accountOwner: accountOwner
+        accountOwner: accountOwner,
+        tagIndex,
+        getTagsForFlog,
+        tagHasFlogEntryDate,
     }
 }

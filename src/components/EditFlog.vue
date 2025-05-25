@@ -2,30 +2,33 @@
   <aside class="vue-file">EditFlog.vue</aside>
 
   <div class="flex gap-8">
-
     <section class="container main">
-      <div class="viewport">  
+      <div :class="{ viewport: !selectedTag }">
         <h4 class="flog-title">
-    {{ flog.url }}
-    
-    <FlogPretext
-    :pretext="flog.pretext"
-    :read-only="flog.readOnly"
-    @update-pretext="
-      (updatedPretext) => handleUpdatePretext(flog, updatedPretext)
-      "
-    />
-    <button class="small close-flog" @click.prevent="() => closeFlog(flog)">
-    flog list
-    </button>
-  </h4>
+          {{ flog.url }}
+
+          <FlogPretext
+            :pretext="flog.pretext"
+            :read-only="flog.readOnly"
+            @update-pretext="
+              (updatedPretext) => handleUpdatePretext(flog, updatedPretext)
+            "
+          />
+          <button
+            class="small close-flog"
+            @click.prevent="() => closeFlog(flog)"
+          >
+            flog list
+          </button>
+        </h4>
 
         <AddEntry
-        :entry-value="addEntryValue"
-        @new-entry="(entryData) => addNewEntry(unref(entryData), flog)"
+          v-if="!selectedTag"
+          :entry-value="addEntryValue"
+          @new-entry="(entryData) => addNewEntry(unref(entryData), flog)"
         />
       </div>
-      
+
       <div id="spinner">
         <PacmanLoader
           :loading="flog.status != IFlogStatus.loaded"
@@ -33,10 +36,10 @@
           :size="loaderProps.size"
         />
       </div>
-      
+
       <div v-if="flog.status == IFlogStatus.loaded">
         <EntryList
-          :entries="flog.loadedEntries"
+          :entries="filteredEntries"
           :editing-entry="getFlogEditingEntry(flog)"
           :read-only="flog.readOnly"
           @edit-entry="editEntry"
@@ -49,15 +52,61 @@
         />
       </div>
     </section>
-    <section class="container sidebar">
-      <div class="toc viewport mb-7">
-        <h2>Table of Contents (h1s)</h2>
-          <PacmanLoader
-            :loading="!mounted"
-            :color="loaderProps.color"
-            :size="loaderProps.size"
-          />
+    <section class="container sidebar viewport">
+      <div class="sidebar-tabs">
+        <div
+          v-for="tab in sidebarTabs"
+          :key="tab"
+          :data-tab-selected="currentTab == tab"
+          class="sidebar-tab"
+          @click="
+            () => {
+              currentTab = tab;
+            }
+          "
+        >
+          {{ tab }}
+        </div>
       </div>
+      <div :data-tab-selected="currentTab == 'Tags'" class="sidebar-panel mb-7">
+        <FlogTags
+          :flog-tag-map="flogTagMap"
+          :flog-file="flog.url"
+          @tag-selected="handleTagSelect"
+        />
+      </div>
+      <div
+        :data-tab-selected="currentTab == 'TOC'"
+        class="toc sidebar-panel mb-7"
+      >
+        <h2>Contents</h2>
+        <PacmanLoader
+          :loading="!mounted"
+          :color="loaderProps.color"
+          :size="loaderProps.size"
+        />
+      </div>
+      <div
+        :data-tab-selected="currentTab == 'About'"
+        class="sidebar-panel mb-7"
+      >
+        <h2>About</h2>
+        <p>Add a new entry to this flog.</p>
+        <p>Scroll to read and edit entries in this flog.</p>
+        <p>Write entries using markdown.</p>
+        <p>
+          Use h1's (a line staring with "# ") to tag your entries. One or more
+          tags will automatically be extracted from any h1.
+        </p>
+        <p>The TOC panel allows you to navigate the h1's.</p>
+        <p>
+          The Tags panel allows you to navigate the tags in this flog, and other
+          flogs with those tags.
+        </p>
+      </div>
+    </section>
+    <section v-if="selectedTag" class="container sidebar viewport">
+      <TagFlogsEntries :key="selectedTag" :flog-entries-map="externalFlogTagMap"/>
     </section>
   </div>
 </template>
@@ -65,7 +114,12 @@
 <script setup lang="ts">
 import { ref, unref, watch } from "vue";
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
-import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource";
+import {
+  useFlogSource,
+  IFlogSourceType,
+  type TagMap,
+  type Tag,
+} from "@/composables/useFlogSource";
 import { useFlog, IFlogStatus } from "@/composables/useFlog";
 import type { IFlog } from "@/composables/useFlog";
 import EntryData from "@/modules/EntryData";
@@ -75,6 +129,8 @@ import EntryList from "@components/EntryList.vue";
 import FlogPretext from "@components/FlogPretext.vue";
 // @ts-expect-error - vue-spinner typing issue
 import PacmanLoader from "vue-spinner/src/PacmanLoader.vue";
+import FlogTags from "@components/FlogTags.vue";
+import TagFlogsEntries from "./TagFlogsEntries.vue";
 
 const props = defineProps<{
   flog: IFlog; // Accept the flog as a prop
@@ -82,7 +138,22 @@ const props = defineProps<{
 
 const { closeFlog } = useOpenFlogs();
 
-const { saveFlogToSource } = useFlogSource(IFlogSourceType.dropbox);
+const { saveFlogToSource, tagIndex, getTagsForFlog, tagHasFlogEntryDate } =
+  useFlogSource(IFlogSourceType.dropbox);
+
+const flogTagMap = ref<TagMap>(
+  unref(getTagsForFlog(props.flog.url) || []) as TagMap
+);
+watch(
+  [tagIndex, getTagsForFlog],
+  () => {
+    // console.log("TAGS watch tagIndex", getTagsForFlog(props.flog.url));
+    flogTagMap.value = unref(getTagsForFlog(props.flog.url) || []) as TagMap;
+  },
+  { immediate: true }
+);
+
+const filteredEntries = ref<IEntry[]>(props.flog.loadedEntries);
 
 const { addEntry, updatePretext, deleteEntry, editEntry } = useFlog(props.flog);
 
@@ -160,29 +231,63 @@ function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
   }
 }
 
+// Sidebar Tabs
+type SidebarTab = "TOC" | "Tags" | "About";
+const currentTab = ref<SidebarTab>("Tags");
+const sidebarTabs = ref<SidebarTab[]>(["TOC", "Tags", "About"]);
+
+const selectedTag = ref<Tag["tag"]>();
+
+const handleTagSelect = (tag: Tag["tag"]) => {
+  console.log("TAGS handleTagSelect", tag);
+  selectedTag.value = tag;
+  if (!tag) {
+    filteredEntries.value = props.flog.loadedEntries;
+  } else {
+    filteredEntries.value = props.flog.loadedEntries.filter((entry) => {
+      return tagHasFlogEntryDate(tag, props.flog.url, entry.date);
+    });
+  }
+};
+
+const externalFlogTagMap = ref<Tag["flogs"]>([]);
+watch(
+  [selectedTag, flogTagMap],
+  ([newSelectedTag, newFlogTagMap], [oldSelectedTag]) => {
+    if (!newSelectedTag) externalFlogTagMap.value = [];
+    else if (oldSelectedTag!=newSelectedTag)
+      externalFlogTagMap.value = newFlogTagMap
+        .filter(([tag]) => tag == newSelectedTag)
+        .map<Tag["flogs"]>(([, flogs]) => flogs)
+        .flat()
+        .filter(([flogFile]) => flogFile != props.flog.url);
+  },
+  { immediate: true, deep: true }
+);
+
 // Function to handle the TOC in right column
 
-const mounted = ref(false);       
+const mounted = ref(false);
 const mountedCheck = () => {
-    mounted.value = true;
-};       
+  mounted.value = true;
+};
 
 watch(mounted, (newValue) => {
   if (newValue) {
-    const toc = document.querySelector('.toc');
+    const toc = document.querySelector(".toc");
     if (!toc) return;
 
     // Look for added h1 nodes
-    const headers = document.querySelectorAll('h1');
+    const headers = document.querySelectorAll("h1");
     if (headers.length > 0) {
-      const list = document.createElement('ul');
-      list.className = 'toc-list';
+      const list = document.createElement("ul");
+      list.className = "toc-list";
 
       // Add a "Back to Top" link as the first item
-      const backToTopItem = document.createElement('li');
-      const backToTopAnchor = document.createElement('a');
-      backToTopAnchor.href = '#logo';
-      backToTopAnchor.textContent = 'Back to Top';
+      const backToTopItem = document.createElement("li");
+      const backToTopAnchor = document.createElement("a");
+      backToTopAnchor.href = "#logo";
+      backToTopAnchor.textContent = "Back to Top";
       backToTopItem.appendChild(backToTopAnchor);
       list.appendChild(backToTopItem);
 
@@ -191,8 +296,8 @@ watch(mounted, (newValue) => {
         if (!header.id) {
           header.id = `heading-${index}`;
         }
-        const listItem = document.createElement('li');
-        const anchor = document.createElement('a');
+        const listItem = document.createElement("li");
+        const anchor = document.createElement("a");
         anchor.href = `#${header.id}`;
         anchor.textContent = header.textContent || `Heading ${index + 1}`;
         listItem.appendChild(anchor);
@@ -202,8 +307,6 @@ watch(mounted, (newValue) => {
     }
   }
 });
-
-
 </script>
 
 <style scoped>
@@ -212,22 +315,6 @@ watch(mounted, (newValue) => {
   width: 100%;
   padding: 1rem;
 }
-
-.toc {
-  scroll-behavior: smooth;
-  position: fixed;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  max-width: 300px;
-  overflow: auto;
-  
-  h2 {
-    margin-top:0
-  } 
-
-}
-
 
 h4 {
   box-sizing: border-box;
@@ -242,9 +329,21 @@ h5 {
   padding: 0;
 }
 
-button.small{
-  margin-left: 10px
-  }
+button.small {
+  margin-left: 10px;
+}
+
+.toc-list li {
+  padding: 5px 0;
+  list-style: circle;
+  margin-left: 20px;
+}
+
+.bullet {
+  list-style-type: none;
+  list-style-position: outside;
+  margin-left: 20px;
+}
 </style>
 <style>
 .sidebar {
@@ -254,9 +353,52 @@ button.small{
   }
 }
 
-.toc-list li { 
-  padding: 5px 0;
-  list-style:circle;
-  margin-left: 20px;
+.sidebar-tabs {
+  scroll-behavior: smooth;
+  position: fixed;
+  padding-left: 10px;
+}
+
+.sidebar-tab {
+  display: inline-block;
+  width: fit-content;
+  padding: 4px;
+  margin-right: 0.5px;
+  border: 1px solid #ccc;
+  border-radius: 4px 4px 0 0;
+  border-bottom: none;
+  height: fit-content;
+}
+
+.sidebar-tab[data-tab-selected="true"] {
+  text-shadow: 0px 0px 1px light-dark(black,white), 0px 0px 1px light-dark(black,white);
+}
+
+.sidebar-panel {
+  scroll-behavior: smooth;
+  position: fixed;
+  top: 92px;
+  height: calc(100dvh - 140px);
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  max-width: 300px;
+  width: 100%;
+  overflow: auto;
+
+  h2 {
+    margin-top: 0;
+  }
+}
+
+.sidebar-panel {
+  visibility: hidden;
+}
+.sidebar-panel[data-tab-selected="true"] {
+  visibility: visible;
+}
+
+.sidebar-panel p {
+  padding: 7px 0px;
 }
 </style>
