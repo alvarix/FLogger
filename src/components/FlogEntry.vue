@@ -2,14 +2,12 @@
   <div class="entry">
     <h3>{{ formattedDate }}</h3>
 
-    <!-- If not editing, display rendered markdown with VueShowdown -->
     <div
       v-if="!props.isEditing"
       class="entry__body"
       @click="handleStartEditing"
     >
       <MarkedText :raw-text="entryText" />
-      <!-- <VueShowdown flavor="github" :markdown="entryText" /> -->
     </div>
 
     <!-- Display a contenteditable textarea if editing -->
