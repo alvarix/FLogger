@@ -273,7 +273,7 @@ onMounted(() => {
     //   el.addEventListener("click", focusin);
     //   el.addEventListener("blur", focusout);
     // }
-    document.addEventListener("selectionchange", selectionchange);
+    if (editable) document.addEventListener("selectionchange", selectionchange);
     // document.addEventListener("focusin", focusin);
     // document.addEventListener("focusout", focusout);
   });
@@ -287,7 +287,7 @@ onUnmounted(() => {
   //   el.removeEventListener("click", focusin);
   //   el.removeEventListener("blur", focusout);
   // }
-  document.removeEventListener("selectionchange", selectionchange);
+  if (editable) document.removeEventListener("selectionchange", selectionchange);
   // document.removeEventListener("focusin", focusin);
   // document.removeEventListener("focusout", focusout);
 });

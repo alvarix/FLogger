@@ -2,17 +2,14 @@
   <aside class="vue-file">TagFlogsEntries.vue</aside>
 
   <h2>Tagged entries in other flogs</h2>
-  <div v-if="matchedFlogEntries.length == 0">none</div>
+  <div v-if="flogEntriesMap.length == 0">none</div>
   <div v-else>
     <div
-      v-for="[flog, entries] in matchedFlogEntries"
-      :key="flog.url"
+      v-for="[flogFile, entryDates] in flogEntriesMap"
+      :key="flogFile"
       class="mb-2"
     >
-      <h3>{{ flog.url }}</h3>
-      <div v-for="entry in entries" :key="entry.date.toLocaleString()">
-        <FlogEntry :key="entry.date.toDateString()" :entry="entry" />
-      </div>
+      <TagFlog :flog-file="flogFile" :entry-dates="entryDates" />
     </div>
   </div>
 </template>
@@ -26,7 +23,7 @@ import {
   type IFlog,
 } from "@composables/useFlogSource";
 import type { IEntry } from "@/modules/EntryData";
-import FlogEntry from "./FlogEntry.vue";
+import TagFlog from "@components/TagFlog.vue";
 
 const { flogEntriesMap } = defineProps<{
   flogEntriesMap: Tag["flogs"];
@@ -69,7 +66,8 @@ watch(
           .flat()
           .filter((tagEntryDate) => {
             return (
-              new Date(tagEntryDate).toDateString() == loadedEntry.date.toDateString()
+              new Date(tagEntryDate).toDateString() ==
+              loadedEntry.date.toDateString()
             );
           });
         return entriesMap.length > 0;
@@ -80,6 +78,7 @@ watch(
   },
   { immediate: true, deep: true }
 );
+
 </script>
 
 <style scoped>

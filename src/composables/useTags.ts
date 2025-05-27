@@ -8,6 +8,7 @@ export type { TagMap as TagMap }
 export type { TagIndexRev as TagIndexRev }
 export type { Tag as Tag };
 export type { TagFlogFile as TagFlogFile }
+export type { TagEntryDate as TagEntryDate }
 
 export interface ITagsComposable {
     tagIndex: Ref<TagIndex | undefined>
@@ -60,19 +61,16 @@ export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
 
     const tagHasFlogEntryDate = (tag: TagValue, flogFile: TagFlogFile, entryDate: TagEntryDate) => {
         const tagFlogs = (new Map(tagIndex.value?.tagMap || [])).get(tag) || [];
-        console.log('CHAD tagFlogs', flogFile, entryDate.toLocaleString(), tagFlogs)
 
         const flogTagFlog = tagFlogs.filter(
             ([tagFlogFile]) => tagFlogFile == flogFile
         );
-        console.log('CHAD flogTagFlog', flogFile, flogTagFlog)
 
         const tagFlogEntryDates = flogTagFlog
             .map(([, tagFlogEntryDates]) =>
                 tagFlogEntryDates.map((tagFlogEntryDate) => (new Date(tagFlogEntryDate)).toDateString())
             )
             .flat();
-        console.log('CHAD tagFlogEntryDates', entryDate.toDateString(), tagFlogEntryDates)
 
         const entryMatch = tagFlogEntryDates.includes(
             entryDate.toDateString()
