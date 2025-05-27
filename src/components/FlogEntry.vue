@@ -8,7 +8,8 @@
       class="entry__body"
       @click="handleStartEditing"
     >
-      <VueShowdown flavor="github" :markdown="entryText" />
+      <MarkedText :raw-text="entryText" />
+      <!-- <VueShowdown flavor="github" :markdown="entryText" /> -->
     </div>
 
     <!-- Display a contenteditable textarea if editing -->
@@ -37,6 +38,7 @@ import { ref, computed, nextTick, watch } from "vue";
 import type { IEntry } from "../modules/EntryData";
 import { useKeyDownHandler } from "@/composables/useFlog.ts";
 import { placeCursorAtEnd } from "@/modules/utilities";
+import MarkedText from "@/components/MarkedText.vue";
 
 const { handleKeyDown } = useKeyDownHandler(handleBlur);
 
