@@ -106,7 +106,10 @@
       </div>
     </section>
     <section v-if="selectedTag" class="container sidebar viewport">
-      <TagFlogsEntries :key="selectedTag" :flog-entries-map="externalFlogTagMap"/>
+      <TagFlogsEntries
+        :key="selectedTag"
+        :flog-entries-map="externalFlogTagMap"
+      />
     </section>
   </div>
 </template>
@@ -147,13 +150,10 @@ const flogTagMap = ref<TagMap>(
 watch(
   [tagIndex, getTagsForFlog],
   () => {
-    // console.log("TAGS watch tagIndex", getTagsForFlog(props.flog.url));
     flogTagMap.value = unref(getTagsForFlog(props.flog.url) || []) as TagMap;
   },
   { immediate: true }
 );
-
-const filteredEntries = ref<IEntry[]>(props.flog.loadedEntries);
 
 const { addEntry, updatePretext, deleteEntry, editEntry } = useFlog(props.flog);
 
@@ -236,12 +236,28 @@ type SidebarTab = "TOC" | "Tags" | "About";
 const currentTab = ref<SidebarTab>("Tags");
 const sidebarTabs = ref<SidebarTab[]>(["TOC", "Tags", "About"]);
 
+const filteredEntries = ref<IEntry[]>(props.flog.loadedEntries);
 const selectedTag = ref<Tag["tag"]>();
 
+watch(
+  [() => props.flog.loadedEntries, selectedTag],
+  () => {
+    const tag = selectedTag.value;
+    if (tag) {
+      filteredEntries.value = props.flog.loadedEntries.filter((entry) => {
+        return tagHasFlogEntryDate(tag, props.flog.url, entry.date);
+      });
+    } else {
+      filteredEntries.value = props.flog.loadedEntries;
+    }
+  },
+  { immediate: true }
+);
+
 const handleTagSelect = (tag: Tag["tag"]) => {
-  console.log("TAGS handleTagSelect", tag);
   selectedTag.value = tag;
   if (!tag) {
+    console.log();
     filteredEntries.value = props.flog.loadedEntries;
   } else {
     filteredEntries.value = props.flog.loadedEntries.filter((entry) => {
@@ -255,7 +271,7 @@ watch(
   [selectedTag, flogTagMap],
   ([newSelectedTag, newFlogTagMap], [oldSelectedTag]) => {
     if (!newSelectedTag) externalFlogTagMap.value = [];
-    else if (oldSelectedTag!=newSelectedTag)
+    else if (oldSelectedTag != newSelectedTag)
       externalFlogTagMap.value = newFlogTagMap
         .filter(([tag]) => tag == newSelectedTag)
         .map<Tag["flogs"]>(([, flogs]) => flogs)
@@ -371,7 +387,8 @@ button.small {
 }
 
 .sidebar-tab[data-tab-selected="true"] {
-  text-shadow: 0px 0px 1px light-dark(black,white), 0px 0px 1px light-dark(black,white);
+  text-shadow: 0px 0px 1px light-dark(black, white),
+    0px 0px 1px light-dark(black, white);
 }
 
 .sidebar-panel {
