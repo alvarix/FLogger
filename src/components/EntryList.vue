@@ -47,7 +47,7 @@ import type { IEntry } from "@modules/EntryData";
 import type { IFlog } from "@modules/Flog";
 
 const props = defineProps<{
-  flog?: IFlog;
+  flog: IFlog;
   entries?: Array<IEntry>;
   readOnly?: boolean;
   editingEntry?: IEntry;

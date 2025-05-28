@@ -29,17 +29,26 @@
 
 <script setup lang="ts">
 import { ref, computed, nextTick, watch } from "vue";
-import type { IEntry } from "../modules/EntryData";
-import { useKeyDownHandler, type IFlog } from "@/composables/useFlog.ts";
+import {
+  useKeyDownHandler,
+  useFlog,
+  IFlogSourceType,
+  type IFlog,
+  type IEntry,
+  type Tag,
+} from "@/composables/useFlog.ts";
 import { placeCursorAtEnd } from "@/modules/utilities";
 import MarkedText from "@/components/MarkedText.vue";
-import { type Tag, useTags } from "@composables/useTags.ts";
 
-const { handleKeyDown } = useKeyDownHandler(handleBlur);
-const { getTagsForFlogEntryDate, tagIndex } = useTags();
+const defaultPlaceholderFlog: IFlog = {
+  sourceType: IFlogSourceType.localFile,
+  url: "unknown",
+  loadedEntries: [],
+  readOnly: true,
+};
 
 const { flog, entry, isEditing, readOnly } = defineProps<{
-  flog?: IFlog;
+  flog: IFlog;
   entry: IEntry;
   isEditing?: boolean;
   readOnly?: boolean;
@@ -48,13 +57,21 @@ const { flog, entry, isEditing, readOnly } = defineProps<{
 // Emits an event to the parent
 const emit = defineEmits(["update-entry", "start-editing", "stop-editing"]);
 
+const flogRef = ref<IFlog>(flog || defaultPlaceholderFlog);
+
+const { handleKeyDown } = useKeyDownHandler(handleBlur);
+
+const { getTagsForEntryDate, flogTagMap } = useFlog(flogRef);
+
 const entryTags = ref<Tag["tag"][]>(
-  (flog && getTagsForFlogEntryDate(flog.url, entry.date)) || []
-); 
-watch(tagIndex, () => {
-  entryTags.value =
-    (flog && getTagsForFlogEntryDate(flog.url, entry.date)) || [];
-});
+  (flog && getTagsForEntryDate(entry.date)) || []
+);
+watch(
+  () => flogTagMap,
+  () => {
+    entryTags.value = (flog && getTagsForEntryDate(entry.date)) || [];
+  }
+);
 
 // Utility function to format timestamp to MM/DD/YYYY
 function formatDate(timestamp: string | number | Date): string {
