@@ -14,11 +14,14 @@ export interface ITagsComposable {
     tagIndex: Ref<TagIndex | undefined>
     setTagsIndex: (newTagIndex: TagIndex, callback?: ICallback) => void,
     getTagsForFlog: (flogFile: TagFlogFile) => TagMap,
+    getTagsForFlogEntryDate: (flogFile: TagFlogFile, entryDate: TagEntryDate) => Tag['tag'][],
     tagHasFlogEntryDate: (tag: TagValue, flogFile: TagFlogFile, entryDate: TagEntryDate) => boolean,
 }
 
+const tagIndex = ref<TagIndex | undefined>()
+
 export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
-    const tagIndex = ref<TagIndex | undefined>(starterIndex)
+    if (!tagIndex.value && starterIndex) tagIndex.value = starterIndex
 
     const setTagsIndex = (newTagIndex: TagIndex, callback?: ICallback) => {
         console.log('New tag index', newTagIndex.rev);
@@ -59,6 +62,22 @@ export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
         return mapWithTagsFiltered
     }
 
+    const getTagsForFlogEntryDate = (flogFile: TagFlogFile, entryDate: TagEntryDate) => {
+        const mapWithTagsFiltered: Tag['tag'][] | undefined =
+            (tagIndex.value?.tagMap?.filter(
+                ([, tagFlogs]) =>
+                    // true if this tag contains an entry for this flogFile with the entryDate
+                    tagFlogs.filter(
+                        ([file, entryDates]) => file == flogFile && 0 < entryDates.filter((thisEntryDate) => {
+                            const entryDateDate = new Date(entryDate)
+                            const thisEntryDateDate = new Date(thisEntryDate)
+                            return entryDateDate.getTime()==thisEntryDateDate.getTime()
+                        }).length
+                    ).length > 0
+            ))?.map(([tag]) => tag) || [];
+        return mapWithTagsFiltered as Tag['tag'][]
+    }
+
     const tagHasFlogEntryDate = (tag: TagValue, flogFile: TagFlogFile, entryDate: TagEntryDate) => {
         const tagFlogs = (new Map(tagIndex.value?.tagMap || [])).get(tag) || [];
 
@@ -85,6 +104,7 @@ export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
         tagIndex,
         setTagsIndex,
         getTagsForFlog,
+        getTagsForFlogEntryDate,
         tagHasFlogEntryDate,
     }
 }

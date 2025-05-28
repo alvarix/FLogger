@@ -39,6 +39,7 @@
 
       <div v-if="flog.status == IFlogStatus.loaded">
         <EntryList
+          :flog="flog"
           :entries="filteredEntries"
           :editing-entry="getFlogEditingEntry(flog)"
           :read-only="flog.readOnly"

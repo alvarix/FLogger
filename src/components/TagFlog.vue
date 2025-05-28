@@ -11,6 +11,7 @@
     <div v-for="entry in matchedFlogEntries" :key="entry.date.toLocaleString()">
       <FlogEntry
         :key="entry.date.toDateString()"
+        :flog="flog"
         :entry="entry"
         :read-only="flog.readOnly"
         :is-editing="isEditingFlogEntry == entry"
@@ -44,9 +45,8 @@ const toggleShow = () => {
   showFlog.value = !showFlog.value;
 };
 
-const { availableFlogs, loadFlogEntriesFromSource } = useFlogSource(
-  IFlogSourceType.dropbox
-);
+const { availableFlogs, loadFlogEntriesFromSource } =
+  useFlogSource(IFlogSourceType.dropbox);
 
 const loadedFlogs = ref<IFlog[]>([]);
 

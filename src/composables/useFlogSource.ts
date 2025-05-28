@@ -101,6 +101,7 @@ export interface IFlogSource {
     // useSourceType(sourceType).
     tagIndex: Ref<TagIndex | undefined>;
     getTagsForFlog: ITagsComposable['getTagsForFlog'];
+    getTagsForFlogEntryDate: ITagsComposable['getTagsForFlogEntryDate']
     tagHasFlogEntryDate: ITagsComposable['tagHasFlogEntryDate'];
 
 }
@@ -120,6 +121,7 @@ const {
     connectionPopupWindow: connectionPopupWindow_dropbox,
     tagIndex: tagIndex_dropbox,
     getTagsForFlog: getFlogTags_dropbox,
+    getTagsForFlogEntryDate: getTagsForFlogEntryDate_dropbox,
     tagHasFlogEntryDate: tagHasFlogEntryDate_dropbox
 } = useDropboxFlogs();
 
@@ -264,12 +266,21 @@ export const useFlogSource = (sourceType: IFlogSourceType): IFlogSource => {
         }
     }
 
-    const getTagsForFlog: ITagsComposable['getTagsForFlog'] = (args) => {
+    const getTagsForFlog: ITagsComposable['getTagsForFlog'] = (...args) => {
         switch (sourceType) {
             case IFlogSourceType.dropbox:
-                return (getFlogTags_dropbox(args) || []) as TagMap;
+                return (getFlogTags_dropbox(...args) || []) as TagMap;
             default:
                 return [] as TagMap
+        }
+    }
+
+    const getTagsForFlogEntryDate: ITagsComposable['getTagsForFlogEntryDate'] = (...args) => {
+        switch (sourceType) {
+            case IFlogSourceType.dropbox:
+                return (getTagsForFlogEntryDate_dropbox(...args) || []) as Tag['tag'][];
+            default:
+                return [] as Tag['tag'][]
         }
     }
 
@@ -301,6 +312,7 @@ export const useFlogSource = (sourceType: IFlogSourceType): IFlogSource => {
 
         tagIndex,
         getTagsForFlog,
+        getTagsForFlogEntryDate,
         tagHasFlogEntryDate,
     }
 }

@@ -1,4 +1,6 @@
 <template>
+  <aside class="vue-file">MarkedText.vue</aside>
+
   <div
     id="live-md"
     ref="liveMdEl"
@@ -19,19 +21,22 @@ import {
 } from "vue";
 import { marked } from "marked";
 
-const { rawText, editable } = defineProps({
+const { rawText, tags, editable } = defineProps({
   rawText: {
     type: String,
     default: "",
   },
+  tags: {
+    type: Array,
+    default: () => [],
+    optional: true,
+  },
   editable: {
     type: Boolean,
     default: false,
-    optional: true
-  }
+    optional: true,
+  },
 });
-
-console.log("MarkedText rawText", rawText);
 
 // Followed approach shown here: https://dev.to/pyrsmk/how-to-use-the-contenteditable-attribute-in-vue-3-a89
 
@@ -50,14 +55,30 @@ console.log("MarkedText rawText", rawText);
 
 const renderer = {
   heading({ tokens, depth }) {
+    function buildRegexFromArray(strings, flags = "") {
+      const escapedStrings = strings.map((s) =>
+        // eslint-disable-next-line
+        s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")
+      );
+      const regexPattern = "(" + escapedStrings.join("|") + ")";
+      return new RegExp(regexPattern, flags);
+    }
+
     const text = this.parser.parseInline(tokens);
+    const taggedText =
+      depth > 1 || tags.length == 0
+        ? text
+        : text.replace(
+            buildRegexFromArray(tags, "g"),
+            (match) => `<span class="md-tag">${match}</span>`
+          );
     const escapedText = text.toLowerCase().replace(/[^\w]+/g, "-");
     return `
       <h${depth} contenteditable class="md-focus">
         <a name="${escapedText}" href="#${escapedText}">
           <span></span>
         </a>
-        ${text}
+        ${taggedText}
       </h${depth}>`;
   },
   strong({ tokens }) {
@@ -105,9 +126,7 @@ const liveMarkedHtmlString = ref(rawText);
 watch(
   markdownHtml,
   async () => {
-    console.log("watch(markdownHtml");
     liveMarkedHtmlString.value = await marked.parse(markdownHtml.value);
-    console.log("watch(markdownHtml", liveMarkedHtmlString.value);
   },
   { immediate: true }
 );
@@ -287,7 +306,8 @@ onUnmounted(() => {
   //   el.removeEventListener("click", focusin);
   //   el.removeEventListener("blur", focusout);
   // }
-  if (editable) document.removeEventListener("selectionchange", selectionchange);
+  if (editable)
+    document.removeEventListener("selectionchange", selectionchange);
   // document.removeEventListener("focusin", focusin);
   // document.removeEventListener("focusout", focusout);
 });
@@ -299,6 +319,9 @@ onUnmounted(() => {
 }
 .md-active {
   color: #777;
+}
+.md-tag {
+  border: 1px dashed blue;
 }
 /* b.md-active::before,
 b.md-active::after,
