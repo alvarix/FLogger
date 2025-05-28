@@ -35,7 +35,6 @@ const headingRenderer = ({
   tokens,
   depth,
 }: Tokens.Heading | Tokens.Generic): string => {
-  console.log('CHAD ', this, tokens, depth)
   // @ts-expect-error - Still figuring out Marked typing
   const text = this?.parser?.parseInline(tokens);
   const escapedText = text?.toLowerCase().replace(/[^\w]+/g, "-");

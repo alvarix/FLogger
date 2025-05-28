@@ -388,7 +388,6 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
                         mergedTagMap.set(tag, [...thisFlogTagFlogs] as Tag['flogs'])
                     }
                 })
-                console.log("TAGS mergedTagMap", [...mergedTagMap])
 
                 // Update and save tagIndex
                 if (tagIndex.value?.file && tagIndex?.value.rev) {

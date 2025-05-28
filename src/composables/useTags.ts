@@ -44,20 +44,19 @@ export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
                     tagFlogs.map(
                         ([file]) => file
                     ).includes(flogFile))) || [];
-        const mapWithTagsFilteredAndFlogRemoved: TagMap = (
-            mapWithTagsFiltered?.map(
-                ([tag, tagFlogs]) => {
-                    const shortFlogs: Tag['flogs'] = tagFlogs.filter(
-                        ([file]) => (file != flogFile)
-                    )
-                    return [
-                        tag,
-                        shortFlogs
-                    ]
-                }
-            )
-        ) || [];
-        console.log("TAGS mapWithTagsFiltered, mapWithTagsFilteredAndFlogRemoved", mapWithTagsFiltered, mapWithTagsFilteredAndFlogRemoved);
+        // const mapWithTagsFilteredAndFlogRemoved: TagMap = (
+        //     mapWithTagsFiltered?.map(
+        //         ([tag, tagFlogs]) => {
+        //             const shortFlogs: Tag['flogs'] = tagFlogs.filter(
+        //                 ([file]) => (file != flogFile)
+        //             )
+        //             return [
+        //                 tag,
+        //                 shortFlogs
+        //             ]
+        //         }
+        //     )
+        // ) || [];
         // return mapWithTagsFilteredAndFlogRemoved
         return mapWithTagsFiltered
     }
