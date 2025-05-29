@@ -5,11 +5,11 @@
   <div v-if="flogEntriesMap.length == 0">none</div>
   <div v-else>
     <div
-      v-for="[flogFile, entryDates] in flogEntriesMap"
-      :key="flogFile"
+      v-for="[tagFlogFile, entryDates] in flogEntriesMap"
+      :key="tagFlogFile"
       class="mb-2"
     >
-      <TagFlog :flog-file="flogFile" :entry-dates="entryDates" />
+      <TagFlog :flog-file="tagFlogFile" :entry-dates="entryDates" />
     </div>
   </div>
 </template>
@@ -20,20 +20,19 @@ import type { Tag } from "@composables/useTags";
 import {
   IFlogSourceType,
   useFlogSource,
-  type IFlog,
+  type FlogEntryMap,
 } from "@composables/useFlogSource";
-import type { IEntry } from "@/modules/EntryData";
 import TagFlog from "@components/TagFlog.vue";
 
 const { flogEntriesMap } = defineProps<{
   flogEntriesMap: Tag["flogs"];
 }>();
 
-const { availableFlogs, loadFlogEntriesFromSource } = useFlogSource(
+const { availableFlogs, loadAndGetFlogEntryMapFromTagFlogMap } = useFlogSource(
   IFlogSourceType.dropbox
 );
 
-const loadedFlogs = ref<IFlog[]>([]);
+const matchedFlogEntries = ref<FlogEntryMap>([]);
 
 watch(
   availableFlogs,
@@ -41,50 +40,13 @@ watch(
     // When availableFlogs updates:
     //  - Update loadedFlogs to match
     //  - Load entries from source for each flog in availableFlogs and flogEntriesMap
-    flogEntriesMap.forEach(([flogFile]) => {
-      const flog = availableFlogs.value.reduce<IFlog | undefined>(
-        (acc, current) => (current.url == flogFile ? current : acc),
-        undefined
-      );
-      if (flog) {
-        loadedFlogs.value.push(flog);
-        if (flog.loadedEntries.length == 0) loadFlogEntriesFromSource(flog);
-      }
-    });
-  },
-  { immediate: true, deep: true }
-);
-
-const matchedFlogEntries = ref<[IFlog, IEntry[]][]>([]);
-
-watch(
-  loadedFlogs,
-  () => {
-    // When loadedFlogs updates:
-    //  - Update matchedFlogEntries
+    //  - Update matchedFlogEntries for these same flogs and the matching entries in each
     //    This requires building a map
     //    We loop through loadedFlogs, find matching entries,
     //    and output a map of flogs to matching entries
-    const map = new Map(matchedFlogEntries.value);
-    loadedFlogs.value.forEach((flog) => {
-      // Filter entries for this flog to ones that have a match in flogEntriesMap
-      const matchingEntries = flog.loadedEntries.filter((loadedEntry) => {
-        // Find if there are any matches in flogEntriesMap
-        // for this specific flog entry
-        const entriesMap = flogEntriesMap
-          .filter(([tagFlogFile]) => tagFlogFile == flog.url)
-          .map(([, tagEntryDates]) => tagEntryDates)
-          .flat()
-          .map((tagEntryDate) => new Date(tagEntryDate))
-          .filter((tagEntryDate) => tagEntryDate.getTime() == loadedEntry.date.getTime())
-          .flat();
-        // Filter out this entry if there are matches in flogEntriesMap
-        // (Not likely to be > 1, but possible.)
-        return entriesMap.length > 0;
-      });
-      map.set(flog, matchingEntries);
-    });
-    matchedFlogEntries.value = [...map];
+
+    matchedFlogEntries.value =
+      loadAndGetFlogEntryMapFromTagFlogMap(flogEntriesMap);
   },
   { immediate: true, deep: true }
 );

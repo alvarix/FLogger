@@ -116,13 +116,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toValue, unref, watch, type Ref } from "vue";
+import { ref, unref, watch } from "vue";
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
 import {
   useFlogSource,
   IFlogSourceType,
   type Tag,
-  type TagMap,
 } from "@/composables/useFlogSource";
 import {
   useFlog,
@@ -145,7 +144,7 @@ const props = defineProps<{
 
 const { closeFlog } = useOpenFlogs();
 
-const { saveFlogToSource, tagHasFlogEntryDate } = useFlogSource(
+const { saveFlogToSource, tagHasFlogEntryDate, getFlogMapFromTags } = useFlogSource(
   IFlogSourceType.dropbox
 );
 
@@ -255,21 +254,16 @@ const handleTagSelect = (tag: Tag["tag"]) => {
 
 const externalFlogTagMap = ref<Tag["flogs"] | undefined>();
 watch(
-  [selectedTag, () => flogTagMap?.value as TagMap],
-  (newValues) => {
+  selectedTag,
+  (newValue) => {
     // Values for selectedTag and/or flogTagMap could have been updated.
     // Get the values to use for filtering down to externalFlogTagMap,
-    // which should have entries for the selected tag, excluding this 
+    // which should have entries for the selected tag, excluding this
     // EditFlog component's flog.
-    const useSelectedTag = newValues[0] || selectedTag.value;
-    const useFlogTagMap = newValues[1] || flogTagMap?.value || [];
+    const useSelectedTag = newValue || selectedTag.value;
     if (!useSelectedTag) externalFlogTagMap.value = [];
     else
-      externalFlogTagMap.value = useFlogTagMap
-        .filter(([tag]) => tag == useSelectedTag)
-        .map<Tag["flogs"]>(([, flogs]) => flogs)
-        .flat()
-        .filter(([flogFile]) => flogFile != props.flog.url);
+      externalFlogTagMap.value = getFlogMapFromTags(useSelectedTag, props.flog.url);
   },
   { immediate: true, deep: true }
 );

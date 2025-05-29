@@ -1,10 +1,11 @@
 import { ref, unref } from "vue"
 import type { Ref } from "vue"
-import type { TagIndex, TagMap, Tag, TagIndexRev, TagFlogFile, TagValue, TagEntryDate } from "@modules/Tag"
+import type { TagIndex, TagMap, TagFlogMap, Tag, TagIndexRev, TagFlogFile, TagValue, TagEntryDate } from "@modules/Tag"
 
 
 export type { TagIndex as TagIndex }
 export type { TagMap as TagMap }
+export type { TagFlogMap as TagFlogMap }
 export type { TagIndexRev as TagIndexRev }
 export type { Tag as Tag };
 export type { TagFlogFile as TagFlogFile }
@@ -16,6 +17,10 @@ export interface ITagsComposable {
     getTagsForFlog: (flogFile: TagFlogFile) => TagMap,
     getTagsForFlogEntryDate: (flogFile: TagFlogFile, entryDate: TagEntryDate) => Tag['tag'][],
     tagHasFlogEntryDate: (tag: TagValue, flogFile: TagFlogFile, entryDate: TagEntryDate) => boolean,
+    getFlogMapFromTags: (
+        filterTags: Tag["tag"] | Tag["tag"][],
+        excludeFlogs?: TagFlogFile | TagFlogFile[]
+    ) => TagFlogMap;
 }
 
 const tagIndex = ref<TagIndex | undefined>()
@@ -69,12 +74,25 @@ export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
                         ([file, entryDates]) => file == flogFile && 0 < entryDates.filter((thisEntryDate) => {
                             const entryDateDate = new Date(entryDate)
                             const thisEntryDateDate = new Date(thisEntryDate)
-                            return entryDateDate.getTime()==thisEntryDateDate.getTime()
+                            return entryDateDate.getTime() == thisEntryDateDate.getTime()
                         }).length
                     ).length > 0
             ))?.map(([tag]) => tag) || [];
         return mapWithTagsFiltered as Tag['tag'][]
     }
+
+    const getFlogMapFromTags = (
+        filterTags: Tag["tag"] | Tag["tag"][],
+        excludeFlogs?: TagFlogFile | TagFlogFile[]
+    ): TagFlogMap => {
+        const useFilterTags = [filterTags].flat(); // Make sure a single item is converted to an array
+        const useExcludeFlogs = [(excludeFlogs || [])].flat(); // Make sure a single item is converted to an array
+        return tagIndex?.value?.tagMap?.filter(([tag]) => useFilterTags.includes(tag))
+            .map<Tag["flogs"]>(([, flogs]) => flogs)
+            .flat()
+            .filter(([flogFile]) => !useExcludeFlogs.includes(flogFile))
+            || [];
+    };
 
     const tagHasFlogEntryDate = (tag: TagValue, flogFile: TagFlogFile, entryDate: TagEntryDate) => {
         const tagFlogs = (new Map(tagIndex.value?.tagMap || [])).get(tag) || [];
@@ -102,6 +120,7 @@ export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
         getTagsForFlog,
         getTagsForFlogEntryDate,
         tagHasFlogEntryDate,
+        getFlogMapFromTags,
     }
 }
 

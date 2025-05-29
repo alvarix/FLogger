@@ -1,20 +1,28 @@
 import { ref, watch } from "vue"
 import type { Ref } from "vue"
-import type { IFlog } from "@/modules/Flog"
-import { IFlogStatus, IFlogSourceType, deserializeFlog, serializeFlog } from "@/modules/Flog"
+import {
+    type IFlog,
+    type IEntry,
+    IFlogStatus,
+    IFlogSourceType,
+    deserializeFlog,
+    serializeFlog,
+} from "@/modules/Flog"
 import { useDropboxFiles } from "@/composables/useDropboxFiles"
 import type { IDropboxFile, ILoadFileContentCallbackSuccess, ILoadFileContentCallbackError } from "@/composables/useDropboxFiles";
-import { useTags, type ITagsComposable, type TagMap } from "./useTags"
+import { useTags, type ITagsComposable, type TagMap, type TagFlogMap, type TagFlogFile } from "./useTags"
 import type { TagIndex, Tag } from "@/modules/Tag"
-import type { IEntry } from "@/modules/EntryData"
 
 // Re-export these for convenience
 export type { IFlog as IFlog }
+export type { IEntry as IEntry }
 export { IFlogStatus as IFlogStatus }; //enum, not a type
 export type { ITagsComposable as ITagsComposable }
 export type { TagIndex as TagIndex }
 export type { TagMap as TagMap }
+export type { TagFlogMap as TagFlogMap }
 export type { Tag as Tag }
+export type { TagFlogFile as TagFlogFile }
 export interface IDropboxFlog extends IFlog {
     rev?: string;
 }
@@ -49,6 +57,7 @@ export interface IDropboxFlogs {
     getTagsForFlog: ITagsComposable['getTagsForFlog'];
     getTagsForFlogEntryDate: ITagsComposable['getTagsForFlogEntryDate'];
     tagHasFlogEntryDate: ITagsComposable['tagHasFlogEntryDate'];
+    getFlogMapFromTags: ITagsComposable['getFlogMapFromTags'];
 }
 
 /*
@@ -164,7 +173,14 @@ const {
 
 const tagIndexFileName = "flogger.tag-index.json"
 const tagIndexFilePath = "/" + tagIndexFileName
-const { tagIndex: tagIndex_useTags, setTagsIndex, getTagsForFlog, getTagsForFlogEntryDate, tagHasFlogEntryDate } = useTags({ file: tagIndexFilePath, rev: undefined })
+const {
+    tagIndex: tagIndex_useTags,
+    setTagsIndex,
+    getTagsForFlog,
+    getTagsForFlogEntryDate,
+    getFlogMapFromTags,
+    tagHasFlogEntryDate
+} = useTags({ file: tagIndexFilePath, rev: undefined })
 
 const tagIndex = ref(tagIndex_useTags)
 watch(
@@ -330,10 +346,10 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
                 }
 
                 // Grab current tagMap
-                const tagMap: Map<Tag['tag'], Tag['flogs']> 
+                const tagMap: Map<Tag['tag'], Tag['flogs']>
                     = new Map([...(tagIndex.value?.tagMap || [])]);
                 // Build tagMap for current flog
-                const thisFlogTagMap: Map<Tag['tag'], Tag['flogs']> 
+                const thisFlogTagMap: Map<Tag['tag'], Tag['flogs']>
                     = new Map()
                 flog.loadedEntries.forEach(entry => {
                     const entryTags = parseTagsFromEntry(entry)
@@ -447,6 +463,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
         tagIndex,
         getTagsForFlog,
         getTagsForFlogEntryDate,
+        getFlogMapFromTags,
         tagHasFlogEntryDate,
     }
 }

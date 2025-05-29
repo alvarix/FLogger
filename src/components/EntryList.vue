@@ -43,8 +43,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, defineEmits } from "vue";
 import FlogEntry from "@components/FlogEntry.vue";
-import type { IEntry } from "@modules/EntryData";
-import type { IFlog } from "@modules/Flog";
+import type { IFlog, IEntry } from "@modules/Flog";
 
 const props = defineProps<{
   flog: IFlog;

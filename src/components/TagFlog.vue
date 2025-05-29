@@ -30,8 +30,8 @@ import {
   IFlogSourceType,
   useFlogSource,
   type IFlog,
+  type IEntry,
 } from "@composables/useFlogSource";
-import type { IEntry } from "@/modules/EntryData";
 import { useFlog } from "@composables/useFlog";
 import FlogEntry from "./FlogEntry.vue";
 
