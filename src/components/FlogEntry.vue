@@ -98,7 +98,6 @@ const handleStartEditing = () => {
 
 function setupEditing() {
   nextTick(() => {
-    console.log("entryEl", entryEl.value);
     if (entryEl.value && entryEl.value != null) {
       // Set cursor position to the end of the text
       placeCursorAtEnd(entryEl.value);
@@ -111,7 +110,6 @@ function setupEditing() {
 
 // Function to emit the update when blur occurs
 function handleBlur() {
-  // console.log("handleBlur triggered", event.srcElement.value, entryText.value);
   // Could use either of these:
   // entryText.value = event.target.innerText;
   entryText.value = entryEl.value != null ? entryEl.value.innerText : "";
@@ -128,7 +126,6 @@ function handleBlur() {
 watch(
   () => entry,
   (newValue) => {
-    // console.log('watch entry')
     entryText.value = newValue.entry;
   }
 );
@@ -144,7 +141,6 @@ watch(
 watch(
   () => readOnly,
   (newValue) => {
-    // console.log('watch readOnly')
     isReadOnly.value = newValue;
   }
 );

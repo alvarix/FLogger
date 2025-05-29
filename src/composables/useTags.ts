@@ -24,7 +24,6 @@ export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
     if (!tagIndex.value && starterIndex) tagIndex.value = starterIndex
 
     const setTagsIndex = (newTagIndex: TagIndex, callback?: ICallback) => {
-        console.log('New tag index', newTagIndex.rev);
         tagIndex.value = {
             tagMap: unref(newTagIndex.tagMap),
             rev: unref(newTagIndex.rev),
@@ -93,8 +92,6 @@ export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
         const entryMatch = tagFlogEntryDates.includes(
             entryDate.toDateString()
         );
-
-        // console.log("TAGS check", entryMatch);
 
         return entryMatch;
     }

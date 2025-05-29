@@ -172,21 +172,18 @@ watch(
 )
 watch(accountOwner_dropbox,
     () => {
-        console.log('watch accountOwner_dropbox', accountOwner_dropbox)
         accountOwner.value = accountOwner_dropbox.value
     },
     { immediate: true }
 )
 watch(hasConnection_dropbox,
     () => {
-        console.log('watch hasConnection_dropbox', hasConnection_dropbox)
         hasConnection.value = hasConnection_dropbox.value
     },
     { immediate: true }
 )
 watch(connectionPopupWindow_dropbox,
     () => {
-        console.log('watch connectionPopupWindow_dropbox', connectionPopupWindow_dropbox)
         connectionPopupWindow.value = connectionPopupWindow_dropbox.value
     },
     { immediate: true }
@@ -194,7 +191,6 @@ watch(connectionPopupWindow_dropbox,
 watch(
     tagIndex_dropbox,
     () => {
-        // console.log("TAGS watch tagIndex_dropbox", tagIndex_dropbox)
         tagIndex.value = tagIndex_dropbox.value
     }
     ,

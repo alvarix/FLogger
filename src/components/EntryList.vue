@@ -67,15 +67,12 @@ function changeEntry(
   actionName: "copy" | "delete" | "edit" | "update",
   entry: IEntry
 ) {
-  // console.log('changeEntry', actionName)
   emit(`${actionName}-entry`, entry);
 }
 
 // Function to catch update from child and emit to grandparent
 function updateEntry(updatedEntry: IEntry) {
   if (!props.readOnly) {
-    // console.log("updateEntry() called");
-    // console.log("Forwarding updated entry to grandparent:", updatedEntry);
     emit("update-entry", updatedEntry);
   }
 }

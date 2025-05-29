@@ -14,18 +14,13 @@ const { rawText } = defineProps<{
   rawText?: string;
 }>();
 
-console.log("MarkedTextTS rawText", rawText);
-
 // Followed approach shown here: https://dev.to/pyrsmk/how-to-use-the-contenteditable-attribute-in-vue-3-a89
 
 // const postprocess = (html) => {
-//   // console.log("html", html.replace(/(\<[^\>]*)(\?\>)/g,`$1 onfocus="()=>console.log('hi!!!')"$2`));
-//   // console.log("html", html);
 //   const processedHtml = html.replace(
 //     /(\<[^\>]*)(\/?\>)/g,
 //     `$1 contenteditable$2`
 //   );
-//   console.log("processedHtml", processedHtml);
 //   return processedHtml;
 // };
 
@@ -105,7 +100,6 @@ const changeLiveMd = async () => {
 };
 
 // const updatePreview = () => {
-//   console.log("updatePreview", mdEl.value?.innerText);
 //   markDown.value = mdEl.value?.innerText || "";
 // };
 const preview = computed(() => {
@@ -120,31 +114,10 @@ onMounted(() => {
 //   const level =
 //     ["none", "capturing", "target", "bubbling"][event.eventPhase] ?? "error";
 
-//   // console.log(
-//   //   "Element focused: ",
-//   //   level,
-//   //   event.target,
-//   //   event.relatedTarget,
-//   //   event.originalTarget,
-//   //   event.currentTarget,
-//   //   event.defaultPrevented,
-//   //   event.bubbles
-//   // );
 // };
 // const focusout = (event) => {
 //   const level =
 //     ["none", "capturing", "target", "bubbling"][event.eventPhase] ?? "error";
-
-//   // console.log(
-//   //   "Element blurred: ",
-//   //   level,
-//   //   event.target,
-//   //   event.relatedTarget,
-//   //   event.originalTarget,
-//   //   event.currentTarget,
-//   //   event.defaultPrevented,
-//   //   event.bubbles
-//   // );
 // };
 
 // const keydowncursor = (event) => {
@@ -153,20 +126,6 @@ onMounted(() => {
 //   }
 //   const level =
 //     ["none", "capturing", "target", "bubbling"][event.eventPhase] ?? "error";
-
-//   console.log(
-//     "Element keydown: ",
-//     level,
-//     event.target,
-//     event.relatedTarget,
-//     event.originalTarget,
-//     event.currentTarget,
-//     event.defaultPrevented,
-//     event.bubbles,
-//     event.code,
-//     event.location,
-//     event.isComposing
-//   );
 // };
 
 const previewEl = ref<HTMLElement>(); // saved to spare processor time
@@ -188,12 +147,8 @@ const selectionchange = () =>
       text = grab?.anchorNode, //  <-- clicked here
       node = text?.parentElement; // <-- container
 
-    console.log("selectionchange: ", grab, text, node);
-    console.log("currentEl, previewEl", currentEl.value, previewEl.value);
     if (node && node !== currentEl.value) {
-      // console.log("classNames: ", node?.className, currentEl.value?.className);
       if (currentEl.value) {
-        console.log("1");
         Array.from(
           currentEl.value.getElementsByClassName("md-explicit")
         ).forEach((el) => el.remove());
@@ -204,14 +159,7 @@ const selectionchange = () =>
         );
         currentEl.value = undefined;
       }
-      // console.log("grab.containsNode: ", grab.containsNode(node));
-      // console.log("grab.containsNode firstChild: ", grab.containsNode(node.firstChild));
-      console.log(
-        "previewEl.value.contains node: ",
-        previewEl.value?.contains(node)
-      );
       if (previewEl.value?.contains(node)) {
-        console.log("2");
         // currentEl.value.className = currentEl.value.className.replace(" md-active", "");
         currentEl.value = toMd(node);
         if (currentEl.value) currentEl.value.className += " md-active";
@@ -291,7 +239,6 @@ onMounted(() => {
     //   rootEl,
     //   ...Array.from(rootEl.getElementsByClassName("md-focus")),
     // ];
-    // console.log("els", els);
     // for (const el of els) {
     //   // el.addEventListener("keydown", keydowncursor);
     //   el.addEventListener("click", focusin);
@@ -335,9 +282,6 @@ function postprocess(html) {
 marked.use({ hooks: { postprocess } });
 
 // Run marked
-console.log(marked.parse(`
-<img src=x onerror=alert(1)//>
-`));
  *
  * 
  */

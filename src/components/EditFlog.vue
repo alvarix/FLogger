@@ -168,12 +168,10 @@ function addNewEntry(entryData: IEntry, flog: IFlog) {
 }
 
 const handleStartEditingEntry = (flog: IFlog, entry: IEntry) => {
-  // console.log('handleStartEditingEntry', entry)
   isEditingFlogEntries.value.set(flog, entry);
 };
 
 const handleStopEditingEntry = (flog: IFlog) => {
-  // console.log('handleStopEditingEntry')
   isEditingFlogEntries.value.delete(flog);
 };
 
@@ -199,13 +197,9 @@ const handleDeleteEntry = (flog: IFlog, entry: IEntry) => {
 
 // Function to handle the update event from the grandchild and update flog
 const handleUpdateEntry = (flog: IFlog, updatedEntry: IEntry) => {
-  // console.log("handleUpdateEntry() in grandparent called");
-  // console.log("Received updated entry:", updatedEntry);
-
   if (flog) {
     editEntry(updatedEntry);
     isEditingFlogEntries.value.delete(flog);
-    // console.log("deleting", isEditingFlogEntries.value.delete(flog));
     // = new Map([]); // Create a new map with one entry rather than track multiple entries being edited across flogs at the same time
   } else {
     console.error("flog is not defined or initialized");
@@ -220,8 +214,6 @@ const loaderProps = {
 // Function to catch update from child and emit to grandparent
 function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
   if (flog && !flog.readOnly) {
-    // console.log("handleUpdatePretext() called");
-    // console.log("new pretext:", updatedPretext);
     updatePretext(updatedPretext);
     saveFlogToSource(flog);
   }
@@ -253,7 +245,6 @@ watch(
 const handleTagSelect = (tag: Tag["tag"]) => {
   selectedTag.value = tag;
   if (!tag) {
-    console.log();
     filteredEntries.value = props.flog.loadedEntries;
   } else {
     filteredEntries.value = props.flog.loadedEntries.filter((entry) => {

@@ -104,24 +104,18 @@ watch(
 const isEditingFlogEntry = ref<IEntry | undefined>(); // Keep a map of [flog, index] pairs to look up index of entry being edit
 
 const handleStartEditingEntry = (entry: IEntry) => {
-  console.log("handleStartEditingEntry", entry);
   isEditingFlogEntry.value = entry;
 };
 
 const handleStopEditingEntry = () => {
-  // console.log('handleStopEditingEntry')
   isEditingFlogEntry.value = undefined;
 };
 
 // Function to handle the update event from the grandchild and update flog
 const handleUpdateEntry = (updatedEntry: IEntry) => {
-  // console.log("handleUpdateEntry() in grandparent called");
-  // console.log("Received updated entry:", updatedEntry);
-
   if (flog.value && !flog.value.readOnly) {
     editEntry(updatedEntry);
     isEditingFlogEntry.value = undefined;
-    // console.log("deleting", isEditingFlogEntry.value.delete(flog));
     // = new Map([]); // Create a new map with one entry rather than track multiple entries being edited across flogs at the same time
   } else {
     console.error("flog is not defined or initialized");

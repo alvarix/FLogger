@@ -104,12 +104,10 @@ for (const propName in repoFilesGlob) {
         );
     }
 }
-// console.log("repoFiles.value", repoFiles.value);
 
 // Clientside fetches to get file contents for each path
 const repoFilesWithContents: IDropboxFile[] = []
 repoFiles.value.forEach(async repoFile => {
-    // console.log(repoFile.path)
 
     // As mentioned before...
     // ...when the frontend does fetch calls, it will add the '/repo_template/' part back.
@@ -121,7 +119,6 @@ repoFiles.value.forEach(async repoFile => {
             return response.text(); // Assuming the server returns JSON
         })
         .then(data => {
-            // console.log('data', data)
             // folderContents.value.push(data);
             repoFilesWithContents.push({
                 path: repoFile.path,
@@ -133,7 +130,6 @@ repoFiles.value.forEach(async repoFile => {
         });
 })
 repoFiles.value = repoFilesWithContents
-// console.log('repoFiles.value', repoFiles.value)
 
 /*
  * Module-scoped: useDropboxFiles 
@@ -174,7 +170,6 @@ const tagIndex = ref(tagIndex_useTags)
 watch(
     tagIndex_useTags,
     () => {
-        // console.log("TAGS watch tagIndex_useTags")
         tagIndex.value = tagIndex_useTags.value
     }
     ,
@@ -195,14 +190,12 @@ watch(
     { immediate: true })
 
 function handleTagIndexFileLoad(result: ILoadFileContentCallbackSuccess | ILoadFileContentCallbackError) {
-    // console.log("TAGS loadFileContent callback", result)
     const { rev, content, error } = result
     if (error) {
         if (error == "file not found") {
             // If loading content fails because the file doesn't exist, create the file
             addFile({ path: tagIndexFileName, content: JSON.stringify([]) }, (result) => {
                 // Once the file is created, set the index in useTags
-                // console.log("TAGS addFile callback", result)
                 setTagsIndex({
                     file: tagIndexFilePath,
                     rev: result.rev,
@@ -227,7 +220,6 @@ function handleTagIndexFileLoad(result: ILoadFileContentCallbackSuccess | ILoadF
             rev,
             tagMap: [...parsedTags],
         })
-        // console.log("TAGS tagIndex", { ...unref(ref(tagIndex)), setTagsIndex: undefined })
     }
 }
 
@@ -295,7 +287,6 @@ watch(
 export const useDropboxFlogs = (): IDropboxFlogs => {
 
     const loadFlogEntries = (flog: IDropboxFlog) => {
-        // console.log('loadFlogEntries flog', flog)
         loadFileContent(
             { path: flog.url },
             (result) => {
@@ -314,7 +305,6 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
     }
 
     const saveFlogEntries = (flog: IDropboxFlog) => {
-        // console.log('saveFlogEntries flog', flog)
         // First save the flog file
         saveFileContent(
             {
@@ -414,7 +404,6 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
     }
 
     const addFlog = (flog: IDropboxFlog) => {
-        // console.log('addFlog flog', flog)
         addFile(
             {
                 path: flog.url,
@@ -427,7 +416,6 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
     }
 
     const deleteFlog = (flog: IDropboxFlog) => {
-        // console.log('addFlog flog', flog)
         deleteFile(
             {
                 path: flog.url,

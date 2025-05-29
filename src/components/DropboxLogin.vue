@@ -95,7 +95,6 @@ const openWindowAndLaunchConnectFlog = () => {
 };
 
 const selectFile = (file: IFlog) => {
-  console.log("selectFile", file);
   loadFlogEntriesFromSource(file);
   openFlog(file);
 };

@@ -41,13 +41,10 @@ const { rawText, tags, editable } = defineProps({
 // Followed approach shown here: https://dev.to/pyrsmk/how-to-use-the-contenteditable-attribute-in-vue-3-a89
 
 // const postprocess = (html) => {
-//   // console.log("html", html.replace(/(\<[^\>]*)(\?\>)/g,`$1 onfocus="()=>console.log('hi!!!')"$2`));
-//   // console.log("html", html);
 //   const processedHtml = html.replace(
 //     /(\<[^\>]*)(\/?\>)/g,
 //     `$1 contenteditable$2`
 //   );
-//   console.log("processedHtml", processedHtml);
 //   return processedHtml;
 // };
 
@@ -142,34 +139,10 @@ const changeLiveMd = () => {
 // const focusin = (event) => {
 //   const level =
 //     ["none", "capturing", "target", "bubbling"][event.eventPhase] ?? "error";
-//   console.log("focusin", level);
-
-//   // console.log(
-//   //   "Element focused: ",
-//   //   level,
-//   //   event.target,
-//   //   event.relatedTarget,
-//   //   event.originalTarget,
-//   //   event.currentTarget,
-//   //   event.defaultPrevented,
-//   //   event.bubbles
-//   // );
 // };
 // const focusout = (event) => {
 //   const level =
 //     ["none", "capturing", "target", "bubbling"][event.eventPhase] ?? "error";
-//   console.log("focusout", level);
-
-//   // console.log(
-//   //   "Element blurred: ",
-//   //   level,
-//   //   event.target,
-//   //   event.relatedTarget,
-//   //   event.originalTarget,
-//   //   event.currentTarget,
-//   //   event.defaultPrevented,
-//   //   event.bubbles
-//   // );
 // };
 
 const currentEl = ref();
@@ -183,12 +156,8 @@ const selectionchange = (event) => {
     text = grab.baseNode || 0, //  <-- clicked here
     node = text.parentNode; // <-- container
 
-  // console.log("selectionchange: ", grab, text, node);
-  // console.log("currentEl, liveMdEl", currentEl.value, liveMdEl.value);
   if (node && node !== currentEl.value) {
-    // console.log("classNames: ", node?.className, currentEl.value?.className);
     if (currentEl.value) {
-      // console.log("1");
       Array.from(currentEl.value.getElementsByClassName("md-explicit")).forEach(
         (el) => el.remove()
       );
@@ -199,14 +168,7 @@ const selectionchange = (event) => {
       );
       currentEl.value = undefined;
     }
-    // console.log("grab.containsNode: ", grab.containsNode(node));
-    // console.log("grab.containsNode firstChild: ", grab.containsNode(node.firstChild));
-    // console.log(
-    //   "liveMdEl.value.contains node: ",
-    //   liveMdEl.value.contains(node)
-    // );
     if (liveMdEl.value.contains(node)) {
-      // console.log("2");
       // currentEl.value.className = currentEl.value.className.replace(" md-active", "");
       currentEl.value = toMarkedUXHtmlString(node);
       currentEl.value.className += " md-active";
@@ -286,7 +248,6 @@ onMounted(() => {
     //   rootEl,
     //   ...Array.from(rootEl.getElementsByClassName("md-focus")),
     // ];
-    // console.log("els", els);
     // for (const el of els) {
     //   // el.addEventListener("keydown", keydowncursor);
     //   el.addEventListener("click", focusin);
