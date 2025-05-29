@@ -8,9 +8,9 @@
     </button>
   </h3>
   <div v-if="showFlog">
-    <div v-for="entry in matchedFlogEntries" :key="entry.date.toLocaleString()">
+    <div v-for="entry in matchedFlogEntries" :key="entry.date.getTime()">
       <FlogEntry
-        :key="entry.date.toDateString()"
+        :key="entry.date.getTime()"
         :flog="flog"
         :entry="entry"
         :read-only="flog.readOnly"
@@ -90,8 +90,8 @@ watch(
     const matchingEntries = flog.value?.loadedEntries.filter((loadedEntry) => {
       const entriesMap = entryDates.filter((tagEntryDate) => {
         return (
-          new Date(tagEntryDate).toDateString() ==
-          loadedEntry.date.toDateString()
+          new Date(tagEntryDate).getTime() ==
+          loadedEntry.date.getTime()
         );
       });
       return entriesMap.length > 0;

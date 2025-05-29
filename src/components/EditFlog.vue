@@ -71,7 +71,7 @@
       </div>
       <div :data-tab-selected="currentTab == 'Tags'" class="sidebar-panel mb-7">
         <FlogTags
-          :flog-tag-map="flogTagMap"
+          :flog-tag-map="flogTagMap || []"
           :flog-file="flog.url"
           @tag-selected="handleTagSelect"
         />
@@ -109,32 +109,35 @@
     <section v-if="selectedTag" class="container sidebar viewport">
       <TagFlogsEntries
         :key="selectedTag"
-        :flog-entries-map="externalFlogTagMap"
+        :flog-entries-map="externalFlogTagMap || []"
       />
     </section>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, unref, watch } from "vue";
+import { ref, toValue, unref, watch, type Ref } from "vue";
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
 import {
   useFlogSource,
   IFlogSourceType,
-  type TagMap,
   type Tag,
+  type TagMap,
 } from "@/composables/useFlogSource";
-import { useFlog, IFlogStatus } from "@/composables/useFlog";
-import type { IFlog } from "@/composables/useFlog";
-import EntryData from "@/modules/EntryData";
-import type { IEntry } from "@/modules/EntryData";
+import {
+  useFlog,
+  IFlogStatus,
+  type IFlog,
+  EntryData,
+  type IEntry,
+} from "@/composables/useFlog";
 import AddEntry from "@components/AddEntry.vue";
 import EntryList from "@components/EntryList.vue";
 import FlogPretext from "@components/FlogPretext.vue";
 // @ts-expect-error - vue-spinner typing issue
 import PacmanLoader from "vue-spinner/src/PacmanLoader.vue";
 import FlogTags from "@components/FlogTags.vue";
-import TagFlogsEntries from "./TagFlogsEntries.vue";
+import TagFlogsEntries from "@components/TagFlogsEntries.vue";
 
 const props = defineProps<{
   flog: IFlog; // Accept the flog as a prop
@@ -142,21 +145,13 @@ const props = defineProps<{
 
 const { closeFlog } = useOpenFlogs();
 
-const { saveFlogToSource, tagIndex, getTagsForFlog, tagHasFlogEntryDate } =
-  useFlogSource(IFlogSourceType.dropbox);
-
-const flogTagMap = ref<TagMap>(
-  unref(getTagsForFlog(props.flog.url) || []) as TagMap
-);
-watch(
-  [tagIndex, getTagsForFlog],
-  () => {
-    flogTagMap.value = unref(getTagsForFlog(props.flog.url) || []) as TagMap;
-  },
-  { immediate: true }
+const { saveFlogToSource, tagHasFlogEntryDate } = useFlogSource(
+  IFlogSourceType.dropbox
 );
 
-const { addEntry, updatePretext, deleteEntry, editEntry } = useFlog(props.flog);
+const { flogTagMap, addEntry, updatePretext, deleteEntry, editEntry } = useFlog(
+  props.flog
+);
 
 const addEntryValue = ref<IEntry | undefined>(); // Initialize reactive addEntryValue
 const isEditingFlogEntries = ref(new Map<IFlog, IEntry>()); // Keep a map of [flog, index] pairs to look up index of entry being edit PER flog
@@ -267,14 +262,20 @@ const handleTagSelect = (tag: Tag["tag"]) => {
   }
 };
 
-const externalFlogTagMap = ref<Tag["flogs"]>([]);
+const externalFlogTagMap = ref<Tag["flogs"] | undefined>();
 watch(
-  [selectedTag, flogTagMap],
-  ([newSelectedTag, newFlogTagMap], [oldSelectedTag]) => {
-    if (!newSelectedTag) externalFlogTagMap.value = [];
-    else if (oldSelectedTag != newSelectedTag)
-      externalFlogTagMap.value = newFlogTagMap
-        .filter(([tag]) => tag == newSelectedTag)
+  [selectedTag, () => flogTagMap?.value as TagMap],
+  (newValues) => {
+    // Values for selectedTag and/or flogTagMap could have been updated.
+    // Get the values to use for filtering down to externalFlogTagMap,
+    // which should have entries for the selected tag, excluding this 
+    // EditFlog component's flog.
+    const useSelectedTag = newValues[0] || selectedTag.value;
+    const useFlogTagMap = newValues[1] || flogTagMap?.value || [];
+    if (!useSelectedTag) externalFlogTagMap.value = [];
+    else
+      externalFlogTagMap.value = useFlogTagMap
+        .filter(([tag]) => tag == useSelectedTag)
         .map<Tag["flogs"]>(([, flogs]) => flogs)
         .flat()
         .filter(([flogFile]) => flogFile != props.flog.url);

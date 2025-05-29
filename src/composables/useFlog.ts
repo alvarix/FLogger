@@ -2,13 +2,14 @@ import { ref, toValue, watch } from "vue"
 import type { Ref } from "vue"
 import type { IFlog } from "@/modules/Flog"
 import { IFlogStatus } from "@/modules/Flog"
-import type { IEntry } from '@/modules/EntryData'
+import EntryData, { type IEntry } from '@/modules/EntryData'
 import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource"
 import { useTags, type Tag, type TagEntryDate, type TagMap } from "@composables/useTags"
 
 // Re-export these for convenience
 export type { Tag as Tag }
 export type { IEntry as IEntry }
+export { EntryData as EntryData }
 export { IFlogSourceType as IFlogSourceType }
 
 /**
