@@ -70,7 +70,7 @@
         </div>
       </div>
       <div :data-tab-selected="currentTab == 'Tags'" class="sidebar-panel mb-7">
-        <FlogTags
+        <TagMapSelector
           :flog-tag-map="flogTagMap || []"
           :flog-file="flog.url"
           @tag-selected="handleTagSelect"
@@ -135,7 +135,7 @@ import EntryList from "@components/EntryList.vue";
 import FlogPretext from "@components/FlogPretext.vue";
 // @ts-expect-error - vue-spinner typing issue
 import PacmanLoader from "vue-spinner/src/PacmanLoader.vue";
-import FlogTags from "@components/FlogTags.vue";
+import TagMapSelector from "@components/TagMapSelector.vue";
 import TagFlogsEntries from "@components/TagFlogsEntries.vue";
 
 const props = defineProps<{
