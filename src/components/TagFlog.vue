@@ -116,7 +116,6 @@ const handleUpdateEntry = (updatedEntry: IEntry) => {
   if (flog.value && !flog.value.readOnly) {
     editEntry(updatedEntry);
     isEditingFlogEntry.value = undefined;
-    // = new Map([]); // Create a new map with one entry rather than track multiple entries being edited across flogs at the same time
   } else {
     console.error("flog is not defined or initialized");
   }

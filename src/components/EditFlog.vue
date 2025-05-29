@@ -199,7 +199,6 @@ const handleUpdateEntry = (flog: IFlog, updatedEntry: IEntry) => {
   if (flog) {
     editEntry(updatedEntry);
     isEditingFlogEntries.value.delete(flog);
-    // = new Map([]); // Create a new map with one entry rather than track multiple entries being edited across flogs at the same time
   } else {
     console.error("flog is not defined or initialized");
   }
