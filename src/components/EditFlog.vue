@@ -72,7 +72,6 @@
       <div :data-tab-selected="currentTab == 'Tags'" class="sidebar-panel mb-7">
         <TagMapSelector
           :flog-tag-map="flogTagMap || []"
-          :flog-file="flog.url"
           @tag-selected="handleTagSelect"
         />
       </div>
