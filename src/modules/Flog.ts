@@ -1,9 +1,16 @@
 /**
- * Interfaces and utility functions for a EditFlog.
+ * Interfaces and utility functions for a Flog.
  */
 
 /**
- * The interface for a EditFlog
+ * Uses IEntry to define the entries for a flog.
+ */
+import type { IEntry } from './EntryData'
+// Re-export for convenience
+export type { IEntry as IEntry }
+
+/**
+ * The interface for a Flog
  * @public
  */
 export interface IFlog extends IFlogCore {
@@ -16,7 +23,7 @@ export interface IFlog extends IFlogCore {
 }
 
 /**
- * The core abstract model for a EditFlog
+ * The core abstract model for a Flog
  * @private
  */
 interface IFlogCore {
@@ -24,11 +31,6 @@ interface IFlogCore {
     pretext?: string,
     status?: IFlogStatus
 }
-
-/**
- * Uses IEntry to define the entries for a flog.
- */
-import type { IEntry } from './EntryData'
 
 /**
  * An enum for flog status values

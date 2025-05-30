@@ -1,9 +1,10 @@
 <template>
   <aside class="vue-file">EntryList.vue</aside>
   <ul class="entry-list">
-    <li v-for="(entry) in entries" :key="entry.entry">
+    <li v-for="entry in entries" :key="entry.entry">
       <FlogEntry
         :key="entry.entry"
+        :flog="flog"
         :entry="entry"
         :read-only="readOnly"
         :is-editing="editingEntry == entry"
@@ -13,9 +14,7 @@
       />
       <div v-if="editingEntry == entry" class="entry__btns">
         <button class="entry__btn mr-8" @click.prevent="">#</button>
-        <span class='small'>
-          Shift + Return or Tab to save
-        </span>
+        <span class="small"> Shift + Return or Tab to save </span>
       </div>
       <div v-else class="entry__btns">
         <button
@@ -44,9 +43,10 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, defineEmits } from "vue";
 import FlogEntry from "@components/FlogEntry.vue";
-import type { IEntry } from "@/modules/EntryData";
+import type { IFlog, IEntry } from "@modules/Flog";
 
 const props = defineProps<{
+  flog: IFlog;
   entries?: Array<IEntry>;
   readOnly?: boolean;
   editingEntry?: IEntry;
@@ -59,23 +59,19 @@ const emit = defineEmits([
   "update-entry",
   "start-editing",
   "stop-editing",
-  "mounted"
+  "mounted",
 ]);
-
 
 function changeEntry(
   actionName: "copy" | "delete" | "edit" | "update",
   entry: IEntry
 ) {
-  // console.log('changeEntry', actionName)
   emit(`${actionName}-entry`, entry);
 }
 
 // Function to catch update from child and emit to grandparent
 function updateEntry(updatedEntry: IEntry) {
   if (!props.readOnly) {
-    // console.log("updateEntry() called");
-    // console.log("Forwarding updated entry to grandparent:", updatedEntry);
     emit("update-entry", updatedEntry);
   }
 }
@@ -102,8 +98,8 @@ const handleStopEditingEntry = () => {
 };
 
 onMounted(() => {
-  console.log('Child component mounted!');
-  emit('mounted'); // Correctly emits the 'mounted' event
+  console.log("Child component mounted!");
+  emit("mounted"); // Correctly emits the 'mounted' event
 });
 </script>
 

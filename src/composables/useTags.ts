@@ -1,26 +1,34 @@
 import { ref, unref } from "vue"
 import type { Ref } from "vue"
-import type { TagIndex, TagMap, Tag, TagIndexRev, TagFlogFile, TagValue, TagEntryDate } from "@modules/Tag"
+import type { TagIndex, TagMap, TagFlogMap, Tag, TagIndexRev, TagFlogFile, TagValue, TagEntryDate } from "@modules/Tag"
 
 
 export type { TagIndex as TagIndex }
 export type { TagMap as TagMap }
+export type { TagFlogMap as TagFlogMap }
 export type { TagIndexRev as TagIndexRev }
 export type { Tag as Tag };
 export type { TagFlogFile as TagFlogFile }
+export type { TagEntryDate as TagEntryDate }
 
 export interface ITagsComposable {
     tagIndex: Ref<TagIndex | undefined>
     setTagsIndex: (newTagIndex: TagIndex, callback?: ICallback) => void,
     getTagsForFlog: (flogFile: TagFlogFile) => TagMap,
+    getTagsForFlogEntryDate: (flogFile: TagFlogFile, entryDate: TagEntryDate) => Tag['tag'][],
     tagHasFlogEntryDate: (tag: TagValue, flogFile: TagFlogFile, entryDate: TagEntryDate) => boolean,
+    getFlogMapFromTags: (
+        filterTags: Tag["tag"] | Tag["tag"][],
+        excludeFlogs?: TagFlogFile | TagFlogFile[]
+    ) => TagFlogMap;
 }
 
+const tagIndex = ref<TagIndex | undefined>()
+
 export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
-    const tagIndex = ref<TagIndex | undefined>(starterIndex)
+    if (!tagIndex.value && starterIndex) tagIndex.value = starterIndex
 
     const setTagsIndex = (newTagIndex: TagIndex, callback?: ICallback) => {
-        console.log('New tag index', newTagIndex.rev);
         tagIndex.value = {
             tagMap: unref(newTagIndex.tagMap),
             rev: unref(newTagIndex.rev),
@@ -40,45 +48,68 @@ export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
                     tagFlogs.map(
                         ([file]) => file
                     ).includes(flogFile))) || [];
-        const mapWithTagsFilteredAndFlogRemoved: TagMap = (
-            mapWithTagsFiltered?.map(
-                ([tag, tagFlogs]) => {
-                    const shortFlogs: Tag['flogs'] = tagFlogs.filter(
-                        ([file]) => (file != flogFile)
-                    )
-                    return [
-                        tag,
-                        shortFlogs
-                    ]
-                }
-            )
-        ) || [];
-        console.log("TAGS mapWithTagsFiltered, mapWithTagsFilteredAndFlogRemoved", mapWithTagsFiltered, mapWithTagsFilteredAndFlogRemoved);
+        // const mapWithTagsFilteredAndFlogRemoved: TagMap = (
+        //     mapWithTagsFiltered?.map(
+        //         ([tag, tagFlogs]) => {
+        //             const shortFlogs: Tag['flogs'] = tagFlogs.filter(
+        //                 ([file]) => (file != flogFile)
+        //             )
+        //             return [
+        //                 tag,
+        //                 shortFlogs
+        //             ]
+        //         }
+        //     )
+        // ) || [];
         // return mapWithTagsFilteredAndFlogRemoved
         return mapWithTagsFiltered
     }
 
+    const getTagsForFlogEntryDate = (flogFile: TagFlogFile, entryDate: TagEntryDate) => {
+        const mapWithTagsFiltered: Tag['tag'][] | undefined =
+            (tagIndex.value?.tagMap?.filter(
+                ([, tagFlogs]) =>
+                    // true if this tag contains an entry for this flogFile with the entryDate
+                    tagFlogs.filter(
+                        ([file, entryDates]) => file == flogFile && 0 < entryDates.filter((thisEntryDate) => {
+                            const entryDateDate = new Date(entryDate)
+                            const thisEntryDateDate = new Date(thisEntryDate)
+                            return entryDateDate.getTime() == thisEntryDateDate.getTime()
+                        }).length
+                    ).length > 0
+            ))?.map(([tag]) => tag) || [];
+        return mapWithTagsFiltered as Tag['tag'][]
+    }
+
+    const getFlogMapFromTags = (
+        filterTags: Tag["tag"] | Tag["tag"][],
+        excludeFlogs?: TagFlogFile | TagFlogFile[]
+    ): TagFlogMap => {
+        const useFilterTags = [filterTags].flat(); // Make sure a single item is converted to an array
+        const useExcludeFlogs = [(excludeFlogs || [])].flat(); // Make sure a single item is converted to an array
+        return tagIndex?.value?.tagMap?.filter(([tag]) => useFilterTags.includes(tag))
+            .map<Tag["flogs"]>(([, flogs]) => flogs)
+            .flat()
+            .filter(([flogFile]) => !useExcludeFlogs.includes(flogFile))
+            || [];
+    };
+
     const tagHasFlogEntryDate = (tag: TagValue, flogFile: TagFlogFile, entryDate: TagEntryDate) => {
         const tagFlogs = (new Map(tagIndex.value?.tagMap || [])).get(tag) || [];
-        console.log('CHAD tagFlogs', flogFile, entryDate.toLocaleString(), tagFlogs)
 
         const flogTagFlog = tagFlogs.filter(
             ([tagFlogFile]) => tagFlogFile == flogFile
         );
-        console.log('CHAD flogTagFlog', flogFile, flogTagFlog)
 
         const tagFlogEntryDates = flogTagFlog
             .map(([, tagFlogEntryDates]) =>
                 tagFlogEntryDates.map((tagFlogEntryDate) => (new Date(tagFlogEntryDate)).toDateString())
             )
             .flat();
-        console.log('CHAD tagFlogEntryDates', entryDate.toDateString(), tagFlogEntryDates)
 
         const entryMatch = tagFlogEntryDates.includes(
             entryDate.toDateString()
         );
-
-        // console.log("TAGS check", entryMatch);
 
         return entryMatch;
     }
@@ -87,7 +118,9 @@ export const useTags = (starterIndex?: TagIndex): ITagsComposable => {
         tagIndex,
         setTagsIndex,
         getTagsForFlog,
+        getTagsForFlogEntryDate,
         tagHasFlogEntryDate,
+        getFlogMapFromTags,
     }
 }
 

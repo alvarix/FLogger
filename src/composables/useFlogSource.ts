@@ -1,16 +1,20 @@
 import { ref, watch } from "vue"
 import type { Ref } from "vue"
-import type { IFlog } from "@/modules/Flog"
+import type { IFlog, IEntry } from "@/modules/Flog"
 import { IFlogStatus, IFlogSourceType } from "@/modules/Flog"
 import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
-import type { IDropboxFlog, ITagsComposable, TagIndex, TagMap, Tag } from "@/composables/useDropboxFlogs";
+import type { IDropboxFlog, ITagsComposable, TagIndex, TagMap, Tag, TagFlogMap } from "@/composables/useDropboxFlogs";
 
 // Re-export these for convenience
 export type { IFlog as IFlog }
+export type { IEntry as IEntry }
 export type { Tag as Tag }
 export type { TagMap as TagMap }
 export { IFlogStatus as IFlogStatus }
 export { IFlogSourceType as IFlogSourceType }
+
+// A map of Flogs to arrays of Entries
+export type FlogEntryMap = [IFlog, IEntry[]][];
 
 // useFlogSource returns the refs and operations defined in IFlogSource
 // It includes:
@@ -101,8 +105,10 @@ export interface IFlogSource {
     // useSourceType(sourceType).
     tagIndex: Ref<TagIndex | undefined>;
     getTagsForFlog: ITagsComposable['getTagsForFlog'];
+    getTagsForFlogEntryDate: ITagsComposable['getTagsForFlogEntryDate'];
     tagHasFlogEntryDate: ITagsComposable['tagHasFlogEntryDate'];
-
+    getFlogMapFromTags: ITagsComposable['getFlogMapFromTags'];
+    loadAndGetFlogEntryMapFromTagFlogMap: (flogEntriesMap: Tag["flogs"]) => FlogEntryMap;
 }
 
 const {
@@ -120,6 +126,8 @@ const {
     connectionPopupWindow: connectionPopupWindow_dropbox,
     tagIndex: tagIndex_dropbox,
     getTagsForFlog: getFlogTags_dropbox,
+    getTagsForFlogEntryDate: getTagsForFlogEntryDate_dropbox,
+    getFlogMapFromTags: getFlogMapFromTags_dropbox,
     tagHasFlogEntryDate: tagHasFlogEntryDate_dropbox
 } = useDropboxFlogs();
 
@@ -170,21 +178,18 @@ watch(
 )
 watch(accountOwner_dropbox,
     () => {
-        console.log('watch accountOwner_dropbox', accountOwner_dropbox)
         accountOwner.value = accountOwner_dropbox.value
     },
     { immediate: true }
 )
 watch(hasConnection_dropbox,
     () => {
-        console.log('watch hasConnection_dropbox', hasConnection_dropbox)
         hasConnection.value = hasConnection_dropbox.value
     },
     { immediate: true }
 )
 watch(connectionPopupWindow_dropbox,
     () => {
-        console.log('watch connectionPopupWindow_dropbox', connectionPopupWindow_dropbox)
         connectionPopupWindow.value = connectionPopupWindow_dropbox.value
     },
     { immediate: true }
@@ -192,7 +197,6 @@ watch(connectionPopupWindow_dropbox,
 watch(
     tagIndex_dropbox,
     () => {
-        // console.log("TAGS watch tagIndex_dropbox", tagIndex_dropbox)
         tagIndex.value = tagIndex_dropbox.value
     }
     ,
@@ -264,12 +268,30 @@ export const useFlogSource = (sourceType: IFlogSourceType): IFlogSource => {
         }
     }
 
-    const getTagsForFlog: ITagsComposable['getTagsForFlog'] = (args) => {
+    const getTagsForFlog: ITagsComposable['getTagsForFlog'] = (...args) => {
         switch (sourceType) {
             case IFlogSourceType.dropbox:
-                return (getFlogTags_dropbox(args) || []) as TagMap;
+                return (getFlogTags_dropbox(...args) || []) as TagMap;
             default:
                 return [] as TagMap
+        }
+    }
+
+    const getTagsForFlogEntryDate: ITagsComposable['getTagsForFlogEntryDate'] = (...args) => {
+        switch (sourceType) {
+            case IFlogSourceType.dropbox:
+                return (getTagsForFlogEntryDate_dropbox(...args) || []) as Tag['tag'][];
+            default:
+                return [] as Tag['tag'][]
+        }
+    }
+
+    const getFlogMapFromTags: ITagsComposable['getFlogMapFromTags'] = (...args) => {
+        switch (sourceType) {
+            case IFlogSourceType.dropbox:
+                return (getFlogMapFromTags_dropbox(...args) || []) as TagFlogMap;
+            default:
+                return [] as TagFlogMap
         }
     }
 
@@ -281,6 +303,43 @@ export const useFlogSource = (sourceType: IFlogSourceType): IFlogSource => {
                 return false
         }
     }
+
+    const loadAndGetFlogEntryMapFromTagFlogMap = (
+        flogEntriesMap: Tag["flogs"]
+    ): FlogEntryMap => {
+        const newMatchedFlogEntries = new Map<IFlog, IEntry[]>();
+
+        flogEntriesMap.forEach(([tagFlogFile]) => {
+            const flog = availableFlogs.value.reduce<IFlog | undefined>(
+                (acc, current) => (current.url == tagFlogFile ? current : acc),
+                undefined
+            );
+            if (flog) {
+                if (flog.loadedEntries.length == 0) loadFlogEntriesFromSource(flog);
+                // Filter entries for this flog to ones that have a match in flogEntriesMap
+                const matchingEntries = flog.loadedEntries.filter((loadedEntry) => {
+                    // Find if there are any matches in flogEntriesMap
+                    // for this specific flog entry
+                    const entriesMap = flogEntriesMap
+                        .filter(([tagFlogFile]) => tagFlogFile == flog.url)
+                        .map(([, tagEntryDates]) => tagEntryDates)
+                        .flat()
+                        .map((tagEntryDate) => new Date(tagEntryDate))
+                        .filter(
+                            (tagEntryDate) =>
+                                tagEntryDate.getTime() == loadedEntry.date.getTime()
+                        )
+                        .flat();
+                    // Filter out this entry if there are matches in flogEntriesMap
+                    // (Not likely to be > 1, but possible.)
+                    return entriesMap.length > 0;
+                });
+                newMatchedFlogEntries.set(flog, matchingEntries);
+            }
+        });
+
+        return [...newMatchedFlogEntries];
+    };
 
     return {
         availableFlogs,
@@ -301,6 +360,9 @@ export const useFlogSource = (sourceType: IFlogSourceType): IFlogSource => {
 
         tagIndex,
         getTagsForFlog,
+        getTagsForFlogEntryDate,
         tagHasFlogEntryDate,
+        getFlogMapFromTags,
+        loadAndGetFlogEntryMapFromTagFlogMap,
     }
 }

@@ -39,6 +39,7 @@
 
       <div v-if="flog.status == IFlogStatus.loaded">
         <EntryList
+          :flog="flog"
           :entries="filteredEntries"
           :editing-entry="getFlogEditingEntry(flog)"
           :read-only="flog.readOnly"
@@ -69,9 +70,8 @@
         </div>
       </div>
       <div :data-tab-selected="currentTab == 'Tags'" class="sidebar-panel mb-7">
-        <FlogTags
-          :flog-tag-map="flogTagMap"
-          :flog-file="flog.url"
+        <TagMapSelector
+          :flog-tag-map="flogTagMap || []"
           @tag-selected="handleTagSelect"
         />
       </div>
@@ -106,7 +106,10 @@
       </div>
     </section>
     <section v-if="selectedTag" class="container sidebar viewport">
-      <TagFlogsEntries :key="selectedTag" :flog-entries-map="externalFlogTagMap"/>
+      <TagFlogsEntries
+        :key="selectedTag"
+        :flog-entries-map="externalFlogTagMap || []"
+      />
     </section>
   </div>
 </template>
@@ -117,20 +120,22 @@ import { useOpenFlogs } from "@/composables/useOpenFlogs";
 import {
   useFlogSource,
   IFlogSourceType,
-  type TagMap,
   type Tag,
 } from "@/composables/useFlogSource";
-import { useFlog, IFlogStatus } from "@/composables/useFlog";
-import type { IFlog } from "@/composables/useFlog";
-import EntryData from "@/modules/EntryData";
-import type { IEntry } from "@/modules/EntryData";
+import {
+  useFlog,
+  IFlogStatus,
+  type IFlog,
+  EntryData,
+  type IEntry,
+} from "@/composables/useFlog";
 import AddEntry from "@components/AddEntry.vue";
 import EntryList from "@components/EntryList.vue";
 import FlogPretext from "@components/FlogPretext.vue";
 // @ts-expect-error - vue-spinner typing issue
 import PacmanLoader from "vue-spinner/src/PacmanLoader.vue";
-import FlogTags from "@components/FlogTags.vue";
-import TagFlogsEntries from "./TagFlogsEntries.vue";
+import TagMapSelector from "@components/TagMapSelector.vue";
+import TagFlogsEntries from "@components/TagFlogsEntries.vue";
 
 const props = defineProps<{
   flog: IFlog; // Accept the flog as a prop
@@ -138,24 +143,13 @@ const props = defineProps<{
 
 const { closeFlog } = useOpenFlogs();
 
-const { saveFlogToSource, tagIndex, getTagsForFlog, tagHasFlogEntryDate } =
-  useFlogSource(IFlogSourceType.dropbox);
-
-const flogTagMap = ref<TagMap>(
-  unref(getTagsForFlog(props.flog.url) || []) as TagMap
-);
-watch(
-  [tagIndex, getTagsForFlog],
-  () => {
-    // console.log("TAGS watch tagIndex", getTagsForFlog(props.flog.url));
-    flogTagMap.value = unref(getTagsForFlog(props.flog.url) || []) as TagMap;
-  },
-  { immediate: true }
+const { saveFlogToSource, tagHasFlogEntryDate, getFlogMapFromTags } = useFlogSource(
+  IFlogSourceType.dropbox
 );
 
-const filteredEntries = ref<IEntry[]>(props.flog.loadedEntries);
-
-const { addEntry, updatePretext, deleteEntry, editEntry } = useFlog(props.flog);
+const { flogTagMap, addEntry, updatePretext, deleteEntry, editEntry } = useFlog(
+  props.flog
+);
 
 const addEntryValue = ref<IEntry | undefined>(); // Initialize reactive addEntryValue
 const isEditingFlogEntries = ref(new Map<IFlog, IEntry>()); // Keep a map of [flog, index] pairs to look up index of entry being edit PER flog
@@ -172,12 +166,10 @@ function addNewEntry(entryData: IEntry, flog: IFlog) {
 }
 
 const handleStartEditingEntry = (flog: IFlog, entry: IEntry) => {
-  // console.log('handleStartEditingEntry', entry)
   isEditingFlogEntries.value.set(flog, entry);
 };
 
 const handleStopEditingEntry = (flog: IFlog) => {
-  // console.log('handleStopEditingEntry')
   isEditingFlogEntries.value.delete(flog);
 };
 
@@ -203,14 +195,9 @@ const handleDeleteEntry = (flog: IFlog, entry: IEntry) => {
 
 // Function to handle the update event from the grandchild and update flog
 const handleUpdateEntry = (flog: IFlog, updatedEntry: IEntry) => {
-  // console.log("handleUpdateEntry() in grandparent called");
-  // console.log("Received updated entry:", updatedEntry);
-
   if (flog) {
     editEntry(updatedEntry);
     isEditingFlogEntries.value.delete(flog);
-    // console.log("deleting", isEditingFlogEntries.value.delete(flog));
-    // = new Map([]); // Create a new map with one entry rather than track multiple entries being edited across flogs at the same time
   } else {
     console.error("flog is not defined or initialized");
   }
@@ -224,8 +211,6 @@ const loaderProps = {
 // Function to catch update from child and emit to grandparent
 function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
   if (flog && !flog.readOnly) {
-    // console.log("handleUpdatePretext() called");
-    // console.log("new pretext:", updatedPretext);
     updatePretext(updatedPretext);
     saveFlogToSource(flog);
   }
@@ -236,10 +221,25 @@ type SidebarTab = "TOC" | "Tags" | "About";
 const currentTab = ref<SidebarTab>("Tags");
 const sidebarTabs = ref<SidebarTab[]>(["TOC", "Tags", "About"]);
 
+const filteredEntries = ref<IEntry[]>(props.flog.loadedEntries);
 const selectedTag = ref<Tag["tag"]>();
 
+watch(
+  [() => props.flog.loadedEntries, selectedTag],
+  () => {
+    const tag = selectedTag.value;
+    if (tag) {
+      filteredEntries.value = props.flog.loadedEntries.filter((entry) => {
+        return tagHasFlogEntryDate(tag, props.flog.url, entry.date);
+      });
+    } else {
+      filteredEntries.value = props.flog.loadedEntries;
+    }
+  },
+  { immediate: true }
+);
+
 const handleTagSelect = (tag: Tag["tag"]) => {
-  console.log("TAGS handleTagSelect", tag);
   selectedTag.value = tag;
   if (!tag) {
     filteredEntries.value = props.flog.loadedEntries;
@@ -250,17 +250,18 @@ const handleTagSelect = (tag: Tag["tag"]) => {
   }
 };
 
-const externalFlogTagMap = ref<Tag["flogs"]>([]);
+const externalFlogTagMap = ref<Tag["flogs"] | undefined>();
 watch(
-  [selectedTag, flogTagMap],
-  ([newSelectedTag, newFlogTagMap], [oldSelectedTag]) => {
-    if (!newSelectedTag) externalFlogTagMap.value = [];
-    else if (oldSelectedTag!=newSelectedTag)
-      externalFlogTagMap.value = newFlogTagMap
-        .filter(([tag]) => tag == newSelectedTag)
-        .map<Tag["flogs"]>(([, flogs]) => flogs)
-        .flat()
-        .filter(([flogFile]) => flogFile != props.flog.url);
+  selectedTag,
+  (newValue) => {
+    // Values for selectedTag and/or flogTagMap could have been updated.
+    // Get the values to use for filtering down to externalFlogTagMap,
+    // which should have entries for the selected tag, excluding this
+    // EditFlog component's flog.
+    const useSelectedTag = newValue || selectedTag.value;
+    if (!useSelectedTag) externalFlogTagMap.value = [];
+    else
+      externalFlogTagMap.value = getFlogMapFromTags(useSelectedTag, props.flog.url);
   },
   { immediate: true, deep: true }
 );
@@ -371,7 +372,8 @@ button.small {
 }
 
 .sidebar-tab[data-tab-selected="true"] {
-  text-shadow: 0px 0px 1px light-dark(black,white), 0px 0px 1px light-dark(black,white);
+  text-shadow: 0px 0px 1px light-dark(black, white),
+    0px 0px 1px light-dark(black, white);
 }
 
 .sidebar-panel {

@@ -41,7 +41,6 @@ const emit = defineEmits(["update-pretext"]);
 const isEditing = ref(false);
 const pretextEl = ref<HTMLElement | null>(null);
 const pretextValue = ref<string>(props.pretext || "");
-console.log("pretextValue.value", pretextValue.value);
 
 function edit() {
   isEditing.value = true;
@@ -49,7 +48,6 @@ function edit() {
 
 function setupEditing() {
   nextTick(() => {
-    console.log("pretextEl", pretextEl.value);
     if (pretextEl.value && pretextEl.value != null) {
       // Set cursor position to the end of the text
       placeCursorAtEnd(pretextEl.value);
@@ -75,7 +73,6 @@ watch(
 
 // Function to emit the update when blur occurs
 function save() {
-  // console.log('save pretextValue', pretextValue)
   // Could use either of these:
   // entryText.value = event.target.innerText;
   pretextValue.value = pretextEl.value!=null ? pretextEl.value.innerText : '';

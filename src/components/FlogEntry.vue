@@ -2,13 +2,8 @@
   <div class="entry">
     <h3>{{ formattedDate }}</h3>
 
-    <!-- If not editing, display rendered markdown with VueShowdown -->
-    <div
-      v-if="!props.isEditing"
-      class="entry__body"
-      @click="handleStartEditing"
-    >
-      <VueShowdown flavor="github" :markdown="entryText" />
+    <div v-if="!isEditing" class="entry__body" @click="handleStartEditing">
+      <MarkedText :raw-text="entryText" :tags="entryTags" />
     </div>
 
     <!-- Display a contenteditable textarea if editing -->
@@ -34,13 +29,26 @@
 
 <script setup lang="ts">
 import { ref, computed, nextTick, watch } from "vue";
-import type { IEntry } from "../modules/EntryData";
-import { useKeyDownHandler } from "@/composables/useFlog.ts";
+import {
+  useKeyDownHandler,
+  useFlog,
+  IFlogSourceType,
+  type IFlog,
+  type IEntry,
+  type Tag,
+} from "@/composables/useFlog.ts";
 import { placeCursorAtEnd } from "@/modules/utilities";
+import MarkedText from "@/components/MarkedText.vue";
 
-const { handleKeyDown } = useKeyDownHandler(handleBlur);
+const defaultPlaceholderFlog: IFlog = {
+  sourceType: IFlogSourceType.localFile,
+  url: "unknown",
+  loadedEntries: [],
+  readOnly: true,
+};
 
-const props = defineProps<{
+const { flog, entry, isEditing, readOnly } = defineProps<{
+  flog: IFlog;
   entry: IEntry;
   isEditing?: boolean;
   readOnly?: boolean;
@@ -49,6 +57,22 @@ const props = defineProps<{
 // Emits an event to the parent
 const emit = defineEmits(["update-entry", "start-editing", "stop-editing"]);
 
+const flogRef = ref<IFlog>(flog || defaultPlaceholderFlog);
+
+const { handleKeyDown } = useKeyDownHandler(handleBlur);
+
+const { getTagsForEntryDate, flogTagMap } = useFlog(flogRef);
+
+const entryTags = ref<Tag["tag"][]>(
+  (flog && getTagsForEntryDate(entry.date)) || []
+);
+watch(
+  () => flogTagMap,
+  () => {
+    entryTags.value = (flog && getTagsForEntryDate(entry.date)) || [];
+  }
+);
+
 // Utility function to format timestamp to MM/DD/YYYY
 function formatDate(timestamp: string | number | Date): string {
   const date = new Date(timestamp);
@@ -56,26 +80,24 @@ function formatDate(timestamp: string | number | Date): string {
   const day = String(date.getDate()).padStart(2, "0");
   const year = date.getFullYear();
   const time = date.toLocaleTimeString("en-US");
-  // {{props.entry.date.toLocaleDateString("en-US")}} {{props.entry.date.toLocaleTimeString("en-US")}}
   return `${month}/${day}/${year} ${time}`;
 }
 
 // Computed property to format the entry date
-const formattedDate = computed(() => formatDate(props.entry.date));
+const formattedDate = computed(() => formatDate(entry.date));
 
 // In order to react to props that update after initial component load,
 // we need to make local reactive refs and watch the props
-const entryText = ref<string>(props.entry.entry);
-const isReadOnly = ref<boolean | null>(props.readOnly);
+const entryText = ref<string>(entry.entry);
+const isReadOnly = ref<boolean | null>(readOnly);
 const entryEl = ref<HTMLElement | null>(null);
 
 const handleStartEditing = () => {
-  emit("start-editing", props.entry); // Or { ...props.entry, entry: entryText.value } ??
+  emit("start-editing", entry); // Or { ...entry, entry: entryText.value } ??
 };
 
 function setupEditing() {
   nextTick(() => {
-    console.log("entryEl", entryEl.value);
     if (entryEl.value && entryEl.value != null) {
       // Set cursor position to the end of the text
       placeCursorAtEnd(entryEl.value);
@@ -88,14 +110,13 @@ function setupEditing() {
 
 // Function to emit the update when blur occurs
 function handleBlur() {
-  // console.log("handleBlur triggered", event.srcElement.value, entryText.value);
   // Could use either of these:
   // entryText.value = event.target.innerText;
   entryText.value = entryEl.value != null ? entryEl.value.innerText : "";
   // Pass back same entry prop with new entry text overwritten
-  emit("update-entry", { ...props.entry, entry: entryText.value });
+  emit("update-entry", { ...entry, entry: entryText.value });
   // // This doesn't work right now because Entry doesn't have its own index to pass back.
-  // emit("stop-editing", props.index);
+  // emit("stop-editing", index);
   emit("stop-editing");
   // // This is not necessary and triggers a re-render on focus
 }
@@ -103,15 +124,14 @@ function handleBlur() {
 // what do these watches do?
 
 watch(
-  () => props.entry,
+  () => entry,
   (newValue) => {
-    // console.log('watch props.entry')
     entryText.value = newValue.entry;
   }
 );
 
 watch(
-  () => props.isEditing,
+  () => isEditing,
   (newValue) => {
     if (newValue) setupEditing();
   },
@@ -119,9 +139,8 @@ watch(
 );
 
 watch(
-  () => props.readOnly,
+  () => readOnly,
   (newValue) => {
-    // console.log('watch props.readOnly')
     isReadOnly.value = newValue;
   }
 );

@@ -1,5 +1,4 @@
-import type { IFlog } from "./Flog";
-import type { IEntry } from "./EntryData";
+import type { IFlog, IEntry } from "./Flog";
 
 /*
  * Describes the type for an index of Tags
@@ -65,6 +64,7 @@ export type TagIndex = {
  *
  */
 export type TagMap = TagTuple[] // Instead of Map<Tag['tag'], Tag['flogs']>
+export type TagFlogMap = TagFlogTuple[]
 
 /*
  * Abstract Tag model
@@ -72,7 +72,7 @@ export type TagMap = TagTuple[] // Instead of Map<Tag['tag'], Tag['flogs']>
  */
 export type Tag = {
     tag: TagValue;
-    flogs: TagFlogTuple[]
+    flogs: TagFlogMap
 }
 
 /*
@@ -87,7 +87,7 @@ export type TagEntryDate = IEntry['date']
 /*
  * Tuple used to map a single tag to flogs with entries containing the tag
  */
-type TagTuple = [Tag['tag'], TagFlogTuple[]]
+type TagTuple = [Tag['tag'], TagFlogMap]
 /*
  * Tuple used to map a single flog (identified by a "file" string) to entries containing the same tag
  */

@@ -29,6 +29,7 @@ import EditFlog from "@components/EditFlog.vue";
 import { useOpenFlogs } from "@/composables/useOpenFlogs.ts";
 import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource.ts";
 import FloggerHead from "@components/FloggerHead.vue";
+
 const { hasConnection } = useFlogSource(IFlogSourceType.dropbox);
 const { openFlogs } = useOpenFlogs();
 </script>

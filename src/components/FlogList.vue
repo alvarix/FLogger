@@ -116,7 +116,6 @@ watch(
 );
 
 function selectFile(file: IFlog) {
-  console.log("selectFile", file);
   loadFlogEntriesFromSource(file);
   openFlog(file);
 }
@@ -153,7 +152,6 @@ const sortDescending = ref<boolean>(true);
 
 const showSortOptionSelect = ref(false);
 function selectSortOption(option: sortType) {
-  console.log("selectSortOption", option);
   sortOption.value = option;
 }
 
@@ -193,7 +191,6 @@ const sortedAvailableFlogs = ref<IFlog[]>(
 watch(
   [availableFlogs, sortOption, sortDescending],
   () => {
-    console.log("sortOption.value", sortOption.value);
     switch (sortOption.value) {
       case sortType.name:
         sortedAvailableFlogs.value = sortFlogsByFilename(
