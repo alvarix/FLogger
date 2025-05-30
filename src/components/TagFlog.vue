@@ -18,6 +18,7 @@
         @start-editing="() => handleStartEditingEntry(entry)"
         @stop-editing="() => handleStopEditingEntry()"
         @update-entry="(entry) => handleUpdateEntry(entry)"
+        @tag-selected="handleTagSelect"
       />
     </div>
   </div>
@@ -25,7 +26,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
-import type { TagFlogFile, TagEntryDate } from "@composables/useTags";
+import type { TagFlogFile, TagEntryDate, Tag } from "@composables/useTags";
 import {
   IFlogSourceType,
   useFlogSource,
@@ -39,6 +40,10 @@ const { flogFile, entryDates } = defineProps<{
   flogFile: TagFlogFile;
   entryDates: TagEntryDate[];
 }>();
+
+const emit = defineEmits([
+  "tag-selected",
+]);
 
 const showFlog = ref(true);
 const toggleShow = () => {
@@ -120,6 +125,11 @@ const handleUpdateEntry = (updatedEntry: IEntry) => {
     console.error("flog is not defined or initialized");
   }
 };
+
+const handleTagSelect = (tag: Tag["tag"]) => {
+  emit("tag-selected", tag);
+};
+
 </script>
 
 <style scoped>

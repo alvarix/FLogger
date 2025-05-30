@@ -3,7 +3,11 @@
     <h3>{{ formattedDate }}</h3>
 
     <div v-if="!isEditing" class="entry__body" @click="handleStartEditing">
-      <MarkedText :raw-text="entryText" :tags="entryTags" />
+      <MarkedText
+        :raw-text="entryText"
+        :tags="entryTags"
+        @tag-selected="handleTagSelect"
+      />
     </div>
 
     <!-- Display a contenteditable textarea if editing -->
@@ -55,7 +59,12 @@ const { flog, entry, isEditing, readOnly } = defineProps<{
 }>();
 
 // Emits an event to the parent
-const emit = defineEmits(["update-entry", "start-editing", "stop-editing"]);
+const emit = defineEmits([
+  "update-entry",
+  "start-editing",
+  "stop-editing",
+  "tag-selected",
+]);
 
 const flogRef = ref<IFlog>(flog || defaultPlaceholderFlog);
 
@@ -92,7 +101,7 @@ const entryText = ref<string>(entry.entry);
 const isReadOnly = ref<boolean | null>(readOnly);
 const entryEl = ref<HTMLElement | null>(null);
 
-const handleStartEditing = () => {
+const handleStartEditing = (event) => {
   emit("start-editing", entry); // Or { ...entry, entry: entryText.value } ??
 };
 
@@ -120,6 +129,10 @@ function handleBlur() {
   emit("stop-editing");
   // // This is not necessary and triggers a re-render on focus
 }
+
+const handleTagSelect = (tag: Tag["tag"]) => {
+  emit("tag-selected", tag);
+};
 
 // what do these watches do?
 

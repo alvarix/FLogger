@@ -9,7 +9,11 @@
       :key="tagFlogFile"
       class="mb-2"
     >
-      <TagFlog :flog-file="tagFlogFile" :entry-dates="entryDates" />
+      <TagFlog
+        :flog-file="tagFlogFile"
+        :entry-dates="entryDates"
+        @tag-selected="handleTagSelect"
+      />
     </div>
   </div>
 </template>
@@ -27,6 +31,10 @@ import TagFlog from "@components/TagFlog.vue";
 const { flogEntriesMap } = defineProps<{
   flogEntriesMap: Tag["flogs"];
 }>();
+
+const emit = defineEmits([
+  "tag-selected",
+]);
 
 const { availableFlogs, loadAndGetFlogEntryMapFromTagFlogMap } = useFlogSource(
   IFlogSourceType.dropbox
@@ -50,6 +58,12 @@ watch(
   },
   { immediate: true, deep: true }
 );
+
+const handleTagSelect = (tag: Tag["tag"]) => {
+  emit("tag-selected", tag);
+};
+
+
 </script>
 
 <style scoped>

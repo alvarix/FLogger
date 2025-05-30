@@ -11,6 +11,7 @@
         @start-editing="() => handleStartEditingEntry(entry)"
         @stop-editing="() => handleStopEditingEntry()"
         @update-entry="updateEntry"
+        @tag-selected="handleTagSelect"
       />
       <div v-if="editingEntry == entry" class="entry__btns">
         <button class="entry__btn mr-8" @click.prevent="">#</button>
@@ -44,6 +45,7 @@
 import { ref, watch, onMounted, defineEmits } from "vue";
 import FlogEntry from "@components/FlogEntry.vue";
 import type { IFlog, IEntry } from "@modules/Flog";
+import type { Tag } from "@modules/Tag";
 
 const props = defineProps<{
   flog: IFlog;
@@ -60,6 +62,7 @@ const emit = defineEmits([
   "start-editing",
   "stop-editing",
   "mounted",
+  "tag-selected",
 ]);
 
 function changeEntry(
@@ -101,6 +104,10 @@ onMounted(() => {
   console.log("Child component mounted!");
   emit("mounted"); // Correctly emits the 'mounted' event
 });
+
+const handleTagSelect = (tag: Tag["tag"]) => {
+  emit("tag-selected", tag);
+};
 </script>
 
 <style scoped>

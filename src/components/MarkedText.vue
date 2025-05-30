@@ -3,7 +3,7 @@
 
   <div
     id="live-md"
-    ref="liveMdEl"
+    :ref="bindLiveMdEl"
     contenteditable
     @change="changeLiveMd"
     v-html="liveMarkedHtmlString"
@@ -17,7 +17,6 @@ import {
   watch,
   onMounted,
   onUnmounted,
-  nextTick,
 } from "vue";
 import { marked } from "marked";
 
@@ -38,17 +37,14 @@ const { rawText, tags, editable } = defineProps({
   },
 });
 
+// Emits an event to the parent
+const emit = defineEmits(["tag-selected"]);
+
+const handleTagSelect = (tag) => {
+  emit("tag-selected", tag);
+};
+
 // Followed approach shown here: https://dev.to/pyrsmk/how-to-use-the-contenteditable-attribute-in-vue-3-a89
-
-// const postprocess = (html) => {
-//   const processedHtml = html.replace(
-//     /(\<[^\>]*)(\/?\>)/g,
-//     `$1 contenteditable$2`
-//   );
-//   return processedHtml;
-// };
-
-// marked.use({ hooks: { postprocess } });
 
 const renderer = {
   heading({ tokens, depth }) {
@@ -67,7 +63,7 @@ const renderer = {
         ? text
         : text.replace(
             buildRegexFromArray(tags, "g"),
-            (match) => `<span class="md-tag">${match}</span>`
+            (match) => `<button class="md-tag">${match}</button>`
           );
     const escapedText = text.toLowerCase().replace(/[^\w]+/g, "-");
     return `
@@ -85,6 +81,18 @@ const renderer = {
         ${text}
       </strong>`;
   },
+};
+
+const bindLiveMdEl = (el) => {
+  const tagEls = el?.getElementsByClassName("md-tag"); //.getElementsByTagName("h1")
+  if (tagEls)
+    Array.from(tagEls).forEach((el) => {
+      el.addEventListener("click", (event) => {
+        // event.preventDefault();
+        event.stopPropagation();
+        handleTagSelect(el.textContent);
+      });
+    });
 };
 
 marked.use({
@@ -135,15 +143,6 @@ const changeLiveMd = () => {
   // markdownHtml.value += ".";
   liveMarkedHtmlString.value.innerHtml = marked.parse(markdownHtml.value);
 };
-
-// const focusin = (event) => {
-//   const level =
-//     ["none", "capturing", "target", "bubbling"][event.eventPhase] ?? "error";
-// };
-// const focusout = (event) => {
-//   const level =
-//     ["none", "capturing", "target", "bubbling"][event.eventPhase] ?? "error";
-// };
 
 const currentEl = ref();
 
@@ -242,35 +241,14 @@ const toMarkedUXHtmlString = (node) => {
 };
 
 onMounted(() => {
-  nextTick(() => {
-    // const rootEl = document.getElementById("live-md");
-    // const els = [
-    //   rootEl,
-    //   ...Array.from(rootEl.getElementsByClassName("md-focus")),
-    // ];
-    // for (const el of els) {
-    //   // el.addEventListener("keydown", keydowncursor);
-    //   el.addEventListener("click", focusin);
-    //   el.addEventListener("blur", focusout);
-    // }
-    if (editable) document.addEventListener("selectionchange", selectionchange);
-    // document.addEventListener("focusin", focusin);
-    // document.addEventListener("focusout", focusout);
-  });
+  if (editable) document.addEventListener("selectionchange", selectionchange);
+  // nextTick(() => {
+  //   if (editable) document.addEventListener("selectionchange", selectionchange);
+  // });
 });
 onUnmounted(() => {
-  // const els = document
-  //   .getElementById("live-md")
-  //   .getElementsByClassName("md-focus");
-  // for (const el of els) {
-  //   // el.addEventListener("keydown", keydowncursor);
-  //   el.removeEventListener("click", focusin);
-  //   el.removeEventListener("blur", focusout);
-  // }
   if (editable)
     document.removeEventListener("selectionchange", selectionchange);
-  // document.removeEventListener("focusin", focusin);
-  // document.removeEventListener("focusout", focusout);
 });
 </script>
 

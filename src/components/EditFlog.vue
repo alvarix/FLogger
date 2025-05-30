@@ -50,6 +50,7 @@
           @start-editing="(entry) => handleStartEditingEntry(flog, entry)"
           @stop-editing="() => handleStopEditingEntry(flog)"
           @mounted="mountedCheck"
+          @tag-selected="handleTagSelect"
         />
       </div>
     </section>
@@ -109,6 +110,7 @@
       <TagFlogsEntries
         :key="selectedTag"
         :flog-entries-map="externalFlogTagMap || []"
+        @tag-selected="handleTagSelect"
       />
     </section>
   </div>
@@ -143,9 +145,8 @@ const props = defineProps<{
 
 const { closeFlog } = useOpenFlogs();
 
-const { saveFlogToSource, tagHasFlogEntryDate, getFlogMapFromTags } = useFlogSource(
-  IFlogSourceType.dropbox
-);
+const { saveFlogToSource, tagHasFlogEntryDate, getFlogMapFromTags } =
+  useFlogSource(IFlogSourceType.dropbox);
 
 const { flogTagMap, addEntry, updatePretext, deleteEntry, editEntry } = useFlog(
   props.flog
@@ -261,7 +262,10 @@ watch(
     const useSelectedTag = newValue || selectedTag.value;
     if (!useSelectedTag) externalFlogTagMap.value = [];
     else
-      externalFlogTagMap.value = getFlogMapFromTags(useSelectedTag, props.flog.url);
+      externalFlogTagMap.value = getFlogMapFromTags(
+        useSelectedTag,
+        props.flog.url
+      );
   },
   { immediate: true, deep: true }
 );
