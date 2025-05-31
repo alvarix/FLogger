@@ -3,7 +3,10 @@
 
   <h3>
     {{ flog.url }}
-    <button class="small close-flog" @click.prevent="() => toggleShow()">
+    <button class="small open-flog" @click.prevent="() => openFlog()">
+      open
+    </button>
+    <button class="small show-flog" @click.prevent="() => toggleShow()">
       {{ showFlog ? "hide" : "show" }}
     </button>
   </h3>
@@ -43,12 +46,16 @@ const { flogFile, entryDates } = defineProps<{
 
 const emit = defineEmits([
   "tag-selected",
+  "open-flog",
 ]);
 
 const showFlog = ref(true);
 const toggleShow = () => {
   showFlog.value = !showFlog.value;
 };
+const openFlog = () => {
+  emit("open-flog", flog.value)
+}
 
 const { availableFlogs, loadFlogEntriesFromSource } =
   useFlogSource(IFlogSourceType.dropbox);

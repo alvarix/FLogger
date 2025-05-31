@@ -13,6 +13,7 @@
         :flog-file="tagFlogFile"
         :entry-dates="entryDates"
         @tag-selected="handleTagSelect"
+        @open-flog="handleOpenFlog"
       />
     </div>
   </div>
@@ -25,6 +26,7 @@ import {
   IFlogSourceType,
   useFlogSource,
   type FlogEntryMap,
+  type IFlog,
 } from "@composables/useFlogSource";
 import TagFlog from "@components/TagFlog.vue";
 
@@ -34,6 +36,7 @@ const { flogEntriesMap } = defineProps<{
 
 const emit = defineEmits([
   "tag-selected",
+  "open-flog", 
 ]);
 
 const { availableFlogs, loadAndGetFlogEntryMapFromTagFlogMap } = useFlogSource(
@@ -62,6 +65,10 @@ watch(
 const handleTagSelect = (tag: Tag["tag"]) => {
   emit("tag-selected", tag);
 };
+
+const handleOpenFlog = (flog: IFlog) => {
+  emit("open-flog", flog)
+}
 
 
 </script>

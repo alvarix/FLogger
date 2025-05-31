@@ -111,6 +111,7 @@
         :key="selectedTag"
         :flog-entries-map="externalFlogTagMap || []"
         @tag-selected="handleTagSelect"
+        @open-flog="handleOpenFlog"
       />
     </section>
   </div>
@@ -143,10 +144,14 @@ const props = defineProps<{
   flog: IFlog; // Accept the flog as a prop
 }>();
 
-const { closeFlog } = useOpenFlogs();
+const { closeFlog, openFlog } = useOpenFlogs();
 
-const { saveFlogToSource, tagHasFlogEntryDate, getFlogMapFromTags } =
-  useFlogSource(IFlogSourceType.dropbox);
+const {
+  saveFlogToSource,
+  tagHasFlogEntryDate,
+  getFlogMapFromTags,
+  loadFlogEntriesFromSource,
+} = useFlogSource(IFlogSourceType.dropbox);
 
 const { flogTagMap, addEntry, updatePretext, deleteEntry, editEntry } = useFlog(
   props.flog
@@ -154,8 +159,6 @@ const { flogTagMap, addEntry, updatePretext, deleteEntry, editEntry } = useFlog(
 
 const addEntryValue = ref<IEntry | undefined>(); // Initialize reactive addEntryValue
 const isEditingFlogEntries = ref(new Map<IFlog, IEntry>()); // Keep a map of [flog, index] pairs to look up index of entry being edit PER flog
-const getFlogEditingEntry = (flog: IFlog): IEntry | undefined =>
-  isEditingFlogEntries.value.get(flog);
 
 function addNewEntry(entryData: IEntry, flog: IFlog) {
   const newEntry = new EntryData(new Date(entryData.date), entryData.entry);
@@ -249,6 +252,12 @@ const handleTagSelect = (tag: Tag["tag"]) => {
       return tagHasFlogEntryDate(tag, props.flog.url, entry.date);
     });
   }
+};
+
+const handleOpenFlog = (flog: IFlog) => {
+  loadFlogEntriesFromSource(flog);
+  openFlog(flog);
+  closeFlog(props.flog);
 };
 
 const externalFlogTagMap = ref<Tag["flogs"] | undefined>();
