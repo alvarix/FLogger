@@ -41,7 +41,7 @@
         <EntryList
           :flog="flog"
           :entries="filteredEntries"
-          :editing-entry="getFlogEditingEntry(flog)"
+          :editing-entry="isEditingFlogEntries.get(flog)"
           :read-only="flog.readOnly"
           @edit-entry="editEntry"
           @copy-entry="handleCopyEntry"

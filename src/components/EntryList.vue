@@ -7,13 +7,13 @@
         :flog="flog"
         :entry="entry"
         :read-only="readOnly"
-        :is-editing="editingEntry == entry"
+        :is-editing="currentEditingEntry?.id == entry.id"
         @start-editing="() => handleStartEditingEntry(entry)"
         @stop-editing="() => handleStopEditingEntry()"
         @update-entry="updateEntry"
         @tag-selected="handleTagSelect"
       />
-      <div v-if="editingEntry == entry" class="entry__btns">
+      <div v-if="currentEditingEntry?.id == entry.id" class="entry__btns">
         <button class="entry__btn mr-8" @click.prevent="">#</button>
         <span class="small"> Shift + Return or Tab to save </span>
       </div>
@@ -31,7 +31,6 @@
         <button
           v-if="!readOnly"
           class="small entry__btn entry__btn--warn"
-          :disabled="editingEntry == entry"
           @click="changeEntry('delete', entry)"
         >
           Delete
@@ -80,11 +79,11 @@ function updateEntry(updatedEntry: IEntry) {
 }
 
 // Track the currently editing entry ID
-const editingEntry = ref<IEntry | undefined>(props.editingEntry);
+const currentEditingEntry = ref<IEntry | undefined>(props.editingEntry);
 watch(
   () => props.editingEntry,
   (newValue) => {
-    editingEntry.value = newValue;
+        currentEditingEntry.value = newValue;
   },
   { immediate: true }
 );

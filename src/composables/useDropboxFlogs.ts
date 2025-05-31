@@ -314,7 +314,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
                 if (status != IFlogStatus.error) {
                     flog.pretext = pretext
                     const timestamp = Date.now()
-                    flog.loadedEntries = loadedEntries.map((entry, index) => ({ ...entry, id: timestamp + '_' + index }))
+                    flog.loadedEntries = loadedEntries.map((entry) => ({ ...entry, id: timestamp + '_' + entry.date.getTime() }))
                 }
             }
         )

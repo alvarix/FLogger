@@ -127,7 +127,7 @@ export const useFlog = (inFlog: IFlog | Ref<IFlog>): IUseFlog => {
             showMessage('Saved');
 
         } else {
-            console.error('Entry not found in flog.value.loadedEntries');
+            console.error('Entry not found in flog.value.loadedEntries', editEntryIndex , "\n", entry.id);
         }
     }
 
@@ -145,7 +145,7 @@ export const useFlog = (inFlog: IFlog | Ref<IFlog>): IUseFlog => {
             // Save the updated flog to the source to persist the changes
             saveFlogToSource(flog.value);
         } else {
-            console.error('Entry not found in flog.value.loadedEntries');
+            console.error('Entry not found in flog.value.loadedEntries\n');
         }
     };
 

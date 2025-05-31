@@ -2,7 +2,7 @@
   <div class="entry">
     <h3>{{ formattedDate }}</h3>
 
-    <div v-if="!isEditing" class="entry__body" @click="handleStartEditing">
+    <div v-if="!props.isEditing" class="entry__body" @click="handleStartEditing">
       <MarkedText
         :raw-text="entryText"
         :tags="entryTags"
@@ -14,7 +14,7 @@
     <pre
       v-else
       id="editEntry"
-      ref="entryEl"
+      :ref="bindEntryEl"
       class="entry__body"
       :contenteditable="!isReadOnly"
       @blur="handleBlur"
@@ -51,7 +51,7 @@ const defaultPlaceholderFlog: IFlog = {
   readOnly: true,
 };
 
-const { flog, entry, isEditing, readOnly } = defineProps<{
+const props = defineProps<{
   flog: IFlog;
   entry: IEntry;
   isEditing?: boolean;
@@ -66,19 +66,19 @@ const emit = defineEmits([
   "tag-selected",
 ]);
 
-const flogRef = ref<IFlog>(flog || defaultPlaceholderFlog);
+const flogRef = ref<IFlog>(props.flog || defaultPlaceholderFlog);
 
 const { handleKeyDown } = useKeyDownHandler(handleBlur);
 
 const { getTagsForEntryDate, flogTagMap } = useFlog(flogRef);
 
 const entryTags = ref<Tag["tag"][]>(
-  (flog && getTagsForEntryDate(entry.date)) || []
+  (props.flog && getTagsForEntryDate(props.entry.date)) || []
 );
 watch(
   () => flogTagMap,
   () => {
-    entryTags.value = (flog && getTagsForEntryDate(entry.date)) || [];
+    entryTags.value = (props.flog && getTagsForEntryDate(props.entry.date)) || [];
   }
 );
 
@@ -93,16 +93,21 @@ function formatDate(timestamp: string | number | Date): string {
 }
 
 // Computed property to format the entry date
-const formattedDate = computed(() => formatDate(entry.date));
+const formattedDate = computed(() => formatDate(props.entry.date));
 
 // In order to react to props that update after initial component load,
 // we need to make local reactive refs and watch the props
-const entryText = ref<string>(entry.entry);
-const isReadOnly = ref<boolean | null>(readOnly);
+const entryText = ref<string>(props.entry.entry);
+const isReadOnly = ref<boolean | null>(props.readOnly);
 const entryEl = ref<HTMLElement | null>(null);
 
-const handleStartEditing = (event) => {
-  emit("start-editing", entry); // Or { ...entry, entry: entryText.value } ??
+const bindEntryEl = (el: HTMLElement) => {
+  entryEl.value = el;
+  // if (el) el.focus();
+};
+
+const handleStartEditing = () => {
+  emit("start-editing", props.entry); // Or { ...props.entry, entry: entryText.value } ??
 };
 
 function setupEditing() {
@@ -123,7 +128,7 @@ function handleBlur() {
   // entryText.value = event.target.innerText;
   entryText.value = entryEl.value != null ? entryEl.value.innerText : "";
   // Pass back same entry prop with new entry text overwritten
-  emit("update-entry", { ...entry, entry: entryText.value });
+  emit("update-entry", { ...props.entry, entry: entryText.value });
   // // This doesn't work right now because Entry doesn't have its own index to pass back.
   // emit("stop-editing", index);
   emit("stop-editing");
@@ -137,14 +142,14 @@ const handleTagSelect = (tag: Tag["tag"]) => {
 // what do these watches do?
 
 watch(
-  () => entry,
+  () => props.entry,
   (newValue) => {
     entryText.value = newValue.entry;
   }
 );
 
 watch(
-  () => isEditing,
+  () => props.isEditing,
   (newValue) => {
     if (newValue) setupEditing();
   },
@@ -152,7 +157,7 @@ watch(
 );
 
 watch(
-  () => readOnly,
+  () => props.readOnly,
   (newValue) => {
     isReadOnly.value = newValue;
   }
