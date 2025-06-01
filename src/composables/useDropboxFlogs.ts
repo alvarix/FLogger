@@ -1,20 +1,28 @@
 import { ref, watch } from "vue"
 import type { Ref } from "vue"
-import type { IFlog } from "@/modules/Flog"
-import { IFlogStatus, IFlogSourceType, deserializeFlog, serializeFlog } from "@/modules/Flog"
+import {
+    type IFlog,
+    type IEntry,
+    IFlogStatus,
+    IFlogSourceType,
+    deserializeFlog,
+    serializeFlog,
+} from "@/modules/Flog"
 import { useDropboxFiles } from "@/composables/useDropboxFiles"
 import type { IDropboxFile, ILoadFileContentCallbackSuccess, ILoadFileContentCallbackError } from "@/composables/useDropboxFiles";
-import { useTags, type ITagsComposable, type TagMap } from "./useTags"
+import { useTags, type ITagsComposable, type TagMap, type TagFlogMap, type TagFlogFile } from "./useTags"
 import type { TagIndex, Tag } from "@/modules/Tag"
-import type { IEntry } from "@/modules/EntryData"
 
 // Re-export these for convenience
 export type { IFlog as IFlog }
+export type { IEntry as IEntry }
 export { IFlogStatus as IFlogStatus }; //enum, not a type
 export type { ITagsComposable as ITagsComposable }
 export type { TagIndex as TagIndex }
 export type { TagMap as TagMap }
+export type { TagFlogMap as TagFlogMap }
 export type { Tag as Tag }
+export type { TagFlogFile as TagFlogFile }
 export interface IDropboxFlog extends IFlog {
     rev?: string;
 }
@@ -47,7 +55,9 @@ export interface IDropboxFlogs {
     // manages the tags index for all flogs in the user's dropbox source
     tagIndex: Ref<TagIndex | undefined>;
     getTagsForFlog: ITagsComposable['getTagsForFlog'];
+    getTagsForFlogEntryDate: ITagsComposable['getTagsForFlogEntryDate'];
     tagHasFlogEntryDate: ITagsComposable['tagHasFlogEntryDate'];
+    getFlogMapFromTags: ITagsComposable['getFlogMapFromTags'];
 }
 
 /*
@@ -103,12 +113,10 @@ for (const propName in repoFilesGlob) {
         );
     }
 }
-// console.log("repoFiles.value", repoFiles.value);
 
 // Clientside fetches to get file contents for each path
 const repoFilesWithContents: IDropboxFile[] = []
 repoFiles.value.forEach(async repoFile => {
-    // console.log(repoFile.path)
 
     // As mentioned before...
     // ...when the frontend does fetch calls, it will add the '/repo_template/' part back.
@@ -120,7 +128,6 @@ repoFiles.value.forEach(async repoFile => {
             return response.text(); // Assuming the server returns JSON
         })
         .then(data => {
-            // console.log('data', data)
             // folderContents.value.push(data);
             repoFilesWithContents.push({
                 path: repoFile.path,
@@ -132,7 +139,6 @@ repoFiles.value.forEach(async repoFile => {
         });
 })
 repoFiles.value = repoFilesWithContents
-// console.log('repoFiles.value', repoFiles.value)
 
 /*
  * Module-scoped: useDropboxFiles 
@@ -167,13 +173,19 @@ const {
 
 const tagIndexFileName = "flogger.tag-index.json"
 const tagIndexFilePath = "/" + tagIndexFileName
-const { tagIndex: tagIndex_useTags, setTagsIndex, getTagsForFlog, tagHasFlogEntryDate } = useTags({ file: tagIndexFilePath, rev: undefined })
+const {
+    tagIndex: tagIndex_useTags,
+    setTagsIndex,
+    getTagsForFlog,
+    getTagsForFlogEntryDate,
+    getFlogMapFromTags,
+    tagHasFlogEntryDate
+} = useTags({ file: tagIndexFilePath, rev: undefined })
 
 const tagIndex = ref(tagIndex_useTags)
 watch(
     tagIndex_useTags,
     () => {
-        // console.log("TAGS watch tagIndex_useTags")
         tagIndex.value = tagIndex_useTags.value
     }
     ,
@@ -194,14 +206,12 @@ watch(
     { immediate: true })
 
 function handleTagIndexFileLoad(result: ILoadFileContentCallbackSuccess | ILoadFileContentCallbackError) {
-    // console.log("TAGS loadFileContent callback", result)
     const { rev, content, error } = result
     if (error) {
         if (error == "file not found") {
             // If loading content fails because the file doesn't exist, create the file
             addFile({ path: tagIndexFileName, content: JSON.stringify([]) }, (result) => {
                 // Once the file is created, set the index in useTags
-                // console.log("TAGS addFile callback", result)
                 setTagsIndex({
                     file: tagIndexFilePath,
                     rev: result.rev,
@@ -226,7 +236,6 @@ function handleTagIndexFileLoad(result: ILoadFileContentCallbackSuccess | ILoadF
             rev,
             tagMap: [...parsedTags],
         })
-        // console.log("TAGS tagIndex", { ...unref(ref(tagIndex)), setTagsIndex: undefined })
     }
 }
 
@@ -294,7 +303,6 @@ watch(
 export const useDropboxFlogs = (): IDropboxFlogs => {
 
     const loadFlogEntries = (flog: IDropboxFlog) => {
-        // console.log('loadFlogEntries flog', flog)
         loadFileContent(
             { path: flog.url },
             (result) => {
@@ -306,14 +314,13 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
                 if (status != IFlogStatus.error) {
                     flog.pretext = pretext
                     const timestamp = Date.now()
-                    flog.loadedEntries = loadedEntries.map((entry, index) => ({ ...entry, id: timestamp + '_' + index }))
+                    flog.loadedEntries = loadedEntries.map((entry) => ({ ...entry, id: timestamp + '_' + entry.date.getTime() }))
                 }
             }
         )
     }
 
     const saveFlogEntries = (flog: IDropboxFlog) => {
-        // console.log('saveFlogEntries flog', flog)
         // First save the flog file
         saveFileContent(
             {
@@ -339,10 +346,10 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
                 }
 
                 // Grab current tagMap
-                const tagMap: Map<Tag['tag'], Tag['flogs']> 
+                const tagMap: Map<Tag['tag'], Tag['flogs']>
                     = new Map([...(tagIndex.value?.tagMap || [])]);
                 // Build tagMap for current flog
-                const thisFlogTagMap: Map<Tag['tag'], Tag['flogs']> 
+                const thisFlogTagMap: Map<Tag['tag'], Tag['flogs']>
                     = new Map()
                 flog.loadedEntries.forEach(entry => {
                     const entryTags = parseTagsFromEntry(entry)
@@ -387,7 +394,6 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
                         mergedTagMap.set(tag, [...thisFlogTagFlogs] as Tag['flogs'])
                     }
                 })
-                console.log("TAGS mergedTagMap", [...mergedTagMap])
 
                 // Update and save tagIndex
                 if (tagIndex.value?.file && tagIndex?.value.rev) {
@@ -414,7 +420,6 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
     }
 
     const addFlog = (flog: IDropboxFlog) => {
-        // console.log('addFlog flog', flog)
         addFile(
             {
                 path: flog.url,
@@ -427,7 +432,6 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
     }
 
     const deleteFlog = (flog: IDropboxFlog) => {
-        // console.log('addFlog flog', flog)
         deleteFile(
             {
                 path: flog.url,
@@ -458,6 +462,8 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
         accountOwner: accountOwner,
         tagIndex,
         getTagsForFlog,
+        getTagsForFlogEntryDate,
+        getFlogMapFromTags,
         tagHasFlogEntryDate,
     }
 }

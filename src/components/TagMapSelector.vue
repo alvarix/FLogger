@@ -1,5 +1,5 @@
 <template>
-  <aside class="vue-file">FlogTags.vue</aside>
+  <aside class="vue-file">TagMapSelector.vue</aside>
 
   <h2>Tags</h2>
   <p>Select a tag to filter flog entries containing that tag.</p>
@@ -45,10 +45,9 @@
 
 <script setup lang="ts">
 import { ref, defineEmits } from "vue";
-import type { TagFlogFile, Tag, TagMap } from "@/composables/useTags";
+import type { Tag, TagMap } from "@/composables/useTags";
 
-const { flogFile, flogTagMap } = defineProps<{
-  flogFile: TagFlogFile;
+const { flogTagMap } = defineProps<{
   flogTagMap: TagMap;
 }>();
 

@@ -2,17 +2,19 @@
   <aside class="vue-file">TagFlogsEntries.vue</aside>
 
   <h2>Tagged entries in other flogs</h2>
-  <div v-if="matchedFlogEntries.length == 0">none</div>
+  <div v-if="flogEntriesMap.length == 0">none</div>
   <div v-else>
     <div
-      v-for="[flog, entries] in matchedFlogEntries"
-      :key="flog.url"
+      v-for="[tagFlogFile, entryDates] in flogEntriesMap"
+      :key="tagFlogFile"
       class="mb-2"
     >
-      <h3>{{ flog.url }}</h3>
-      <div v-for="entry in entries" :key="entry.date.toLocaleString()">
-        <FlogEntry :key="entry.date.toDateString()" :entry="entry" />
-      </div>
+      <TagFlog
+        :flog-file="tagFlogFile"
+        :entry-dates="entryDates"
+        @tag-selected="handleTagSelect"
+        @open-flog="handleOpenFlog"
+      />
     </div>
   </div>
 </template>
@@ -23,63 +25,52 @@ import type { Tag } from "@composables/useTags";
 import {
   IFlogSourceType,
   useFlogSource,
+  type FlogEntryMap,
   type IFlog,
 } from "@composables/useFlogSource";
-import type { IEntry } from "@/modules/EntryData";
-import FlogEntry from "./FlogEntry.vue";
+import TagFlog from "@components/TagFlog.vue";
 
 const { flogEntriesMap } = defineProps<{
   flogEntriesMap: Tag["flogs"];
 }>();
 
-const { availableFlogs, loadFlogEntriesFromSource } = useFlogSource(
+const emit = defineEmits([
+  "tag-selected",
+  "open-flog", 
+]);
+
+const { availableFlogs, loadAndGetFlogEntryMapFromTagFlogMap } = useFlogSource(
   IFlogSourceType.dropbox
 );
 
-const loadedFlogs = ref<IFlog[]>([]);
+const matchedFlogEntries = ref<FlogEntryMap>([]);
 
 watch(
   availableFlogs,
   () => {
-    flogEntriesMap.forEach(([flogFile]) => {
-      const flog = availableFlogs.value.reduce<IFlog | undefined>(
-        (acc, current) => (current.url == flogFile ? current : acc),
-        undefined
-      );
-      if (flog) {
-        loadedFlogs.value.push(flog);
-        if (flog.loadedEntries.length == 0) loadFlogEntriesFromSource(flog);
-      }
-    });
+    // When availableFlogs updates:
+    //  - Update loadedFlogs to match
+    //  - Load entries from source for each flog in availableFlogs and flogEntriesMap
+    //  - Update matchedFlogEntries for these same flogs and the matching entries in each
+    //    This requires building a map
+    //    We loop through loadedFlogs, find matching entries,
+    //    and output a map of flogs to matching entries
+
+    matchedFlogEntries.value =
+      loadAndGetFlogEntryMapFromTagFlogMap(flogEntriesMap);
   },
   { immediate: true, deep: true }
 );
 
-const matchedFlogEntries = ref<[IFlog, IEntry[]][]>([]);
+const handleTagSelect = (tag: Tag["tag"]) => {
+  emit("tag-selected", tag);
+};
 
-watch(
-  loadedFlogs,
-  () => {
-    const map = new Map(matchedFlogEntries.value);
-    loadedFlogs.value.forEach((flog) => {
-      const matchingEntries = flog.loadedEntries.filter((loadedEntry) => {
-        const entriesMap = flogEntriesMap
-          .filter(([tagFlogFile]) => tagFlogFile == flog.url)
-          .map(([, tagEntryDates]) => tagEntryDates)
-          .flat()
-          .filter((tagEntryDate) => {
-            return (
-              new Date(tagEntryDate).toDateString() == loadedEntry.date.toDateString()
-            );
-          });
-        return entriesMap.length > 0;
-      });
-      map.set(flog, matchingEntries);
-    });
-    matchedFlogEntries.value = [...map];
-  },
-  { immediate: true, deep: true }
-);
+const handleOpenFlog = (flog: IFlog) => {
+  emit("open-flog", flog)
+}
+
+
 </script>
 
 <style scoped>

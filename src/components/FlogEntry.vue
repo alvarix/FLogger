@@ -2,20 +2,19 @@
   <div class="entry">
     <h3>{{ formattedDate }}</h3>
 
-    <!-- If not editing, display rendered markdown with VueShowdown -->
-    <div
-      v-if="!props.isEditing"
-      class="entry__body"
-      @click="handleStartEditing"
-    >
-      <VueShowdown flavor="github" :markdown="entryText" />
+    <div v-if="!props.isEditing" class="entry__body" @click="handleStartEditing">
+      <MarkedText
+        :raw-text="entryText"
+        :tags="entryTags"
+        @tag-selected="handleTagSelect"
+      />
     </div>
 
     <!-- Display a contenteditable textarea if editing -->
     <pre
       v-else
       id="editEntry"
-      ref="entryEl"
+      ref="bindEntryEl"
       class="entry__body"
       :contenteditable="!isReadOnly"
       @blur="handleBlur"
@@ -34,20 +33,54 @@
 
 <script setup lang="ts">
 import { ref, computed, nextTick, watch } from "vue";
-import type { IEntry } from "../modules/EntryData";
-import { useKeyDownHandler } from "@/composables/useFlog.ts";
+import {
+  useKeyDownHandler,
+  useFlog,
+  IFlogSourceType,
+  type IFlog,
+  type IEntry,
+  type Tag,
+} from "@/composables/useFlog.ts";
 import { placeCursorAtEnd } from "@/modules/utilities";
+import MarkedText from "@/components/MarkedText.vue";
 
-const { handleKeyDown } = useKeyDownHandler(handleBlur);
+const defaultPlaceholderFlog: IFlog = {
+  sourceType: IFlogSourceType.localFile,
+  url: "unknown",
+  loadedEntries: [],
+  readOnly: true,
+};
 
 const props = defineProps<{
+  flog: IFlog;
   entry: IEntry;
   isEditing?: boolean;
   readOnly?: boolean;
 }>();
 
 // Emits an event to the parent
-const emit = defineEmits(["update-entry", "start-editing", "stop-editing"]);
+const emit = defineEmits([
+  "update-entry",
+  "start-editing",
+  "stop-editing",
+  "tag-selected",
+]);
+
+const flogRef = ref<IFlog>(props.flog || defaultPlaceholderFlog);
+
+const { handleKeyDown } = useKeyDownHandler(handleBlur);
+
+const { getTagsForEntryDate, flogTagMap } = useFlog(flogRef);
+
+const entryTags = ref<Tag["tag"][]>(
+  (props.flog && getTagsForEntryDate(props.entry.date)) || []
+);
+watch(
+  () => flogTagMap,
+  () => {
+    entryTags.value = (props.flog && getTagsForEntryDate(props.entry.date)) || [];
+  }
+);
 
 // Utility function to format timestamp to MM/DD/YYYY
 function formatDate(timestamp: string | number | Date): string {
@@ -56,7 +89,6 @@ function formatDate(timestamp: string | number | Date): string {
   const day = String(date.getDate()).padStart(2, "0");
   const year = date.getFullYear();
   const time = date.toLocaleTimeString("en-US");
-  // {{props.entry.date.toLocaleDateString("en-US")}} {{props.entry.date.toLocaleTimeString("en-US")}}
   return `${month}/${day}/${year} ${time}`;
 }
 
@@ -69,13 +101,17 @@ const entryText = ref<string>(props.entry.entry);
 const isReadOnly = ref<boolean | null>(props.readOnly);
 const entryEl = ref<HTMLElement | null>(null);
 
+const bindEntryEl = (el: HTMLElement | null) => {
+  entryEl.value = el;
+  // if (el) el.focus();
+};
+
 const handleStartEditing = () => {
   emit("start-editing", props.entry); // Or { ...props.entry, entry: entryText.value } ??
 };
 
 function setupEditing() {
   nextTick(() => {
-    console.log("entryEl", entryEl.value);
     if (entryEl.value && entryEl.value != null) {
       // Set cursor position to the end of the text
       placeCursorAtEnd(entryEl.value);
@@ -88,24 +124,26 @@ function setupEditing() {
 
 // Function to emit the update when blur occurs
 function handleBlur() {
-  // console.log("handleBlur triggered", event.srcElement.value, entryText.value);
   // Could use either of these:
   // entryText.value = event.target.innerText;
   entryText.value = entryEl.value != null ? entryEl.value.innerText : "";
   // Pass back same entry prop with new entry text overwritten
   emit("update-entry", { ...props.entry, entry: entryText.value });
   // // This doesn't work right now because Entry doesn't have its own index to pass back.
-  // emit("stop-editing", props.index);
+  // emit("stop-editing", index);
   emit("stop-editing");
   // // This is not necessary and triggers a re-render on focus
 }
+
+const handleTagSelect = (tag: Tag["tag"]) => {
+  emit("tag-selected", tag);
+};
 
 // what do these watches do?
 
 watch(
   () => props.entry,
   (newValue) => {
-    // console.log('watch props.entry')
     entryText.value = newValue.entry;
   }
 );
@@ -121,7 +159,6 @@ watch(
 watch(
   () => props.readOnly,
   (newValue) => {
-    // console.log('watch props.readOnly')
     isReadOnly.value = newValue;
   }
 );

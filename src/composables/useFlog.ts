@@ -1,14 +1,26 @@
-import { ref, toValue } from "vue"
+import { ref, toValue, watch } from "vue"
 import type { Ref } from "vue"
 import type { IFlog } from "@/modules/Flog"
 import { IFlogStatus } from "@/modules/Flog"
-import type { IEntry } from '@/modules/EntryData'
+import EntryData, { type IEntry } from '@/modules/EntryData'
 import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource"
+import { useTags, type Tag, type TagEntryDate, type TagMap } from "@composables/useTags"
+
+// Re-export these for convenience
+export type { Tag as Tag }
+export type { IEntry as IEntry }
+export { EntryData as EntryData }
+export { IFlogSourceType as IFlogSourceType }
 
 /**
  * The Dropbox flog source operation used by useFlog
  */
 const { saveFlogToSource } = useFlogSource(IFlogSourceType.dropbox);
+
+/**
+ * The shared TagIndex and methods
+ */
+const { getTagsForFlog, getTagsForFlogEntryDate, tagIndex } = useTags();
 
 /**
  * Represents the refs and functions returned by the useFlog composable
@@ -18,6 +30,10 @@ interface IUseFlog {
      * The flog ref
      */
     flog: Ref<IFlog>;
+    /**
+     * The shared tagIndex.tagMap filtered for this flog
+     */
+    flogTagMap?: Ref<TagMap>;
     /**
      * Updates the flog's pretext and saves the flog to source
      * @param {IEntry} entry 
@@ -44,6 +60,13 @@ interface IUseFlog {
      * @returns 
      */
     deleteEntry: (entry: IEntry) => void;
+    /**
+     * Returns a list of Tags for a given EntryDate for the current flog.
+     * Makes use of useTags.getTagsForFlogEntryDate
+     * @param {IEntry} entry 
+     * @returns 
+     */
+    getTagsForEntryDate: (entryDate: TagEntryDate) => Tag['tag'][]
 }
 
 /**
@@ -72,6 +95,15 @@ export const useFlog = (inFlog: IFlog | Ref<IFlog>): IUseFlog => {
     // We want the flog ref in this composable to be independent of the input
     const flog = ref<IFlog>(toValue(inFlog))
 
+    const flogTagMap = ref<TagMap>(getTagsForFlog(flog.value.url))
+    watch(
+        tagIndex,
+        () => {
+            flogTagMap.value = getTagsForFlog(flog.value.url)
+        },
+        { immediate: true }
+    );
+
     const updatePretext = (pretext: string) => {
         flog.value.pretext = pretext
     }
@@ -95,7 +127,7 @@ export const useFlog = (inFlog: IFlog | Ref<IFlog>): IUseFlog => {
             showMessage('Saved');
 
         } else {
-            console.error('Entry not found in flog.value.loadedEntries');
+            console.error('Entry not found in flog.value.loadedEntries', editEntryIndex , "\n", entry.id);
         }
     }
 
@@ -113,16 +145,22 @@ export const useFlog = (inFlog: IFlog | Ref<IFlog>): IUseFlog => {
             // Save the updated flog to the source to persist the changes
             saveFlogToSource(flog.value);
         } else {
-            console.error('Entry not found in flog.value.loadedEntries');
+            console.error('Entry not found in flog.value.loadedEntries\n');
         }
     };
 
+    const getTagsForEntryDate = (entryDate: TagEntryDate): Tag['tag'][] => {
+        return getTagsForFlogEntryDate(flog.value.url, entryDate)
+    }
+
     return {
         flog,
+        flogTagMap,
         updatePretext,
         addEntry,
         editEntry,
         deleteEntry,
+        getTagsForEntryDate,
     }
 }
 
