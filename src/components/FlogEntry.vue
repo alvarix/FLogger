@@ -14,7 +14,7 @@
     <pre
       v-else
       id="editEntry"
-      :ref="bindEntryEl"
+      ref="bindEntryEl"
       class="entry__body"
       :contenteditable="!isReadOnly"
       @blur="handleBlur"
