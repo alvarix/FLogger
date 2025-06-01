@@ -11,16 +11,15 @@
 </template>
 
 <script setup>
-import {
-  ref,
-  defineExpose,
-  watch,
-  onMounted,
-  onUnmounted,
-} from "vue";
+import { ref, defineExpose, watch, onMounted, onUnmounted } from "vue";
 import { marked } from "marked";
+import {
+  getIdString,
+  buildRegexFromArray,
+  renderTextWithTagsMarkedup,
+} from "@/modules/utilities";
 
-const { rawText, tags, editable } = defineProps({
+const { rawText, tags, editable, idSuffix } = defineProps({
   rawText: {
     type: String,
     default: "",
@@ -33,6 +32,11 @@ const { rawText, tags, editable } = defineProps({
   editable: {
     type: Boolean,
     default: false,
+    optional: true,
+  },
+  idSuffix: {
+    type: String,
+    default: "",
     optional: true,
   },
 });
@@ -48,26 +52,15 @@ const handleTagSelect = (tag) => {
 
 const renderer = {
   heading({ tokens, depth }) {
-    function buildRegexFromArray(strings, flags = "") {
-      const escapedStrings = strings.map((s) =>
-        // eslint-disable-next-line
-        s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")
-      );
-      const regexPattern = "(" + escapedStrings.join("|") + ")";
-      return new RegExp(regexPattern, flags);
-    }
-
     const text = this.parser.parseInline(tokens);
+    const headingId = getIdString(`${text} ${idSuffix}`);
     const taggedText =
       depth > 1 || tags.length == 0
         ? text
-        : text.replace(
-            buildRegexFromArray(tags, "g"),
-            (match) => `<button class="md-tag">${match}</button>`
-          );
+        : renderTextWithTagsMarkedup(text, tags);
     const escapedText = text.toLowerCase().replace(/[^\w]+/g, "-");
     return `
-      <h${depth} contenteditable class="md-focus">
+      <h${depth} id="${headingId}" contenteditable class="md-focus">
         <a name="${escapedText}" href="#${escapedText}">
           <span></span>
         </a>

@@ -12,6 +12,7 @@ import { useDropboxFiles } from "@/composables/useDropboxFiles"
 import type { IDropboxFile, ILoadFileContentCallbackSuccess, ILoadFileContentCallbackError } from "@/composables/useDropboxFiles";
 import { useTags, type ITagsComposable, type TagMap, type TagFlogMap, type TagFlogFile } from "./useTags"
 import type { TagIndex, Tag } from "@/modules/Tag"
+import { parseHeadingsFromMarkdownString } from "@/modules/utilities";
 
 // Re-export these for convenience
 export type { IFlog as IFlog }
@@ -336,7 +337,7 @@ export const useDropboxFlogs = (): IDropboxFlogs => {
 
                 // // Parse content of entries for tags
                 function parseTagsFromEntry(entry: IEntry): string[] {
-                    const headings: string[] = entry.entry.match(/(?<=^# ).*$/gm) ?? [];
+                    const headings: string[] = parseHeadingsFromMarkdownString(entry.entry);
                     const headingsTags = headings.map(h => parseTagsFromString(h));
                     const tags = [...new Set<string>(headingsTags.flat())]
                     return tags

@@ -2,10 +2,15 @@
   <div class="entry">
     <h3>{{ formattedDate }}</h3>
 
-    <div v-if="!props.isEditing" class="entry__body" @click="handleStartEditing">
+    <div
+      v-if="!props.isEditing"
+      class="entry__body"
+      @click="handleStartEditing"
+    >
       <MarkedText
         :raw-text="entryText"
         :tags="entryTags"
+        :id-suffix="`${entry.date.getTime()}`"
         @tag-selected="handleTagSelect"
       />
     </div>
@@ -78,7 +83,8 @@ const entryTags = ref<Tag["tag"][]>(
 watch(
   () => flogTagMap,
   () => {
-    entryTags.value = (props.flog && getTagsForEntryDate(props.entry.date)) || [];
+    entryTags.value =
+      (props.flog && getTagsForEntryDate(props.entry.date)) || [];
   }
 );
 

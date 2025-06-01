@@ -1,7 +1,7 @@
 <template>
   <aside class="vue-file">EditFlog.vue</aside>
 
-  <div class="flex gap-8">
+  <div :id="getIdString(flog.url)" class="flex gap-8">
     <section class="container main">
       <div :class="{ viewport: !selectedTag }">
         <h4 class="flog-title">
@@ -73,6 +73,7 @@
       <div :data-tab-selected="currentTab == 'Tags'" class="sidebar-panel mb-7">
         <TagMapSelector
           :flog-tag-map="flogTagMap || []"
+          :selected-tag="selectedTag"
           @tag-selected="handleTagSelect"
         />
       </div>
@@ -86,6 +87,20 @@
           :color="loaderProps.color"
           :size="loaderProps.size"
         />
+        <ul v-if="mounted" class="toc-list">
+          <li>
+            <a :href="'#' + getIdString(flog.url)">Back to Top</a>
+          </li>
+          <li
+            v-for="entryHeading in entryHeadings"
+            :key="`toc-${entryHeading.id}`"
+          >
+            <a
+              :href="`#${entryHeading.id}`"
+              v-html="renderTextWithTagsMarkedup(entryHeading.heading, tags)"
+            ></a>
+          </li>
+        </ul>
       </div>
       <div
         :data-tab-selected="currentTab == 'About'"
@@ -118,7 +133,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, unref, watch } from "vue";
+import { onMounted, ref, unref, watch } from "vue";
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
 import {
   useFlogSource,
@@ -139,6 +154,11 @@ import FlogPretext from "@components/FlogPretext.vue";
 import PacmanLoader from "vue-spinner/src/PacmanLoader.vue";
 import TagMapSelector from "@components/TagMapSelector.vue";
 import TagFlogsEntries from "@components/TagFlogsEntries.vue";
+import {
+  getIdString,
+  parseHeadingsFromMarkdownString,
+  renderTextWithTagsMarkedup,
+} from "@/modules/utilities";
 
 const props = defineProps<{
   flog: IFlog; // Accept the flog as a prop
@@ -222,7 +242,7 @@ function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
 
 // Sidebar Tabs
 type SidebarTab = "TOC" | "Tags" | "About";
-const currentTab = ref<SidebarTab>("Tags");
+const currentTab = ref<SidebarTab>("TOC");
 const sidebarTabs = ref<SidebarTab[]>(["TOC", "Tags", "About"]);
 
 const filteredEntries = ref<IEntry[]>(props.flog.loadedEntries);
@@ -260,6 +280,15 @@ const handleOpenFlog = (flog: IFlog) => {
   closeFlog(props.flog);
 };
 
+const tags = ref<string[]>([]);
+watch(
+  () => flogTagMap,
+  () => {
+    tags.value = flogTagMap?.value.map(([tag]) => tag) || [];
+  },
+  { immediate: true, deep: true }
+);
+
 const externalFlogTagMap = ref<Tag["flogs"] | undefined>();
 watch(
   selectedTag,
@@ -279,48 +308,89 @@ watch(
   { immediate: true, deep: true }
 );
 
-// Function to handle the TOC in right column
+type EntryHeading = {
+  heading: string;
+  id: string;
+};
+const entryHeadings = ref<EntryHeading[]>([]);
 
-const mounted = ref(false);
+const getFlogEntryHeadingIds = (entries: IEntry[]): EntryHeading[] => {
+  const headingIds: EntryHeading[] = [];
+  entries.forEach((entry) => {
+    const headings: string[] = parseHeadingsFromMarkdownString(entry.entry);
+    headings.forEach((heading) =>
+      headingIds.push({
+        heading: heading,
+        id: getIdString(`${heading} ${entry.date.getTime()}`),
+      })
+    );
+  });
+  return headingIds;
+};
+
+watch(
+  () => props.flog.loadedEntries,
+  () => {
+    entryHeadings.value = getFlogEntryHeadingIds(props.flog.loadedEntries);
+  },
+  { immediate: true, deep: true }
+);
+
+/*
+ * The following method of adding the TOC directly to the DOM
+ * no longer works due to the way the MarkedText component injects
+ * string HTML into a vue element using v-html.
+ * Somehow the HTML in these strings is not being seen by the
+ * DOM methods like querySelectorAll and getElementsByClassName
+ *
+ * Also, it would be better to use the vue DOM rather than rely on
+ * knowledge of the entire page DOM, like h1.logo, etc. Another
+ * problem arised when implementing the rendered entries from other
+ * flogs when a tag is selected. The code below would take all h1's
+ * from all rendered entries, and present them as one TOC.
+ */
+
+// // Function to handle the TOC in right column
+
+const mounted = ref<boolean>(false);
 const mountedCheck = () => {
   mounted.value = true;
 };
+// watch(mounted, (newValue) => {
+//   if (newValue) {
+//     const toc = document.querySelector(".toc");
+//     if (!toc) return;
 
-watch(mounted, (newValue) => {
-  if (newValue) {
-    const toc = document.querySelector(".toc");
-    if (!toc) return;
+//     // Look for added h1 nodes
+//     const headers = document.querySelectorAll("h1.md-focus");
+//     if (headers.length > 0) {
+//       const list = document.createElement("ul");
+//       list.className = "toc-list";
 
-    // Look for added h1 nodes
-    const headers = document.querySelectorAll("h1");
-    if (headers.length > 0) {
-      const list = document.createElement("ul");
-      list.className = "toc-list";
+//       // Add a "Back to Top" link as the first item
+//       const backToTopItem = document.createElement("li");
+//       const backToTopAnchor = document.createElement("a");
+//       backToTopAnchor.href = "#logo";
+//       backToTopAnchor.textContent = "Back to Top";
+//       backToTopItem.appendChild(backToTopAnchor);
+//       list.appendChild(backToTopItem);
 
-      // Add a "Back to Top" link as the first item
-      const backToTopItem = document.createElement("li");
-      const backToTopAnchor = document.createElement("a");
-      backToTopAnchor.href = "#logo";
-      backToTopAnchor.textContent = "Back to Top";
-      backToTopItem.appendChild(backToTopAnchor);
-      list.appendChild(backToTopItem);
-
-      headers.forEach((header, index) => {
-        if (header.id === "logo") return;
-        if (!header.id) {
-          header.id = `heading-${index}`;
-        }
-        const listItem = document.createElement("li");
-        const anchor = document.createElement("a");
-        anchor.href = `#${header.id}`;
-        anchor.textContent = header.textContent || `Heading ${index + 1}`;
-        listItem.appendChild(anchor);
-        list.appendChild(listItem);
-      });
-      toc.appendChild(list);
-    }
-  }
-});
+//       headers.forEach((header, index) => {
+//         if (header.id === "logo") return;
+//         if (!header.id) {
+//           header.id = `heading-${index}`;
+//         }
+//         const listItem = document.createElement("li");
+//         const anchor = document.createElement("a");
+//         anchor.href = `#${header.id}`;
+//         anchor.textContent = header.textContent || `Heading ${index + 1}`;
+//         listItem.appendChild(anchor);
+//         list.appendChild(listItem);
+//       });
+//       toc.appendChild(list);
+//     }
+//   }
+// });
 </script>
 
 <style scoped>
@@ -348,9 +418,9 @@ button.small {
 }
 
 .toc-list li {
-  padding: 5px 0;
-  list-style: circle;
-  margin-left: 20px;
+  padding: 7px 0;
+  list-style: none;
+  /* margin-left: 20px; */
 }
 
 .bullet {
@@ -358,8 +428,20 @@ button.small {
   list-style-position: outside;
   margin-left: 20px;
 }
+
 </style>
 <style>
+
+.toc-list button.md-tag {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+  background: rgba(30, 52, 142, 0.5);
+  border-radius: 0;
+  border: 0;
+  border-bottom: 1px solid blue;
+}
+
 .sidebar {
   display: none;
   @media (min-width: 990px) {
