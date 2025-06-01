@@ -101,7 +101,7 @@ const entryText = ref<string>(props.entry.entry);
 const isReadOnly = ref<boolean | null>(props.readOnly);
 const entryEl = ref<HTMLElement | null>(null);
 
-const bindEntryEl = (el: HTMLElement) => {
+const bindEntryEl = (el: HTMLElement | null) => {
   entryEl.value = el;
   // if (el) el.focus();
 };
