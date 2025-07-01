@@ -3,10 +3,12 @@ import type { Ref } from "vue"
 import type { IFlog } from "@/modules/Flog"
 import { IFlogStatus, IFlogSourceType } from "@/modules/Flog"
 import { useDropboxFlogs } from "@/composables/useDropboxFlogs";
-import type { IDropboxFlog } from "@/composables/useDropboxFlogs";
+import type { IDropboxFlog, ITagsComposable, TagIndex, TagMap, Tag } from "@/composables/useDropboxFlogs";
 
 // Re-export these for convenience
 export type { IFlog as IFlog }
+export type { Tag as Tag }
+export type { TagMap as TagMap }
 export { IFlogStatus as IFlogStatus }
 export { IFlogSourceType as IFlogSourceType }
 
@@ -88,6 +90,19 @@ export interface IFlogSource {
 
     // eslint-disable-next-line
     connectionPopupWindow: Ref<any>;
+
+    // **************
+    // SOURCE TAGS INDEX
+    // **************
+
+    // useFlogSource provides a ref to a tag index for the source.
+    // The value contains the pass through ref the corresponding 
+    // corresponding source based on the sourceType param in
+    // useSourceType(sourceType).
+    tagIndex: Ref<TagIndex | undefined>;
+    getTagsForFlog: ITagsComposable['getTagsForFlog'];
+    tagHasFlogEntryDate: ITagsComposable['tagHasFlogEntryDate'];
+
 }
 
 const {
@@ -103,6 +118,9 @@ const {
     clearConnection: clearConnection_dropbox,
     hasConnection: hasConnection_dropbox,
     connectionPopupWindow: connectionPopupWindow_dropbox,
+    tagIndex: tagIndex_dropbox,
+    getTagsForFlog: getFlogTags_dropbox,
+    tagHasFlogEntryDate: tagHasFlogEntryDate_dropbox
 } = useDropboxFlogs();
 
 
@@ -120,6 +138,7 @@ const accountOwner = ref<string | null>(null);
 const hasConnection = ref<boolean>(false);
 // eslint-disable-next-line
 const connectionPopupWindow = ref<any>();
+const tagIndex = ref<TagIndex>();
 
 // Ref variables that are passed through from a specific use[Source]Flogs composable
 // need watchers on source variables
@@ -134,7 +153,7 @@ watch(
             .concat(availableFlogs_dropbox.value)
     }
     ,
-    { immediate: true }
+    { immediate: true, deep: true }
 )
 watch(
     availableRepoFlogs_dropbox,
@@ -147,7 +166,7 @@ watch(
             .concat(availableRepoFlogs_dropbox.value)
     }
     ,
-    { immediate: true }
+    { immediate: true, deep: true }
 )
 watch(accountOwner_dropbox,
     () => {
@@ -170,8 +189,15 @@ watch(connectionPopupWindow_dropbox,
     },
     { immediate: true }
 )
-
-
+watch(
+    tagIndex_dropbox,
+    () => {
+        // console.log("TAGS watch tagIndex_dropbox", tagIndex_dropbox)
+        tagIndex.value = tagIndex_dropbox.value
+    }
+    ,
+    { immediate: true, deep: true }
+)
 
 export const useFlogSource = (sourceType: IFlogSourceType): IFlogSource => {
 
@@ -238,6 +264,24 @@ export const useFlogSource = (sourceType: IFlogSourceType): IFlogSource => {
         }
     }
 
+    const getTagsForFlog: ITagsComposable['getTagsForFlog'] = (args) => {
+        switch (sourceType) {
+            case IFlogSourceType.dropbox:
+                return (getFlogTags_dropbox(args) || []) as TagMap;
+            default:
+                return [] as TagMap
+        }
+    }
+
+    const tagHasFlogEntryDate: ITagsComposable['tagHasFlogEntryDate'] = (...args) => {
+        switch (sourceType) {
+            case IFlogSourceType.dropbox:
+                return tagHasFlogEntryDate_dropbox(...args);
+            default:
+                return false
+        }
+    }
+
     return {
         availableFlogs,
         availableRepoFlogs,
@@ -254,5 +298,9 @@ export const useFlogSource = (sourceType: IFlogSourceType): IFlogSource => {
         clearConnection,
         connectionPopupWindow,
         hasConnection,
+
+        tagIndex,
+        getTagsForFlog,
+        tagHasFlogEntryDate,
     }
 }

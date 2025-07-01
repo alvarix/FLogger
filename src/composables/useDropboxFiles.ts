@@ -25,15 +25,50 @@ export interface IDropboxFiles {
     availableFiles: Ref<IDropboxFile[]>
     availableRepoFiles: Ref<IDropboxFile[]>
     // eslint-disable-next-line
-    loadFileContent: (file: IDropboxFile, callback?: (result: { rev: string, content: string }) => any) => void,
+    loadFileContent: (file: IDropboxFile, callback?: (result: ILoadFileContentCallbackResult) => any) => void,
     // eslint-disable-next-line
     saveFileContent: (file: IDropboxFile, callback?: (result: any) => any) => void,
     // eslint-disable-next-line
-    addFile: (file: IDropboxFile, callback?: () => any) => void
+    addFile: (file: IDropboxFile, callback?: (result: any) => any) => void
     // eslint-disable-next-line
-    deleteFile: (file: IDropboxFile, callback?: () => any) => void
+    deleteFile: (file: IDropboxFile, callback?: (result: any) => any) => void
     accountOwner: Ref<string | null>
 }
+
+export interface ILoadFileContentCallbackResult {
+    rev?: string,
+    content?: string,
+    error?: string
+}
+
+// type ILoadFileContentCallbackResult = ILoadFileContentCallbackSuccess | ILoadFileContentCallbackError
+
+export interface ILoadFileContentCallbackSuccess extends ILoadFileContentCallbackResultRaw {
+    rev: string, content: string
+}
+
+export type ILoadFileContentCallbackError = ConditionalErrorOrResultProperties<ILoadFileContentCallbackResultRaw, 'error', 'content', 'rev'>; // first prop is required if other props are undefined
+// type ExampleType2 = ConditionalProperty<ILoadFileContentCallbackResultRaw, 'propA', 'propB', 'propC'>; // first prop is required if other props are undefined
+
+
+export interface ILoadFileContentCallbackResultRaw {
+    rev?: string,
+    content?: string,
+    error?: string
+}
+
+type ConditionalErrorOrResultProperties<T, REQUIREDKEY extends keyof T, UNDEFINEDKEY1 extends keyof T, UNDEFINEDKEY2 extends keyof T> =
+    T[UNDEFINEDKEY1] extends undefined
+    ? (T[UNDEFINEDKEY2] extends undefined
+        ? T & Required<Pick<T, REQUIREDKEY>> & Partial<Omit<T, REQUIREDKEY>>
+        : T)
+    : T
+
+
+
+// export interface ILoadFileContentCallbackError {
+//     error: string
+// }
 
 // let refreshTokenInterval;
 // const refreshToken = () => {
@@ -419,9 +454,12 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
         availableRepoFiles.value = [];
     }
 
-    // eslint-disable-next-line
-    const loadFileContent = async (file: IDropboxFile, callback?: (result: { rev: string, content: string }) => any) => {
-        // console.log('loadFileContent file', file)
+    // loadFileContent: (file: IDropboxFile, 
+    const loadFileContent = async (
+        file: IDropboxFile,
+        callback?: (result: ILoadFileContentCallbackResult) => void
+    ) => {
+        console.log('loadFileContent file', file)
 
         // dbxAuth.checkAndRefreshAccessToken();
         dbxAuth.checkAndRefreshAccessToken()
@@ -430,6 +468,7 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                 await dbx
                     .filesDownload({ path: file.path })
                     .then((response) => {
+                        console.log('loadFileContent reading', response.result)
                         const reader = new FileReader();
                         reader.onload = (e) => {
                             const fileData = e.target != null ? e.target.result : null;
@@ -447,9 +486,20 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                     .catch((error) => {
                         console.log(
                             `Error downloading file ${file.path} :`, file,
-                            error?.message || error
+                            JSON.stringify(error)
                         );
                         // clearConnection();
+                        // The Dropbox return for an error includes several nested error objects.
+                        // console.log("TAGS load error", error.error)
+                        if (error.error.error['.tag'] == 'path' && error.error.error.path['.tag'] == "not_found") {
+                            if (callback !== undefined)
+                                callback(
+                                    {
+                                        error: "file not found"
+                                    } as ILoadFileContentCallbackError
+                                )
+
+                        }
                     });
             })
             .catch((error: unknown) => {
@@ -483,9 +533,9 @@ export const useDropboxFiles = (repoTemplateFiles?: IDropboxFile[]): IDropboxFil
                     .catch((error) => {
                         console.log(
                             `Error saving file ${file.path} :`,
-                            error.error.error_summary
+                            error
                         );
-                        alert(`Error saving file ${file.path}:\n\n${error.error.error_summary}`)
+                        alert(`Error saving file ${file.path}:\n\n${error?.error?.error_summary}`)
                         // clearConnection();
                     });
             })
