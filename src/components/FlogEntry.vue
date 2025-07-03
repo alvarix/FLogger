@@ -2,10 +2,15 @@
   <div class="entry">
     <h3>{{ formattedDate }}</h3>
 
-    <div v-if="!props.isEditing" class="entry__body" @click="handleStartEditing">
+    <div
+      v-if="!props.isEditing"
+      class="entry__body"
+      @click="handleStartEditing"
+    >
       <MarkedText
         :raw-text="entryText"
         :tags="entryTags"
+        :id-suffix="`${entry.date.getTime()}`"
         @tag-selected="handleTagSelect"
       />
     </div>
@@ -14,7 +19,7 @@
     <pre
       v-else
       id="editEntry"
-      ref="bindEntryEl"
+      :ref="bindEntryEl"
       class="entry__body"
       :contenteditable="!isReadOnly"
       @blur="handleBlur"
@@ -32,7 +37,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, watch } from "vue";
+import {
+  ref,
+  computed,
+  nextTick,
+  watch,
+  type ComponentPublicInstance,
+} from "vue";
 import {
   useKeyDownHandler,
   useFlog,
@@ -78,7 +89,8 @@ const entryTags = ref<Tag["tag"][]>(
 watch(
   () => flogTagMap,
   () => {
-    entryTags.value = (props.flog && getTagsForEntryDate(props.entry.date)) || [];
+    entryTags.value =
+      (props.flog && getTagsForEntryDate(props.entry.date)) || [];
   }
 );
 
@@ -101,9 +113,12 @@ const entryText = ref<string>(props.entry.entry);
 const isReadOnly = ref<boolean | null>(props.readOnly);
 const entryEl = ref<HTMLElement | null>(null);
 
-const bindEntryEl = (el: HTMLElement | null) => {
-  entryEl.value = el;
-  // if (el) el.focus();
+const bindEntryEl = (el: Element | ComponentPublicInstance | null) => {
+  if (el instanceof HTMLElement) {
+    console.log(`bindEntryEl el`, el);
+    entryEl.value = el;
+    // if (el) el.focus();
+  }
 };
 
 const handleStartEditing = () => {
@@ -126,7 +141,13 @@ function setupEditing() {
 function handleBlur() {
   // Could use either of these:
   // entryText.value = event.target.innerText;
-  entryText.value = entryEl.value != null ? entryEl.value.innerText : "";
+  entryText.value =
+    entryEl.value != null
+      ? entryEl.value.innerText
+        ? entryEl.value.innerText
+        : // @ts-expect-error - yo
+          entryEl.value.entry
+      : "";
   // Pass back same entry prop with new entry text overwritten
   emit("update-entry", { ...props.entry, entry: entryText.value });
   // // This doesn't work right now because Entry doesn't have its own index to pass back.
