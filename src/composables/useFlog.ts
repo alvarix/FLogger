@@ -117,7 +117,7 @@ export const useFlog = (inFlog: IFlog | Ref<IFlog>): IUseFlog => {
             console.error(`EditFlog or flog.value.loadedEntries is undefined or not an array: ${flog.value}`);
             return;
         }
-        // Find the index of the entry to delete
+        // Find the index of the entry to update
         const editEntryIndex = flog.value.loadedEntries.findIndex(flogEntry => flogEntry.id === entry.id);
         if (editEntryIndex !== -1) {
             // Update the entry at the found index
