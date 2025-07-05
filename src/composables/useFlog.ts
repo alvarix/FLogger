@@ -7,6 +7,8 @@ import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource"
 import { useTags, type Tag, type TagEntryDate, type TagMap } from "@composables/useTags"
 
 // Re-export these for convenience
+export type { IFlog as IFlog }
+export { IFlogStatus as IFlogStatus }
 export type { Tag as Tag }
 export type { IEntry as IEntry }
 export { EntryData as EntryData }
@@ -95,6 +97,8 @@ export const useFlog = (inFlog: IFlog | Ref<IFlog>): IUseFlog => {
     // We want the flog ref in this composable to be independent of the input
     const flog = ref<IFlog>(toValue(inFlog))
 
+    // Create a reactive tag map for this flog
+    // This will be updated whenever the global tagIndex changes
     const flogTagMap = ref<TagMap>(getTagsForFlog(flog.value.url))
     watch(
         tagIndex,
@@ -104,15 +108,29 @@ export const useFlog = (inFlog: IFlog | Ref<IFlog>): IUseFlog => {
         { immediate: true }
     );
 
+    /**
+     * Updates the flog's pretext
+     * @param pretext - The new pretext to set
+     */
     const updatePretext = (pretext: string) => {
         flog.value.pretext = pretext
     }
 
+    /**
+     * Adds a new entry to the beginning of the flog's loadedEntries array
+     * Note: Currently doesn't save to source, but probably should for symmetry
+     * @param entry - The entry to add
+     */
     const addEntry = (entry: IEntry) => {
         flog.value.loadedEntries.unshift(entry)
     }
 
+    /**
+     * Updates an existing entry in the flog and saves the changes to source
+     * @param entry - The entry with updated data
+     */
     const editEntry = (entry: IEntry) => {
+        // Validate that flog and loadedEntries exist and are properly structured
         if (!flog.value || !Array.isArray(flog.value.loadedEntries)) {
             console.error(`EditFlog or flog.value.loadedEntries is undefined or not an array: ${flog.value}`);
             return;
@@ -120,7 +138,7 @@ export const useFlog = (inFlog: IFlog | Ref<IFlog>): IUseFlog => {
         // Find the index of the entry to update
         const editEntryIndex = flog.value.loadedEntries.findIndex(flogEntry => flogEntry.id === entry.id);
         if (editEntryIndex !== -1) {
-            // Update the entry at the found index
+            // Update the entry at the found index by spreading the existing entry and new entry data
             flog.value.loadedEntries[editEntryIndex] = { ...flog.value.loadedEntries[editEntryIndex], ...entry };
             // Save the updated flog to the source to persist the changes
             saveFlogToSource(flog.value);
@@ -131,7 +149,12 @@ export const useFlog = (inFlog: IFlog | Ref<IFlog>): IUseFlog => {
         }
     }
 
+    /**
+     * Removes an entry from the flog and saves the changes to source
+     * @param entry - The entry to delete
+     */
     const deleteEntry = (entry: IEntry) => {
+        // Validate that flog and loadedEntries exist and are properly structured
         if (!flog.value || !Array.isArray(flog.value.loadedEntries)) {
             console.error('EditFlog.value or flog.value.loadedEntries is undefined or not an array');
             return;
@@ -139,7 +162,7 @@ export const useFlog = (inFlog: IFlog | Ref<IFlog>): IUseFlog => {
         // Find the index of the entry to delete
         const deleteEntryIndex = flog.value.loadedEntries.findIndex(flogEntry => flogEntry.id === entry.id);
         if (deleteEntryIndex !== -1) {
-            // Remove the entry
+            // Remove the entry from the array
             flog.value.loadedEntries.splice(deleteEntryIndex, 1);
 
             // Save the updated flog to the source to persist the changes
@@ -149,10 +172,16 @@ export const useFlog = (inFlog: IFlog | Ref<IFlog>): IUseFlog => {
         }
     };
 
+    /**
+     * Returns a list of tags for a given entry date for the current flog
+     * @param entryDate - The date to get tags for
+     * @returns Array of tag strings
+     */
     const getTagsForEntryDate = (entryDate: TagEntryDate): Tag['tag'][] => {
         return getTagsForFlogEntryDate(flog.value.url, entryDate)
     }
 
+    // Return the composable interface with all the reactive data and functions
     return {
         flog,
         flogTagMap,
@@ -181,9 +210,3 @@ export function useKeyDownHandler(blurCallback: (event: Event) => void) {
     }
     return { handleKeyDown };
 }
-
-/**
- * Re-export these for convenience
- */
-export type { IFlog as IFlog }
-export { IFlogStatus as IFlogStatus }
