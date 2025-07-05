@@ -133,7 +133,10 @@
 </template>
 
 <script setup lang="ts">
+// Vue 3 Composition API imports
 import { onMounted, ref, unref, watch } from "vue";
+
+// Custom composables for flog management
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
 import {
   useFlogSource,
@@ -147,6 +150,8 @@ import {
   EntryData,
   type IEntry,
 } from "@/composables/useFlog";
+
+// Vue component imports
 import AddEntry from "@components/AddEntry.vue";
 import EntryList from "@components/EntryList.vue";
 import FlogPretext from "@components/FlogPretext.vue";
@@ -154,16 +159,20 @@ import FlogPretext from "@components/FlogPretext.vue";
 import PacmanLoader from "vue-spinner/src/PacmanLoader.vue";
 import TagMapSelector from "@components/TagMapSelector.vue";
 import TagFlogsEntries from "@components/TagFlogsEntries.vue";
+
+// Utility functions for text processing and DOM manipulation
 import {
   getIdString,
   parseHeadingsFromMarkdownString,
   renderTextWithTagsMarkedup,
 } from "@/modules/utilities";
 
+// Component props definition
 const props = defineProps<{
   flog: IFlog; // Accept the flog as a prop
 }>();
 
+// Initialize flog management composables
 const { closeFlog, openFlog } = useOpenFlogs();
 
 const {
@@ -177,9 +186,15 @@ const { flogTagMap, addEntry, updatePretext, deleteEntry, editEntry } = useFlog(
   props.flog
 );
 
+// Reactive state for entry management
 const addEntryValue = ref<IEntry | undefined>(); // Initialize reactive addEntryValue
 const isEditingFlogEntries = ref(new Map<IFlog, IEntry>()); // Keep a map of [flog, index] pairs to look up index of entry being edit PER flog
 
+/**
+ * Creates and adds a new entry to the flog
+ * @param entryData - The entry data to add
+ * @param flog - The flog to add the entry to
+ */
 function addNewEntry(entryData: IEntry, flog: IFlog) {
   const newEntry = new EntryData(new Date(entryData.date), entryData.entry);
   addEntry(newEntry);
@@ -189,20 +204,37 @@ function addNewEntry(entryData: IEntry, flog: IFlog) {
   // alert("New entry added");
 }
 
+/**
+ * Starts editing mode for a specific entry
+ * @param flog - The flog containing the entry
+ * @param entry - The entry to start editing
+ */
 const handleStartEditingEntry = (flog: IFlog, entry: IEntry) => {
   isEditingFlogEntries.value.set(flog, entry);
 };
 
+/**
+ * Stops editing mode for a specific flog
+ * @param flog - The flog to stop editing
+ */
 const handleStopEditingEntry = (flog: IFlog) => {
   isEditingFlogEntries.value.delete(flog);
 };
 
+/**
+ * Copies an entry to the add entry form
+ * @param entry - The entry to copy
+ */
 const handleCopyEntry = (entry: IEntry) => {
   addEntryValue.value = entry;
   alert("Your entry was copied into the editor");
 };
 
-// Handle entry deletion with confirmation
+/**
+ * Handles entry deletion with user confirmation
+ * @param flog - The flog containing the entry
+ * @param entry - The entry to delete
+ */
 const handleDeleteEntry = (flog: IFlog, entry: IEntry) => {
   const confirmDelete = window.confirm(
     "Are you sure you want to delete this entry?"
@@ -217,7 +249,11 @@ const handleDeleteEntry = (flog: IFlog, entry: IEntry) => {
   }
 };
 
-// Function to handle the update event from the grandchild and update flog
+/**
+ * Handles entry updates from child components
+ * @param flog - The flog containing the entry
+ * @param updatedEntry - The updated entry data
+ */
 const handleUpdateEntry = (flog: IFlog, updatedEntry: IEntry) => {
   if (flog) {
     editEntry(updatedEntry);
@@ -227,12 +263,17 @@ const handleUpdateEntry = (flog: IFlog, updatedEntry: IEntry) => {
   }
 };
 
+// Loader component properties
 const loaderProps = {
   size: undefined,
   color: undefined,
 };
 
-// Function to catch update from child and emit to grandparent
+/**
+ * Handles pretext updates from child components
+ * @param flog - The flog to update
+ * @param updatedPretext - The new pretext content
+ */
 function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
   if (flog && !flog.readOnly) {
     updatePretext(updatedPretext);
@@ -240,14 +281,16 @@ function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
   }
 }
 
-// Sidebar Tabs
+// Sidebar tab management
 type SidebarTab = "TOC" | "Tags" | "About";
 const currentTab = ref<SidebarTab>("TOC");
 const sidebarTabs = ref<SidebarTab[]>(["TOC", "Tags", "About"]);
 
+// Entry filtering state
 const filteredEntries = ref<IEntry[]>(props.flog.loadedEntries);
 const selectedTag = ref<Tag["tag"]>();
 
+// Watch for changes in entries and selected tag to update filtered entries
 watch(
   [() => props.flog.loadedEntries, selectedTag],
   () => {
@@ -263,6 +306,10 @@ watch(
   { immediate: true }
 );
 
+/**
+ * Handles tag selection and filters entries accordingly
+ * @param tag - The selected tag
+ */
 const handleTagSelect = (tag: Tag["tag"]) => {
   selectedTag.value = tag;
   if (!tag) {
@@ -274,12 +321,17 @@ const handleTagSelect = (tag: Tag["tag"]) => {
   }
 };
 
+/**
+ * Handles opening a different flog and closing the current one
+ * @param flog - The flog to open
+ */
 const handleOpenFlog = (flog: IFlog) => {
   loadFlogEntriesFromSource(flog);
   openFlog(flog);
   closeFlog(props.flog);
 };
 
+// Tag management state
 const tags = ref<string[]>([]);
 watch(
   () => flogTagMap,
@@ -289,6 +341,7 @@ watch(
   { immediate: true, deep: true }
 );
 
+// External flog tag mapping for cross-flog tag navigation
 const externalFlogTagMap = ref<Tag["flogs"] | undefined>();
 watch(
   selectedTag,
@@ -308,12 +361,18 @@ watch(
   { immediate: true, deep: true }
 );
 
+// Table of Contents (TOC) management
 type EntryHeading = {
   heading: string;
   id: string;
 };
 const entryHeadings = ref<EntryHeading[]>([]);
 
+/**
+ * Extracts heading information from flog entries for TOC generation
+ * @param entries - Array of flog entries
+ * @returns Array of heading objects with text and IDs
+ */
 const getFlogEntryHeadingIds = (entries: IEntry[]): EntryHeading[] => {
   const headingIds: EntryHeading[] = [];
   entries.forEach((entry) => {
@@ -328,6 +387,7 @@ const getFlogEntryHeadingIds = (entries: IEntry[]): EntryHeading[] => {
   return headingIds;
 };
 
+// Watch for changes in flog entries to update TOC
 watch(
   () => props.flog.loadedEntries,
   () => {

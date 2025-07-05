@@ -37,6 +37,7 @@
 </template>
 
 <script setup lang="ts">
+// Vue 3 Composition API imports
 import {
   ref,
   computed,
@@ -44,6 +45,7 @@ import {
   watch,
   type ComponentPublicInstance,
 } from "vue";
+// Custom composables and types for flog functionality
 import {
   useKeyDownHandler,
   useFlog,
@@ -52,9 +54,12 @@ import {
   type IEntry,
   type Tag,
 } from "@/composables/useFlog.ts";
+// Utility function for cursor positioning
 import { placeCursorAtEnd } from "@/modules/utilities";
+// Component for rendering marked text with tags
 import MarkedText from "@/components/MarkedText.vue";
 
+// Default flog object used as fallback when no flog is provided
 const defaultPlaceholderFlog: IFlog = {
   sourceType: IFlogSourceType.localFile,
   url: "unknown",
@@ -62,30 +67,37 @@ const defaultPlaceholderFlog: IFlog = {
   readOnly: true,
 };
 
+// Component props definition
 const props = defineProps<{
-  flog: IFlog;
-  entry: IEntry;
-  isEditing?: boolean;
-  readOnly?: boolean;
+  flog: IFlog;           // The flog containing this entry
+  entry: IEntry;         // The entry data to display/edit
+  isEditing?: boolean;   // Whether the entry is currently being edited
+  readOnly?: boolean;    // Whether the entry is read-only
 }>();
 
-// Emits an event to the parent
+// Event emitters for parent component communication
 const emit = defineEmits([
-  "update-entry",
-  "start-editing",
-  "stop-editing",
-  "tag-selected",
+  "update-entry",    // Emitted when entry text is updated
+  "start-editing",   // Emitted when editing begins
+  "stop-editing",    // Emitted when editing ends
+  "tag-selected",    // Emitted when a tag is clicked
 ]);
 
+// Reactive reference to the flog, with fallback to default
 const flogRef = ref<IFlog>(props.flog || defaultPlaceholderFlog);
 
+// Keyboard handler for Shift+Enter to save and blur
 const { handleKeyDown } = useKeyDownHandler(handleBlur);
 
+// Flog composable providing tag functionality
 const { getTagsForEntryDate, flogTagMap } = useFlog(flogRef);
 
+// Reactive array of tags for this entry's date
 const entryTags = ref<Tag["tag"][]>(
   (props.flog && getTagsForEntryDate(props.entry.date)) || []
 );
+
+// Watch for changes in the flog's tag map and update entry tags accordingly
 watch(
   () => flogTagMap,
   () => {
@@ -94,7 +106,11 @@ watch(
   }
 );
 
-// Utility function to format timestamp to MM/DD/YYYY
+/**
+ * Formats a timestamp to MM/DD/YYYY HH:MM:SS format
+ * @param timestamp - The timestamp to format (string, number, or Date)
+ * @returns Formatted date string
+ */
 function formatDate(timestamp: string | number | Date): string {
   const date = new Date(timestamp);
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -104,15 +120,18 @@ function formatDate(timestamp: string | number | Date): string {
   return `${month}/${day}/${year} ${time}`;
 }
 
-// Computed property to format the entry date
+// Computed property that formats the entry's date for display
 const formattedDate = computed(() => formatDate(props.entry.date));
 
-// In order to react to props that update after initial component load,
-// we need to make local reactive refs and watch the props
-const entryText = ref<string>(props.entry.entry);
-const isReadOnly = ref<boolean | null>(props.readOnly);
-const entryEl = ref<HTMLElement | null>(null);
+// Local reactive refs to handle prop updates after initial component load
+const entryText = ref<string>(props.entry.entry);        // Current entry text content
+const isReadOnly = ref<boolean | null>(props.readOnly);  // Read-only state
+const entryEl = ref<HTMLElement | null>(null);           // Reference to the editable element
 
+/**
+ * Binds the contenteditable element reference
+ * @param el - The element to bind (can be HTMLElement or Vue component instance)
+ */
 const bindEntryEl = (el: Element | ComponentPublicInstance | null) => {
   if (el instanceof HTMLElement) {
     console.log(`bindEntryEl el`, el);
@@ -121,10 +140,18 @@ const bindEntryEl = (el: Element | ComponentPublicInstance | null) => {
   }
 };
 
+/**
+ * Handles the start of editing mode
+ * Emits start-editing event with the current entry
+ */
 const handleStartEditing = () => {
   emit("start-editing", props.entry); // Or { ...props.entry, entry: entryText.value } ??
 };
 
+/**
+ * Sets up the editing environment when entering edit mode
+ * Positions cursor at end, scrolls into view, and focuses the element
+ */
 function setupEditing() {
   nextTick(() => {
     if (entryEl.value && entryEl.value != null) {
@@ -137,7 +164,10 @@ function setupEditing() {
   });
 }
 
-// Function to emit the update when blur occurs
+/**
+ * Handles the blur event when editing ends
+ * Extracts text from contenteditable element and emits update events
+ */
 function handleBlur() {
   // Could use either of these:
   // entryText.value = event.target.innerText;
@@ -156,12 +186,17 @@ function handleBlur() {
   // // This is not necessary and triggers a re-render on focus
 }
 
+/**
+ * Handles tag selection events from the MarkedText component
+ * @param tag - The selected tag
+ */
 const handleTagSelect = (tag: Tag["tag"]) => {
   emit("tag-selected", tag);
 };
 
-// what do these watches do?
+// Watchers for reactive prop updates
 
+// Watch for changes to the entry prop and update local entryText
 watch(
   () => props.entry,
   (newValue) => {
@@ -169,6 +204,7 @@ watch(
   }
 );
 
+// Watch for changes to isEditing prop and setup editing when true
 watch(
   () => props.isEditing,
   (newValue) => {
@@ -177,6 +213,7 @@ watch(
   { immediate: true }
 );
 
+// Watch for changes to readOnly prop and update local isReadOnly state
 watch(
   () => props.readOnly,
   (newValue) => {

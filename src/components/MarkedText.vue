@@ -11,14 +11,18 @@
 </template>
 
 <script setup>
+// Vue 3 Composition API imports
 import { ref, defineExpose, watch, onMounted, onUnmounted } from "vue";
+// Markdown parsing library
 import { marked } from "marked";
+// Utility functions for text processing and DOM manipulation
 import {
   getIdString,
-  buildRegexFromArray,
+  buildRegexFromArray, // TODO: Remove unused import
   renderTextWithTagsMarkedup,
 } from "@/modules/utilities";
 
+// Component props definition with TypeScript-style validation
 const { rawText, tags, editable, idSuffix } = defineProps({
   rawText: {
     type: String,
@@ -41,19 +45,29 @@ const { rawText, tags, editable, idSuffix } = defineProps({
   },
 });
 
-// Emits an event to the parent
+// Event emitter for tag selection
 const emit = defineEmits(["tag-selected"]);
 
+/**
+ * Handles tag selection events and emits them to parent component
+ * @param {string} tag - The selected tag text
+ */
 const handleTagSelect = (tag) => {
   emit("tag-selected", tag);
 };
 
+// Custom markdown renderer configuration
 // Followed approach shown here: https://dev.to/pyrsmk/how-to-use-the-contenteditable-attribute-in-vue-3-a89
-
 const renderer = {
+  /**
+   * Custom heading renderer that adds clickable tags and anchor links
+   * @param {Object} params - Object containing tokens and depth
+   * @returns {string} HTML string for the heading
+   */
   heading({ tokens, depth }) {
     const text = this.parser.parseInline(tokens);
     const headingId = getIdString(`${text} ${idSuffix}`);
+    // Only apply tag markup for h1 elements when tags are available
     const taggedText =
       depth > 1 || tags.length == 0
         ? text
@@ -67,6 +81,11 @@ const renderer = {
         ${taggedText}
       </h${depth}>`;
   },
+  /**
+   * Custom strong/bold text renderer
+   * @param {Object} params - Object containing tokens
+   * @returns {string} HTML string for strong text
+   */
   strong({ tokens }) {
     const text = this.parser.parseInline(tokens);
     return `
@@ -76,18 +95,22 @@ const renderer = {
   },
 };
 
+/**
+ * Binds click event listeners to tag elements for interactive tag selection
+ * @param {HTMLElement} el - The container element
+ */
 const bindLiveMdEl = (el) => {
-  const tagEls = el?.getElementsByClassName("md-tag"); //.getElementsByTagName("h1")
+  const tagEls = el?.getElementsByClassName("md-tag");
   if (tagEls)
     Array.from(tagEls).forEach((el) => {
       el.addEventListener("click", (event) => {
-        // event.preventDefault();
         event.stopPropagation();
         handleTagSelect(el.textContent);
       });
     });
 };
 
+// Configure marked.js with custom renderers
 marked.use({
   extensions: [
     {
@@ -96,31 +119,28 @@ marked.use({
     },
   ],
 });
-// marked.use({ renderer });
+
 marked.use({
   extensions: [
     {
       name: "strong",
       renderer: renderer.strong,
     },
-    // {
-    //   name: "heading",
-    //   renderer: renderer.heading,
-    // },
   ],
 });
 
+// Reactive references for markdown content and DOM element
 const markdownHtml = ref(rawText || "");
-// markdownHtml.value = marked.parse(
-//   "# Marked in the browser\n\nRendered by **marked**."
-// );
 const liveMdEl = ref();
-// This exposes access to the elements innerText properties
-// so we can put a string from marked.parse into the dom using v-html.
-// Could look for an existing utility to convert the string into elements.
+
+// Expose the live markdown element for external access
+// This allows parent components to access the element's innerText properties
 defineExpose({ liveMdEl });
 
+// Reactive reference for the rendered HTML string
 const liveMarkedHtmlString = ref(rawText);
+
+// Watch for changes in markdown content and re-render HTML
 watch(
   markdownHtml,
   async () => {
@@ -128,46 +148,60 @@ watch(
   },
   { immediate: true }
 );
-// const liveMarkedHtmlString = computed(() => {
-//   const mdhtml = marked.parse(markdownHtml.value);
-//   return mdhtml;
-// });
+
+/**
+ * Handles changes to the live markdown content
+ * Note: This function appears to have a bug - should use innerHTML instead of innerHtml
+ */
 const changeLiveMd = () => {
-  // markdownHtml.value += ".";
   liveMarkedHtmlString.value.innerHtml = marked.parse(markdownHtml.value);
 };
 
+// Reference to track the currently active element
 const currentEl = ref();
 
+/**
+ * Handles selection change events to show markdown syntax hints
+ * @param {Event} event - The selection change event
+ */
 const selectionchange = (event) => {
+  // Ignore composition events (IME input)
   if (event.isComposing || event.keyCode === 229) {
     return;
   }
-  // get the user selection informations
+  
+  // Get the current selection information
   let grab = document.getSelection(),
-    text = grab.baseNode || 0, //  <-- clicked here
-    node = text.parentNode; // <-- container
+    text = grab.baseNode || 0,
+    node = text.parentNode;
 
+  // Only process if we have a new node and it's different from current
   if (node && node !== currentEl.value) {
+    // Clean up previous element's markdown hints
     if (currentEl.value) {
       Array.from(currentEl.value.getElementsByClassName("md-explicit")).forEach(
         (el) => el.remove()
       );
       currentEl.value.className = currentEl.value.className.replace(
-        // / ?md-active/,
         " md-active",
         ""
       );
       currentEl.value = undefined;
     }
+    
+    // Add markdown hints to new element if it's within our container
     if (liveMdEl.value.contains(node)) {
-      // currentEl.value.className = currentEl.value.className.replace(" md-active", "");
       currentEl.value = toMarkedUXHtmlString(node);
       currentEl.value.className += " md-active";
     }
   }
 };
 
+/**
+ * Adds visual markdown syntax hints to different HTML elements
+ * @param {HTMLElement} node - The DOM element to add hints to
+ * @returns {HTMLElement} The modified element
+ */
 const toMarkedUXHtmlString = (node) => {
   switch (node.tagName) {
     case "H1":
@@ -233,13 +267,14 @@ const toMarkedUXHtmlString = (node) => {
   }
 };
 
+// Lifecycle hooks for event listener management
 onMounted(() => {
+  // Only add selection change listener if component is editable
   if (editable) document.addEventListener("selectionchange", selectionchange);
-  // nextTick(() => {
-  //   if (editable) document.addEventListener("selectionchange", selectionchange);
-  // });
 });
+
 onUnmounted(() => {
+  // Clean up event listener when component is destroyed
   if (editable)
     document.removeEventListener("selectionchange", selectionchange);
 });
