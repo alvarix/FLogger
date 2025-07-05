@@ -3,6 +3,9 @@
     <aside class="vue-file">App.vue</aside>
     <FloggerHead />
 
+    <!-- Offline Status Component -->
+    <OfflineStatus />
+
     <Suspense>
       <DropboxLogin />
     </Suspense>
@@ -26,6 +29,7 @@
 import DropboxLogin from "@components/DropboxLogin.vue";
 import FlogList from "@components/FlogList.vue";
 import EditFlog from "@components/EditFlog.vue";
+import OfflineStatus from "@components/OfflineStatus.vue";
 import { useOpenFlogs } from "@/composables/useOpenFlogs.ts";
 import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource.ts";
 import FloggerHead from "@components/FloggerHead.vue";
