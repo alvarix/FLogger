@@ -8,6 +8,21 @@
         <h4 class="flog-title">
     {{ flog.url }}
     
+    <!-- Offline Status Indicator -->
+    <div class="offline-indicator" v-if="isOffline || hasUnsavedChanges">
+      <span class="offline-dot" :class="{ 'dirty': hasUnsavedChanges }"></span>
+      <span class="offline-text">
+        {{ isOffline ? 'Offline' : 'Unsaved changes' }}
+      </span>
+      <button 
+        v-if="hasUnsavedChanges && !isOffline" 
+        @click="syncOfflineChanges" 
+        class="sync-btn"
+      >
+        Sync
+      </button>
+    </div>
+    
     <FlogPretext
     :pretext="flog.pretext"
     :read-only="flog.readOnly"
@@ -65,8 +80,8 @@
 <script setup lang="ts">
 import { ref, unref, watch } from "vue";
 import { useOpenFlogs } from "@/composables/useOpenFlogs";
-import { useFlogSource, IFlogSourceType } from "@/composables/useFlogSource";
-import { useFlog, IFlogStatus } from "@/composables/useFlog";
+import { useFlogSource, IFlogSourceType, IFlogStatus } from "@/composables/useFlogSource";
+import { useFlogWithOffline } from "@/composables/useFlogWithOffline";
 import type { IFlog } from "@/composables/useFlog";
 import EntryData from "@/modules/EntryData";
 import type { IEntry } from "@/modules/EntryData";
@@ -84,7 +99,15 @@ const { closeFlog } = useOpenFlogs();
 
 const { saveFlogToSource } = useFlogSource(IFlogSourceType.dropbox);
 
-const { addEntry, updatePretext, deleteEntry, editEntry } = useFlog(props.flog);
+const { 
+  addEntry, 
+  updatePretext, 
+  deleteEntry, 
+  editEntry, 
+  isOffline, 
+  hasUnsavedChanges,
+  syncOfflineChanges 
+} = useFlogWithOffline(props.flog);
 
 const addEntryValue = ref<IEntry | undefined>(); // Initialize reactive addEntryValue
 const isEditingFlogEntries = ref(new Map<IFlog, IEntry>()); // Keep a map of [flog, index] pairs to look up index of entry being edit PER flog
@@ -165,7 +188,72 @@ function handleUpdatePretext(flog: IFlog, updatedPretext: string) {
 const mounted = ref(false);       
 const mountedCheck = () => {
     mounted.value = true;
-};       
+};
+
+// Add styles for offline indicator
+const offlineIndicatorStyles = `
+.offline-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 1rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.offline-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ef4444;
+  animation: pulse 2s infinite;
+}
+
+.offline-dot.dirty {
+  background-color: #f59e0b;
+}
+
+.offline-text {
+  font-size: 0.875rem;
+  color: #ef4444;
+  font-weight: 500;
+}
+
+.offline-dot.dirty + .offline-text {
+  color: #f59e0b;
+}
+
+.sync-btn {
+  background: #059669;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.sync-btn:hover {
+  background: #047857;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+`;
+
+// Inject styles
+const style = document.createElement('style');
+style.textContent = offlineIndicatorStyles;
+document.head.appendChild(style);       
 
 watch(mounted, (newValue) => {
   if (newValue) {
